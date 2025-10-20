@@ -1,0 +1,56 @@
+$vl-font-location: "/assets/font/flanders/";
+$vl-icon-font-location: "/assets/font/iconfont/";
+
+@import '@govflanders/vl-ui-design-system-style/scss/core/_core.scss';
+@import '@govflanders/vl-ui-design-system-style/scss';
+
+.head {
+    border-bottom: 1px solid #cbd2da;
+}
+  
+.content {
+    margin-top: 2rem
+}
+  
+.title {
+    margin-bottom: 3rem;
+    text-transform: capitalize;
+    font-weight: 300;
+}
+
+.sticky {
+    position: sticky;
+    top: 1rem;
+
+    a{ 
+        margin: 0.3rem auto;
+    }
+}
+  
+.subtitle {
+    font-weight: 400;
+}
+  
+.numbered-list {
+    list-style-type: decimal;
+}
+  
+dt {
+    font-weight: bold;
+}
+  
+dt,
+dd {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+  
+.list__item {
+    margin-bottom: 2rem;
+    margin-left: 3rem;
+  
+    list-style: decimal;
+  
+    font-size: 3.2rem;
+    font-family: "Flanders Art Sans", sans-serif;
+}
