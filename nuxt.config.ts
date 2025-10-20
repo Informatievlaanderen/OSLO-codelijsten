@@ -12,8 +12,12 @@ export default defineNuxtConfig({
         lang: 'nl',
       },
       script: [
-        { src: 'https://prod.widgets.burgerprofiel.vlaanderen.be/api/v1/node_modules/@govflanders/vl-widget-polyfill/dist/index.js', },
-        { src: 'https://prod.widgets.burgerprofiel.vlaanderen.be/api/v1/node_modules/@govflanders/vl-widget-client/dist/index.js' },
+        {
+          src: 'https://prod.widgets.burgerprofiel.vlaanderen.be/api/v1/node_modules/@govflanders/vl-widget-polyfill/dist/index.js',
+        },
+        {
+          src: 'https://prod.widgets.burgerprofiel.vlaanderen.be/api/v1/node_modules/@govflanders/vl-widget-client/dist/index.js',
+        },
       ],
       meta: [
         { charset: 'utf-8' },
@@ -25,26 +29,11 @@ export default defineNuxtConfig({
         {
           rel: 'icon',
           sizes: '192x192',
-          href: 'https://dij151upo6vad.cloudfront.net/2.latest/icons/app-icon/icon-highres-precomposed.png',
+          href: 'https://data.vlaanderen.be/assets/favicon/icons/icon-highres-precomposed.png',
         },
         {
           rel: 'apple-touch-icon',
-          href: 'https://dij151upo6vad.cloudfront.net/2.latest/icons/app-icon/touch-icon-iphone-precomposed.png',
-        },
-        {
-          rel: 'apple-touch-icon',
-          sizes: '76x76',
-          href: 'https://dij151upo6vad.cloudfront.net/2.latest/icons/app-icon/touch-icon-ipad-precomposed.png',
-        },
-        {
-          rel: 'apple-touch-icon',
-          sizes: '120x120',
-          href: 'https://dij151upo6vad.cloudfront.net/2.latest/icons/app-icon/touch-icon-iphone-retina-precomposed.png',
-        },
-        {
-          rel: 'apple-touch-icon',
-          sizes: '152x152',
-          href: 'https://dij151upo6vad.cloudfront.net/2.latest/icons/app-icon/touch-icon-ipad-retina-precomposed.png',
+          href: 'https://data.vlaanderen.be/assets/favicon/icons/apple-touch-icon.png',
         },
       ],
     },
@@ -53,16 +42,15 @@ export default defineNuxtConfig({
   // needed for nuxt content assets that keeps hanging on build: https://github.com/davestewart/nuxt-content-assets/issues/49#issuecomment-1812810278
   hooks: {
     close: (nuxt) => {
-      if (!nuxt.options._prepare)
-        process.exit()
-    }
+      if (!nuxt.options._prepare) process.exit()
+    },
   },
 
   // Alias declaration for easier access to components directory
   alias: {
-    "@components": fileURLToPath(new URL('./components', import.meta.url)),
-    "@content": fileURLToPath(new URL('./content', import.meta.url)),
-    "@types": fileURLToPath(new URL('./types', import.meta.url)),
+    '@components': fileURLToPath(new URL('./components', import.meta.url)),
+    '@content': fileURLToPath(new URL('./content', import.meta.url)),
+    '@types': fileURLToPath(new URL('./types', import.meta.url)),
   },
 
   // Global CSS: https://nuxt.com/docs/api/configuration/nuxt-config#css
@@ -73,9 +61,7 @@ export default defineNuxtConfig({
   },
 
   // Plugins to run before rendering page: https://nuxt.com/docs/api/configuration/nuxt-config#plugins-1
-  plugins: [
-    { src: '~/plugins/webcomponents.js', mode: 'client' },
-  ],
+  plugins: [{ src: '~/plugins/webcomponents.js', mode: 'client' }],
 
   // Modules: https://nuxt.com/docs/api/configuration/nuxt-config#modules-1
   modules: [
