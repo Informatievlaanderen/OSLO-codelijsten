@@ -8,7 +8,7 @@
           mod-secondary
           mod-block
         >
-          <vl-icon icon="file" mod-before></vl-icon>
+          <vl-icon icon="file-download" mod-before></vl-icon>
           Download RDF
         </vl-link-button>
       </vl-column>
@@ -18,7 +18,7 @@
           mod-secondary
           mod-block
         >
-          <vl-icon icon="file" mod-before></vl-icon>
+          <vl-icon icon="file-download" mod-before></vl-icon>
           Download JSON-LD
         </vl-link-button>
       </vl-column>

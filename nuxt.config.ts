@@ -4,10 +4,9 @@ import { fileURLToPath } from 'url'
 export default defineNuxtConfig({
   // https://nuxt.com/docs/getting-started/deployment#static-hosting
   ssr: true,
-
   app: {
     head: {
-      title: 'OSLO-frontend-template',
+      title: 'oslo-codelijsten',
       htmlAttrs: {
         lang: 'nl',
       },

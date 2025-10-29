@@ -10,24 +10,27 @@
       </thead>
       <tbody>
         <tr>
-          <td><strong>Organisatie-identifier</strong></td>
+          <td><strong>Identificator</strong></td>
           <td>{{ organization?.id ?? fallbackId }}</td>
         </tr>
         <tr>
           <td><strong>Naam</strong></td>
           <td>{{ organization?.name ?? 'Niet beschikbaar' }}</td>
         </tr>
-        <tr>
+        <tr v-if="organization?.alternativeName">
           <td><strong>Alternatieve naam</strong></td>
-          <td>{{ organization?.alternativeName ?? 'Niet beschikbaar' }}</td>
+          <td>{{ organization.alternativeName }}</td>
         </tr>
-        <tr>
-          <td><strong>Type organisatie</strong></td>
+        <tr v-if="organization?.description">
+          <td><strong>Beschrijving</strong></td>
+          <td>{{ organization.description }}</td>
+        </tr>
+        <tr v-if="organization?.seeAlso?.length">
+          <td><strong>Zie ook</strong></td>
           <td>
-            <vl-pill v-if="organization?.type" type="neutral">
-              {{ organization.type }}
-            </vl-pill>
-            <span v-else>Niet beschikbaar</span>
+            <div v-for="link in organization.seeAlso" :key="link">
+              <vl-link :href="link" external>{{ link }}</vl-link>
+            </div>
           </td>
         </tr>
         <tr>
@@ -69,7 +72,8 @@
 </template>
 
 <script setup lang="ts" name="organizationBasicInfo">
-import type { OrganizationData } from '~/types/organisation'
+import type { OrganizationData } from '~/types/organization'
+import { formatDate } from '~/utils/utils'
 
 interface Props {
   organization?: OrganizationData
@@ -78,7 +82,6 @@ interface Props {
 
 defineProps<Props>()
 
-// Helper functions
 const getStatusPillType = (status: string | undefined) => {
   switch (status?.toLowerCase()) {
     case 'actief':
@@ -93,13 +96,5 @@ const getStatusPillType = (status: string | undefined) => {
     default:
       return 'neutral'
   }
-}
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('nl-BE', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
 }
 </script>

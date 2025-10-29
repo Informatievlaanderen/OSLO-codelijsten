@@ -11,8 +11,8 @@
     >
       <vl-info-tile>
         <vl-icon icon="database" slot="icon"></vl-icon>
-        <vl-title tag-name="h4" slot="title">{{ dataset.title }}</vl-title>
-        <vl-link :href="dataset.landingPage" slot="cta" external>
+        <vl-title tag-name="h4" slot="title">{{ dataset.name }}</vl-title>
+        <vl-link :href="dataset.uri" slot="cta" external>
           Bekijk dataset
         </vl-link>
       </vl-info-tile>
@@ -21,11 +21,7 @@
 </template>
 
 <script setup lang="ts" name="organizationDatasets">
-interface Dataset {
-  id: string
-  title: string
-  landingPage: string
-}
+import type { Dataset } from '~/types/organization'
 
 interface Props {
   datasets?: Dataset[]

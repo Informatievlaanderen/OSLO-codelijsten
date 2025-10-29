@@ -1,0 +1,74 @@
+@prefix skos:      <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://data.vlaanderen.be/id/conceptscheme/StandaardStatus>
+   a skos:ConceptScheme ;
+   dct:modified "2020-02-04" ;
+   skos:definition "Informatie over de status van het document"@nl ;
+   skos:prefLabel "StandaardStatus"@nl .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/WerkgroepCharter>
+   a skos:Concept ;
+   skos:prefLabel "Werkgroep Charter"@nl ;
+   skos:definition "Dit document werd door het stuurorgaan Vlaams Informatie- en ICT-beleid bestempeld als Werkgroep Charter. Dit is de beginselverklaring op basis waarvan de ontwikkeling van een standaard wordt gestart."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/OntwerpStandaard>
+   a skos:Concept ;
+   skos:prefLabel "Ontwerp Standaard"@nl ;
+   skos:definition "Dit document werd gepubliceerd door de werkgroep als Ontwerp Standaard. Dit impliceert dat de standaard die in dit document beschreven wordt in ontwikkeling is. Bijgevolg kan het document op elk moment aangepast, vervangen of ingetrokken worden."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/KandidaatStandaard>
+   a skos:Concept ;
+   skos:prefLabel "Kandidaat Standaard"@nl ;
+   skos:definition "Dit document werd gepubliceerd door de werkgroep als Kandidaat Standaard en voorgelegd aan het stuurorgaan Vlaams Informatie- en ICT-beleid. Een evaluatieperiode is bezig en feedback wordt verzameld."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/ErkendeStandaard>
+   a skos:Concept ;
+   skos:prefLabel "Erkende Standaard"@nl ;
+   skos:definition "Dit document werd bekrachtigd door het stuurorgaan Vlaams Informatie- en ICT-beleid als Erkende Standaard. Het 'statuut' van de standaard geeft aan of de toepassing vrijwillig, 'pas toe of leg uit' of verplicht is."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/VervangenStandaard>
+   a skos:Concept ;
+   skos:prefLabel "Vervangen Standaard"@nl ;
+   skos:definition "Dit document werd bestempeld door het stuurorgaan Vlaams Informatie- en ICT-beleid als Vervangen Standaard. Dit betekent dat de oorspronkelijke standaard intussen vervangen is door een andere. Bijgevolg heeft dit document niet langer een officieel statuut."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/VerouderdeStandaard>
+   a skos:Concept ;
+   skos:prefLabel "Verouderde Standaard"@nl ;
+   skos:definition "Dit document werd bestempeld door het stuurorgaan Vlaams Informatie- en ICT-beleid als Verouderde Standaard. Gebruik van de standaard voor nieuwe toepassingen wordt afgeraden."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/HerroepenStandaard>
+   a skos:Concept ;
+   skos:prefLabel "Herroepen Standaard"@nl ;
+   skos:definition "Dit document werd bestempeld door het stuurorgaan Vlaams Informatie- en ICT-beleid als Herroepen Standaard. Dit betekent dat de oorspronkelijke standaard niet langer door het stuurorgaan  wordt onderschreven. Bijgevolg heeft dit document niet langer een officieel statuut."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/NotaWerkgroep>
+   a skos:Concept ;
+   skos:prefLabel "Nota Werkgroep"@nl ;
+   skos:definition "Dit document werd door de werkgroep bestempeld als Nota Werkgroep. Het gaat over documenten die niet of niet meer bedoeld zijn om als standaard te worden erkend maar toch voldoende belang hebben om gepubliceerd te worden."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+<https://data.vlaanderen.be/id/concept/StandaardStatus/ZonderStatus>
+   a skos:Concept ;
+   skos:prefLabel "Zonder Status"@nl ;
+   skos:definition "Dit document heeft nog geen officiële status toegekend gekregen door het stuurorgaan Vlaams Informatie- en ICT-beleid of bevindt zich in een voorbereidende fase voordat een formele status wordt bepaald."@nl ;
+   skos:topConceptOf <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> ;
+   skos:inScheme <https://data.vlaanderen.be/id/conceptscheme/StandaardStatus> .
+
+

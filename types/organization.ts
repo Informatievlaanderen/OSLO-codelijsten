@@ -1,9 +1,10 @@
 export interface ContactPoint {
   id: string
-  type?: string
   name?: string
   email?: string
   telephone?: string
+  fax?: string
+  website?: string
   address?: {
     street: string
     number: string
@@ -12,20 +13,31 @@ export interface ContactPoint {
   }
 }
 
+export interface Capacity {
+  id: string
+  role: string
+  person: string
+  uri: string
+}
+
 export interface Dataset {
   id: string
-  title: string
-  landingPage: string
+  name: string
+  uri: string
 }
 
 export interface OrganizationData {
   id: string
   name: string
   alternativeName?: string
-  type?: string
+  description?: string
   status?: string
   foundingDate?: string
   website?: string
+  seeAlso?: string[]
+  classifications?: Dataset[]
+  capacities?: Capacity[]
   contactPoints?: ContactPoint[]
   datasets?: Dataset[]
+  changes?: Dataset[]
 }
