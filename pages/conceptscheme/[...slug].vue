@@ -17,6 +17,7 @@
 
         <concept-scheme-info v-if="data" :concept-scheme="data" />
         <concept-scheme-concepts :top-concepts="data?.topConcepts" />
+        <actions :downloads="data?.downloads ?? []" name="conceptschema" />
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -26,6 +27,7 @@
 
 <script setup lang="ts">
 import { useConceptSchemeService } from '~/services/comunica.service'
+import actions from '~/components/actions/actions.vue'
 import type { ConceptScheme } from '~/types/conceptScheme'
 
 const route = useRoute()

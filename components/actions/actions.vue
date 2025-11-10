@@ -1,35 +1,41 @@
 <template>
   <vl-column width="12">
-    <vl-title tag-name="h2" mod-h3>Acties</vl-title>
+    <vl-title tag-name="h2" mod-h3>Downloads</vl-title>
     <vl-grid mod-stacked>
-      <vl-column width="4" width-s="6" width-xs="12">
-        <vl-link-button
-          :href="`/organisatie/${organizationId}/rdf`"
-          mod-secondary
-          mod-block
-        >
-          <vl-icon icon="file-download" mod-before></vl-icon>
-          Download RDF
-        </vl-link-button>
-      </vl-column>
-      <vl-column width="4" width-s="6" width-xs="12">
-        <vl-link-button
-          :href="`/organisatie/${organizationId}/json`"
-          mod-secondary
-          mod-block
-        >
-          <vl-icon icon="file-download" mod-before></vl-icon>
-          Download JSON-LD
-        </vl-link-button>
+      <vl-column
+        v-for="(download, index) in downloads"
+        :key="index"
+        width="4"
+        width-m="6"
+        width-s="12"
+      >
+        <vl-info-tile>
+          <vl-title tag-name="h4" slot="title">
+            <vl-icon slot="icon" icon="document-small" mod-light></vl-icon>
+
+            {{ getFormatLabel(download) }}</vl-title
+          >
+          <div slot="content">
+            <p>
+              Bekijk {{ name ?? 'het conceptschema' }} als
+              {{ getFormatLabel(download) }}.
+            </p>
+            <vl-link :href="download" external download>
+              Bekijk {{ getFormatExtension(download).toUpperCase() }}
+            </vl-link>
+          </div>
+        </vl-info-tile>
       </vl-column>
     </vl-grid>
   </vl-column>
 </template>
 
-<script setup lang="ts" name="actions">
+<script setup lang="ts" name="conceptSchemeDownloads">
+import { getFormatLabel, getFormatExtension } from '~/utils/format.utils'
+
 interface Props {
-  organizationId: string
-  organizationName?: string
+  downloads: string[]
+  name?: string
 }
 
 const props = defineProps<Props>()

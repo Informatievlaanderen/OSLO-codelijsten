@@ -72,10 +72,10 @@ export class ConceptSchemeService {
         status: binding.get('status')?.value ?? '',
         dataset:
           binding.get('dataset')?.value ??
-          datasetEntry?.graphname ??
           'https://data.vlaanderen.be/id/dataset/codelist',
         topConcepts,
         concepts: topConcepts,
+        downloads: datasetEntry?.downloads ?? [],
       }
     } catch (error) {
       console.error('Error fetching concept scheme:', error)

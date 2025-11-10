@@ -8,77 +8,94 @@
       <vl-grid mod-v-center mod-center mod-stacked>
         <vl-column width="12">
           <vl-title mod-no-space-bottom tag-name="h1">
-            Concept schema's
+            Conceptschema's
           </vl-title>
         </vl-column>
-        <vl-column v-if="!paginatedSchemes.length" width="12">
-          <vl-alert type="info"> Geen concept schema's gevonden. </vl-alert>
+
+        <!-- Search Bar -->
+        <vl-column width="12">
+          <vl-form-group>
+            <vl-input-field
+              v-model="searchQuery"
+              placeholder="Zoek op label of URI..."
+              mod-block
+            >
+              <vl-icon slot="before" icon="search"></vl-icon>
+            </vl-input-field>
+          </vl-form-group>
         </vl-column>
 
-        <template v-else>
-          <vl-column class="vl-u-table-overflow">
-            <vl-data-table mod-zebra>
-              <thead>
-                <tr>
-                  <th>URI</th>
-                  <th>Label</th>
-                  <th>Definitie</th>
-                  <th>Status</th>
-                  <th>Concepten</th>
-                  <th>Acties</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="scheme in paginatedSchemes" :key="scheme.id">
-                  <td>
-                    <vl-link :href="scheme.uri" external>
-                      {{ scheme.uri }}
-                    </vl-link>
-                  </td>
-                  <td>{{ scheme.label ?? scheme.id }}</td>
-                  <td>
-                    {{ scheme.definition ?? 'Geen definitie beschikbaar' }}
-                  </td>
-                  <td>
-                    <vl-link v-if="scheme.status">
-                      {{ scheme.status }}
-                    </vl-link>
-                    <span v-else>-</span>
-                  </td>
-                  <td>{{ scheme.topConcepts?.length ?? 0 }}</td>
-                  <td>
-                    <vl-link :href="`/conceptscheme/${scheme?.id}`">
-                      Details
-                    </vl-link>
-                  </td>
-                </tr>
-              </tbody>
-            </vl-data-table>
+        <vl-column class="vl-u-table-overflow">
+          <vl-data-table>
+            <thead>
+              <tr>
+                <th>URI</th>
+                <th>Label</th>
+                <th>Definitie</th>
+                <th>Status</th>
+                <th>Concepten</th>
+                <th>Acties</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-if="pagedDatasets().length"
+                v-for="scheme in pagedDatasets()"
+                :key="scheme.id"
+              >
+                <td>
+                  <vl-link :href="scheme.uri" external>
+                    {{ scheme.uri }}
+                  </vl-link>
+                </td>
+                <td>{{ scheme.label ?? scheme.id }}</td>
+                <td>
+                  {{ scheme.definition ?? 'Geen definitie beschikbaar' }}
+                </td>
+                <td>
+                  <vl-pill v-if="scheme.status" mod-success>
+                    {{ scheme.status }}
+                  </vl-pill>
+                  <span v-else>-</span>
+                </td>
+                <td>{{ scheme.topConcepts?.length ?? 0 }}</td>
+                <td>
+                  <vl-link :href="`/conceptscheme/${scheme.id}`">
+                    Bekijk details
+                  </vl-link>
+                </td>
+              </tr>
+              <tr v-else>
+                <td colspan="7" class="vl-u-align-center">
+                  Geen concepten gevonden
+                </td>
+              </tr>
+            </tbody>
+          </vl-data-table>
 
-            <vl-pager mod-align="center">
-              <vl-pager-bounds
-                :from="paginationFrom.toString()"
-                :to="paginationTo.toString()"
-                :total="totalSchemes.toString()"
-                prefix="van"
-              />
-              <vl-pager-item
-                v-if="currentPage > 1"
-                a11yLabel="previous"
-                label="vorige"
-                type="previous"
-                @click="setPreviousPage"
-              />
-              <vl-pager-item
-                v-if="hasNextPage"
-                a11yLabel="next"
-                type="next"
-                label="volgende"
-                @click="setNextPage"
-              />
-            </vl-pager>
-          </vl-column>
-        </template>
+          <vl-pager mod-align="center">
+            <vl-pager-bounds
+              :from="paginationFrom.toString()"
+              :to="paginationTo.toString()"
+              :total="filteredSchemes?.length.toString()"
+              prefix="van"
+            />
+            <vl-pager-item
+              v-if="paginationIndex > 1"
+              a11yLabel="previous"
+              label="vorige"
+              type="previous"
+              @click="setPreviousPage"
+            />
+            <vl-pager-item
+              v-if="hasNextPage"
+              a11yLabel="next"
+              type="next"
+              label="volgende"
+              @click="setNextPage"
+            />
+          </vl-pager>
+        </vl-column>
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -94,8 +111,9 @@ import { ITEMS_PER_PAGE } from '~/constants/constants'
 const conceptSchemeService = useConceptSchemeService()
 const datasetConfig = useDatasetConfig()
 
-const currentPage = ref(1)
+const paginationIndex = ref(1)
 const schemes = ref<ConceptScheme[]>([])
+const searchQuery = ref('')
 
 // Fetch all concept schemes
 const { data: conceptSchemes } = await useAsyncData<ConceptScheme[]>(
@@ -125,12 +143,10 @@ const { data: conceptSchemes } = await useAsyncData<ConceptScheme[]>(
     } catch (err) {
       console.error('Error loading concept schemes:', err)
       return []
-    } finally {
     }
   },
 )
 
-// Update schemes ref when data is loaded
 watch(
   () => conceptSchemes.value,
   (newSchemes) => {
@@ -141,38 +157,62 @@ watch(
   { immediate: true },
 )
 
-const totalSchemes = computed(() => schemes.value.length)
+// Filter schemes based on search query
+const filteredSchemes = computed(() => {
+  if (!searchQuery.value.trim()) {
+    return schemes.value
+  }
 
-const paginatedSchemes = computed(() => {
-  const start = (currentPage.value - 1) * ITEMS_PER_PAGE
-  const end = start + ITEMS_PER_PAGE
-  return schemes.value.slice(start, end)
+  const query = searchQuery.value.toLowerCase().trim()
+
+  return schemes.value.filter((scheme) => {
+    const labelMatch = scheme.label?.toLowerCase().includes(query)
+    const uriMatch = scheme.uri?.toLowerCase().includes(query)
+    const idMatch = scheme.id?.toLowerCase().includes(query)
+    const definitionMatch = scheme.definition?.toLowerCase().includes(query)
+
+    return labelMatch ?? uriMatch ?? idMatch ?? definitionMatch
+  })
 })
 
+// Reset to first page when search query changes
+watch(searchQuery, () => {
+  paginationIndex.value = 1
+})
+
+const pagedDatasets = (): ConceptScheme[] => {
+  return (
+    filteredSchemes.value?.slice(
+      paginationIndex.value - 1,
+      paginationIndex.value + ITEMS_PER_PAGE - 1,
+    ) ?? []
+  )
+}
+
 const paginationFrom = computed(() => {
-  if (totalSchemes.value === 0) return 0
-  return (currentPage.value - 1) * ITEMS_PER_PAGE + 1
+  if (filteredSchemes.value.length === 0) return 0
+  return (paginationIndex.value - 1) * ITEMS_PER_PAGE + 1
 })
 
 const paginationTo = computed(() => {
-  const to = currentPage.value * ITEMS_PER_PAGE
-  return Math.min(to, totalSchemes.value)
+  const to = paginationIndex.value * ITEMS_PER_PAGE
+  return Math.min(to, filteredSchemes.value.length)
 })
 
 const hasNextPage = computed(() => {
-  return currentPage.value * ITEMS_PER_PAGE < totalSchemes.value
+  return paginationIndex.value * ITEMS_PER_PAGE < filteredSchemes.value.length
 })
 
 // Pagination methods
 const setPreviousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
+  if (paginationIndex.value > 1) {
+    paginationIndex.value--
   }
 }
 
 const setNextPage = () => {
   if (hasNextPage.value) {
-    currentPage.value++
+    paginationIndex.value++
   }
 }
 </script>
