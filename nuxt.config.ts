@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   // https://nuxt.com/docs/getting-started/deployment#static-hosting
   ssr: true,
   app: {
+    baseURL: '/doc',
     head: {
       title: 'oslo-codelijsten',
       htmlAttrs: {

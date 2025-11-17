@@ -1,0 +1,22 @@
+FROM node:24-alpine
+
+ADD . /app
+WORKDIR /app
+
+ARG NPM_TOKEN
+RUN echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > /app/.npmrc
+
+ARG DATASET_CONFIG_URL
+RUN echo "VITE_DATASET_CONFIG_URL=${DATASET_CONFIG_URL}" > /app/.env
+
+ARG ENVIRONMENT
+RUN echo "VITE_ENVIRONMENT=${ENVIRONMENT}}" > /app/.env
+
+RUN apk update
+RUN apk add python3 vim make gcc g++ curl
+
+# force a build
+RUN npm install --force
+
+
+

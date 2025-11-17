@@ -75,9 +75,9 @@
 
           <vl-pager mod-align="center">
             <vl-pager-bounds
-              :from="paginationFrom.toString()"
-              :to="paginationTo.toString()"
-              :total="filteredSchemes?.length.toString()"
+              :from="paginationFrom?.toString()"
+              :to="paginationTo?.toString()"
+              :total="filteredSchemes?.length?.toString()"
               prefix="van"
             />
             <vl-pager-item

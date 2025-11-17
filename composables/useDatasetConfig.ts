@@ -10,7 +10,7 @@ export const useDatasetConfig = () => {
 
     try {
       const response = await $fetch<DatasetConfig>(
-        process.env.VITE_DATASET_CONFIG_URL!,
+        import.meta.env.VITE_DATASET_CONFIG_URL!,
       )
 
       // Parse the response if it's a string since Github raw URLs return strings
@@ -29,7 +29,9 @@ export const useDatasetConfig = () => {
     key: string,
   ): Promise<ConceptSchemeConfig | undefined> => {
     const data = await fetchConfig()
-    return data?.conceptSchemes.find((scheme) => scheme.key === key)
+    return data?.conceptSchemes.find(
+      (scheme: ConceptSchemeConfig) => scheme.key === key,
+    )
   }
 
   const getAllConceptSchemes = async (): Promise<ConceptSchemeConfig[]> => {

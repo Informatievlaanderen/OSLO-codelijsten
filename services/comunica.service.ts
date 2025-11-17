@@ -10,11 +10,8 @@ export class ConceptSchemeService {
     slug: string,
     sourceUrl?: string,
   ): Promise<ConceptScheme | null> {
-    console.log(this.datasetConfig, 'datasetConfig', slug)
     // Find the matching entry in dataset config by key
     const datasetEntry = await this.datasetConfig.getConceptSchemeByKey(slug)
-
-    console.log('Dataset entry for slug', slug, datasetEntry)
 
     if (!datasetEntry && !sourceUrl) {
       console.error(`No dataset configuration found for slug: ${slug}`)
@@ -104,7 +101,6 @@ export class ConceptSchemeService {
         await this.datasetConfig.getConceptSchemeByKey(conceptSchemeSlug)
       if (scheme?.url) {
         sources = [scheme.url]
-        console.log('Using specific concept scheme source:', scheme.url)
       } else {
         console.warn(`No concept scheme found for: ${conceptSchemeSlug}`)
         // Fallback to searching all schemes
