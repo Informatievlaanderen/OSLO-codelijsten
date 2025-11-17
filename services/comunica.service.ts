@@ -75,7 +75,7 @@ export class ConceptSchemeService {
           'https://data.vlaanderen.be/id/dataset/codelist',
         topConcepts,
         concepts: topConcepts,
-        downloads: datasetEntry?.downloads ?? [],
+        source: datasetEntry?.url ?? '',
       }
     } catch (error) {
       console.error('Error fetching concept scheme:', error)
@@ -212,6 +212,7 @@ export class ConceptSchemeService {
           ) as ConceptScheme[],
           broader: broaderConcepts,
           narrower: narrowerConcepts,
+          source: source,
         }
       }
 
@@ -250,6 +251,7 @@ export class ConceptSchemeService {
         label: binding.get('label')?.value,
         definition: binding.get('definition')?.value,
         notation: binding.get('notation')?.value,
+        source: sourceUrl,
       }))
     } catch (error) {
       console.error(`Error fetching ${relation} concepts:`, error)
@@ -288,6 +290,7 @@ export class ConceptSchemeService {
         uri: schemeUri,
         label: binding.get('label')?.value ?? schemeId,
         definition: binding.get('definition')?.value,
+        source: sourceUrl,
       }
     } catch (error) {
       console.error('Error fetching scheme info:', error)
@@ -322,6 +325,7 @@ export class ConceptSchemeService {
         label: binding.get('label')?.value ?? '',
         definition: binding.get('definition')?.value ?? '',
         notation: binding.get('notation')?.value ?? '',
+        source: sourceUrl,
       }))
     } catch (error) {
       console.error('Error fetching top concepts:', error)

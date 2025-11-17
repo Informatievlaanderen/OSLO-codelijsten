@@ -34,7 +34,6 @@
 import { getFormatLabel, getFormatExtension } from '~/utils/format.utils'
 
 interface Props {
-  downloads: string[]
   name?: string
 }
 

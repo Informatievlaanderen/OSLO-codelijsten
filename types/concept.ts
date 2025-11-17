@@ -13,9 +13,10 @@ export interface Concept {
   topConceptOf?: ConceptScheme[]
   narrower?: Concept[]
   broader?: Concept[]
+  source: string
 }
 
 export type TopConcept = Pick<
   Concept,
-  'id' | 'uri' | 'label' | 'definition' | 'notation'
+  'id' | 'uri' | 'label' | 'definition' | 'notation' | 'source'
 >

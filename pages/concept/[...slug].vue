@@ -18,6 +18,18 @@
             </vl-link>
           </div>
         </vl-column>
+        <vl-column width="12">
+          <vl-button
+            @click="
+              () => openSource(data.source ?? 'https://data.vlaanderen.be')
+            "
+            mod-secondary
+            mod-small
+          >
+            <vl-icon icon="download-harddisk" mod-before></vl-icon>
+            Bekijk brondata
+          </vl-button>
+        </vl-column>
         <concept-info v-if="data" :concept="data" />
 
         <concept-relations
@@ -35,6 +47,7 @@
 <script setup lang="ts">
 import type { Concept } from '~/types/concept'
 import { useConceptSchemeService } from '~/services/comunica.service'
+import { openSource } from '~/utils/utils'
 
 const route = useRoute()
 const slug = computed(() => {

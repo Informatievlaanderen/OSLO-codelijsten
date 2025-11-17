@@ -9,14 +9,13 @@ export interface ConceptScheme {
   dataset?: string
   topConcepts?: TopConcept[]
   concepts?: Concept[]
-  downloads?: string[]
+  source: string
 }
 
 export interface ConceptSchemeConfig {
   key: string
   type: 'file-import' | 'organisation'
   url: string
-  downloads: string[]
 }
 
 export interface DatasetConfig {

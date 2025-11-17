@@ -5,3 +5,8 @@ export const formatDate = (dateString: string) => {
     day: 'numeric',
   })
 }
+
+export const openSource = (source: string) => {
+  if (!source) return
+  window.open(source, '_blank')
+}

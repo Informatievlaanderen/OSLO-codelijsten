@@ -14,10 +14,19 @@
             </vl-title>
           </div>
         </vl-column>
+        <vl-column width="12">
+          <vl-button
+            @click="() => openSource(data?.source ?? '')"
+            mod-secondary
+            mod-small
+          >
+            <vl-icon icon="download-harddisk" mod-before></vl-icon>
+            Bekijk brondata
+          </vl-button>
+        </vl-column>
 
         <concept-scheme-info v-if="data" :concept-scheme="data" />
         <concept-scheme-concepts :top-concepts="data?.topConcepts" />
-        <actions :downloads="data?.downloads ?? []" name="conceptschema" />
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -27,7 +36,8 @@
 
 <script setup lang="ts">
 import { useConceptSchemeService } from '~/services/comunica.service'
-import actions from '~/components/actions/actions.vue'
+import { openSource } from '~/utils/utils'
+
 import type { ConceptScheme } from '~/types/conceptScheme'
 
 const route = useRoute()

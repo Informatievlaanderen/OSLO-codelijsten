@@ -93,12 +93,7 @@
     {
       "key": "StandaardStatus",
       "type": "file-import",
-      "url": "https://github.com/Informatievlaanderen/codelijsten/raw/master/standaardstatus/standaardstatus.ttl",
-      "downloads": [
-        "https://github.com/Informatievlaanderen/codelijsten/raw/master/standaardstatus/standaardstatus.ttl",
-        "https://github.com/Informatievlaanderen/codelijsten/raw/master/standaardstatus/standaardstatus.jsonld",
-        "https://github.com/Informatievlaanderen/codelijsten/raw/master/standaardstatus/standaardstatus.rdf"
-      ]
+      "url": "https://github.com/Informatievlaanderen/codelijsten/raw/master/standaardstatus/standaardstatus.ttl"
     },
     {
       "key": "adresstatus",
