@@ -105,64 +105,33 @@
 
 <script setup lang="ts">
 import type { ConceptScheme } from '~/types/conceptScheme'
-import { useConceptSchemeService } from '~/services/comunica.service'
 import { ITEMS_PER_PAGE } from '~/constants/constants'
 
-const conceptSchemeService = useConceptSchemeService()
-const datasetConfig = useDatasetConfig()
-
 const paginationIndex = ref(1)
-const schemes = ref<ConceptScheme[]>([])
 const searchQuery = ref('')
 
-// Fetch only config immediately
-const { data: allSchemeConfigs } = await useAsyncData(
-  'scheme-configs',
+// Fetch all schemes from the backend API (no CORS issues)
+const { data: schemes } = await useAsyncData<ConceptScheme[]>(
+  'concept-schemes',
   async () => {
     try {
-      return await datasetConfig.getAllConceptSchemes()
+      return await $fetch('/api/conceptschemes')
     } catch (err) {
-      console.error('Error loading scheme configs:', err)
+      console.error('Error loading concept schemes:', err)
       return []
     }
   },
 )
 
-const loadSchemeData = async (key: string, url: string) => {
-  try {
-    const scheme = await conceptSchemeService.getConceptScheme(key)
-    if (scheme) {
-      schemes.value.push(scheme)
-    }
-  } catch (err) {
-    console.error(`Error loading scheme ${key}:`, err)
-  }
-}
-
-// Some configs may fail due to CORS from raw github locally, but won't in production
-watch(
-  () => allSchemeConfigs.value,
-  (configs) => {
-    if (configs) {
-      Promise.all(
-        configs.map((config) => loadSchemeData(config.key, config.url)),
-      ).catch((err) => {
-        console.error('Error loading concept schemes in parallel:', err)
-      })
-    }
-  },
-  { immediate: true },
-)
-
 // Filter schemes based on search query
 const filteredSchemes = computed(() => {
   if (!searchQuery.value.trim()) {
-    return schemes.value
+    return schemes.value ?? []
   }
 
   const query = searchQuery.value.toLowerCase().trim()
 
-  return schemes.value.filter((scheme) => {
+  return (schemes.value ?? []).filter((scheme) => {
     const labelMatch = scheme.label?.toLowerCase().includes(query)
     const uriMatch = scheme.uri?.toLowerCase().includes(query)
     const idMatch = scheme.id?.toLowerCase().includes(query)

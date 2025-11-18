@@ -22,6 +22,11 @@ export const useSeoHead = (config: SeoConfig) => {
         property: 'og:type',
         content: type,
       },
+      {
+        property: 'og:image',
+        content:
+          'https://data.vlaanderen.be/assets/favicon/icons/apple-touch-icon.png',
+      },
     ],
   })
 }

@@ -1,5 +1,6 @@
 import { useRdfQuery } from '~/composables/useRdfQuery'
 import { useDatasetConfig } from '~/composables/useDatasetConfig'
+import { CONCEPT_SCHEME_QUERY } from '~/constants/constants'
 import type { ConceptScheme } from '~/types/conceptScheme'
 import type { TopConcept, Concept } from '~/types/concept'
 
@@ -27,24 +28,9 @@ export class ConceptSchemeService {
       return null
     }
 
-    const query = `
-      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-      PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-      PREFIX adms: <https://www.w3.org/ns/adms#>
-      PREFIX dct: <http://purl.org/dc/terms/>
-
-      SELECT ?scheme ?label ?definition ?status ?dataset WHERE {
-        ?scheme a skos:ConceptScheme .
-        OPTIONAL { ?scheme skos:prefLabel ?label . }
-        OPTIONAL { ?scheme skos:definition ?definition . }
-        OPTIONAL { ?scheme adms:status ?status . }
-        OPTIONAL { ?scheme dct:isPartOf ?dataset . }
-      }
-    `
-
     try {
       const result = await this.rdfQuery.executeQuery({
-        query,
+        query: CONCEPT_SCHEME_QUERY,
         sources: [source],
       })
 
