@@ -1,4 +1,5 @@
 import type { DatasetConfig, ConceptSchemeConfig } from '~/types/conceptScheme'
+import { useState } from '#app'
 
 export const useDatasetConfig = () => {
   const config = useState<DatasetConfig | null>('conceptschemes', () => null)

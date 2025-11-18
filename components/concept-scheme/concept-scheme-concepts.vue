@@ -10,6 +10,7 @@
             <th>URI</th>
             <th>Label</th>
             <th>Definitie</th>
+            <th>Acties</th>
           </tr>
         </thead>
         <tbody>
@@ -21,6 +22,11 @@
             </td>
             <td>{{ concept.label }}</td>
             <td>{{ concept.definition ?? 'Niet beschikbaar' }}</td>
+            <td v-if="conceptScheme">
+              <vl-link :href="`/doc/concept/${conceptScheme}/${concept.id}`">
+                Bekijk details
+              </vl-link>
+            </td>
           </tr>
         </tbody>
       </vl-data-table>
@@ -33,6 +39,7 @@ import type { TopConcept } from '~/types/concept'
 
 interface Props {
   topConcepts?: TopConcept[]
+  conceptScheme?: string
 }
 
 defineProps<Props>()

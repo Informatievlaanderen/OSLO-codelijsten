@@ -115,43 +115,40 @@ const paginationIndex = ref(1)
 const schemes = ref<ConceptScheme[]>([])
 const searchQuery = ref('')
 
-// Fetch all concept schemes
-const { data: conceptSchemes } = await useAsyncData<ConceptScheme[]>(
-  'all-concept-schemes',
+// Fetch only config immediately
+const { data: allSchemeConfigs } = await useAsyncData(
+  'scheme-configs',
   async () => {
     try {
-      // Get all concept scheme configurations
-      const allSchemeConfigs = await datasetConfig.getAllConceptSchemes()
-
-      // Fetch data for each concept scheme
-      const schemePromises = allSchemeConfigs.map(async (config) => {
-        try {
-          const scheme = await conceptSchemeService.getConceptScheme(config.key)
-          return scheme
-        } catch (err) {
-          console.error(`Error loading scheme ${config.key}:`, err)
-          return null
-        }
-      })
-
-      const results = await Promise.all(schemePromises)
-
-      // Filter out null results and return
-      return results.filter(
-        (scheme): scheme is ConceptScheme => scheme !== null,
-      )
+      return await datasetConfig.getAllConceptSchemes()
     } catch (err) {
-      console.error('Error loading concept schemes:', err)
+      console.error('Error loading scheme configs:', err)
       return []
     }
   },
 )
 
+const loadSchemeData = async (key: string, url: string) => {
+  try {
+    const scheme = await conceptSchemeService.getConceptScheme(key)
+    if (scheme) {
+      schemes.value.push(scheme)
+    }
+  } catch (err) {
+    console.error(`Error loading scheme ${key}:`, err)
+  }
+}
+
+// Some configs may fail due to CORS from raw github locally, but won't in production
 watch(
-  () => conceptSchemes.value,
-  (newSchemes) => {
-    if (newSchemes) {
-      schemes.value = newSchemes
+  () => allSchemeConfigs.value,
+  (configs) => {
+    if (configs) {
+      Promise.all(
+        configs.map((config) => loadSchemeData(config.key, config.url)),
+      ).catch((err) => {
+        console.error('Error loading concept schemes in parallel:', err)
+      })
     }
   },
   { immediate: true },

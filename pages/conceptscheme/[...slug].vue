@@ -26,7 +26,11 @@
         </vl-column>
 
         <concept-scheme-info v-if="data" :concept-scheme="data" />
-        <concept-scheme-concepts :top-concepts="data?.topConcepts" />
+        <concept-scheme-concepts
+          v-if="data"
+          :top-concepts="data?.topConcepts"
+          :conceptScheme="data.id"
+        />
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -39,6 +43,7 @@ import { useConceptSchemeService } from '~/services/comunica.service'
 import { openSource } from '~/utils/utils'
 
 import type { ConceptScheme } from '~/types/conceptScheme'
+import { useSeoHead } from '~/composables/useSEO'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
@@ -63,4 +68,8 @@ if (!data?.value?.label) {
     statusMessage: 'Page not found',
   })
 }
+
+useSeoHead({
+  title: data.value?.label ?? `Conceptschema: ${slug.value}`,
+})
 </script>

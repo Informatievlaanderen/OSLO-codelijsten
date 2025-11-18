@@ -9,7 +9,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#prefLabel"
               external
             >
-              label
+              Label
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -21,7 +21,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#definition"
               external
             >
-              definition
+              Definitie
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -33,7 +33,7 @@
         <vl-properties-list>
           <vl-properties-label>
             <vl-link href="https://www.w3.org/ns/adms#status" external>
-              status
+              Status
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -43,7 +43,7 @@
             <span v-else>Niet beschikbaar</span>
           </vl-properties-data>
 
-          <vl-properties-label>dataset</vl-properties-label>
+          <vl-properties-label>Dataset</vl-properties-label>
           <vl-properties-data>
             <vl-link
               v-if="conceptScheme?.dataset"

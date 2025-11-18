@@ -21,7 +21,7 @@
         <vl-column width="12">
           <vl-button
             @click="
-              () => openSource(data.source ?? 'https://data.vlaanderen.be')
+              () => openSource(data?.source ?? 'https://data.vlaanderen.be')
             "
             mod-secondary
             mod-small
@@ -48,6 +48,7 @@
 import type { Concept } from '~/types/concept'
 import { useConceptSchemeService } from '~/services/comunica.service'
 import { openSource } from '~/utils/utils'
+import { useSeoHead } from '~/composables/useSEO'
 
 const route = useRoute()
 const slug = computed(() => {
@@ -76,4 +77,8 @@ if (!data?.value) {
     statusMessage: 'Concept niet gevonden',
   })
 }
+
+useSeoHead({
+  title: data.value?.label ?? `Concept: ${slug.value}`,
+})
 </script>

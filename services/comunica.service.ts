@@ -1,4 +1,5 @@
 import { useRdfQuery } from '~/composables/useRdfQuery'
+import { useDatasetConfig } from '~/composables/useDatasetConfig'
 import type { ConceptScheme } from '~/types/conceptScheme'
 import type { TopConcept, Concept } from '~/types/concept'
 

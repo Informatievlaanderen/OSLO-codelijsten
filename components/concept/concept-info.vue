@@ -10,7 +10,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#prefLabel"
               external
             >
-              label
+              Label
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -22,7 +22,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#definition"
               external
             >
-              definition
+              Definitie
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -34,7 +34,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#note"
               external
             >
-              additional information
+              Aanvullende informatie
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -45,7 +45,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#topConceptOf"
               external
             >
-              is top concept in scheme
+              Concept in schema
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -65,7 +65,7 @@
 
           <vl-properties-label>
             <vl-link href="https://www.w3.org/ns/adms#status" external>
-              status
+              Status
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -83,7 +83,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#notation"
               external
             >
-              notation
+              Notatie
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -95,7 +95,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#narrower"
               external
             >
-              has narrower
+              Beperktere betekenis
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -118,7 +118,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#broader"
               external
             >
-              has broader
+              Bredere betekenis
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
@@ -140,7 +140,7 @@
               href="https://www.w3.org/2009/08/skos-reference/skos.html#inScheme"
               external
             >
-              is in Scheme
+              Onderdeel van schema
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>

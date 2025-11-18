@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts" name="conceptSchemeConcepts">
-import type { TopConcept } from '~/types/conceptScheme'
+import type { TopConcept } from '~/types/concept'
 
 interface Props {
   topConcepts?: TopConcept[]

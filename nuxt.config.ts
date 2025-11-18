@@ -3,11 +3,15 @@ import { fileURLToPath } from 'url'
 
 export default defineNuxtConfig({
   // https://nuxt.com/docs/getting-started/deployment#static-hosting
-  ssr: true,
+  routeRules: {
+    // serve root as ssr
+    '/': { ssr: true },
+  },
   app: {
     baseURL: '/doc',
+
     head: {
-      title: 'oslo-codelijsten',
+      title: 'Codelijsten',
       htmlAttrs: {
         lang: 'nl',
       },
