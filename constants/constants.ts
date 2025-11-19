@@ -70,3 +70,5 @@ export const schemeQuery = (schemeUri: string) => `
       OPTIONAL { <${schemeUri}> skos:definition ?definition . }
     }
   `
+
+  export const TEXT_TURTLE = 'text/turtle'

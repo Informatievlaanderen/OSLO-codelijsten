@@ -1,49 +1,88 @@
 import { getConcept } from '~/server/services/rdfquery.service'
+import { handleContentNegotiation } from '~/services/content-negotiation.service'
 import type { Concept } from '~/types/concept'
 
-export default defineEventHandler(async (event): Promise<Concept | null> => {
-  try {
-    // Env variable access during build time
-    const runtimeConfig = useRuntimeConfig()
-    const slug = getRouterParam(event, 'slug')
+export default defineEventHandler(
+  async (event): Promise<Concept | string | null> => {
+    try {
+      const slug = getRouterParam(event, 'slug')
 
-    if (!slug) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Slug parameter is required',
-      })
-    }
+      if (!slug) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Slug parameter is required',
+        })
+      }
 
-    const slugParts = (slug as string).split('/')
-    const conceptSchemeSlug = slugParts.length > 1 ? slugParts[0] : null
-    const conceptId = slugParts.length > 1 ? slugParts[1] : slugParts[0]
+      // See if a .ttl extension is present in the slug
+      const hasTtlExtension = slug.endsWith('.ttl')
+      const cleanSlug = hasTtlExtension ? slug.replace(/\.ttl$/, '') : slug
 
-    // Fetch dataset config to get source URL
-    const response = await $fetch<any>(runtimeConfig.DATASET_CONFIG_URL!)
-    const data = typeof response === 'string' ? JSON.parse(response) : response
+      const config = await getConceptConfig(cleanSlug)
 
-    let sourceUrl: string = ''
-
-    if (conceptSchemeSlug) {
-      const scheme = data.conceptSchemes.find(
-        (s: any) => s.key === conceptSchemeSlug,
+      // Handle content negotiation
+      const acceptHeader = getHeader(event, 'accept') ?? ''
+      const negotiatedContent = await handleContentNegotiation(
+        event,
+        acceptHeader,
+        config.sourceUrl,
       )
-      sourceUrl = scheme?.url
+      if (negotiatedContent) return negotiatedContent
+
+      // Return JSON response
+      return await buildConceptResponse(config.conceptId, config.sourceUrl)
+    } catch (error) {
+      console.error('Error fetching concept:', error)
+      throw error
     }
+  },
+)
 
-    // Call the server-side getConcept function with sourceUrl
-    const concept = await getConcept(conceptId, sourceUrl)
+interface ConceptConfig {
+  conceptId: string
+  sourceUrl: string
+}
 
-    if (!concept) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: `Concept not found: ${conceptId}`,
-      })
-    }
+const getConceptConfig = async (slug: string): Promise<ConceptConfig> => {
+  const runtimeConfig = useRuntimeConfig()
+  const slugParts = slug.split('/')
+  const conceptSchemeSlug = slugParts.length > 1 ? slugParts[0] : null
+  const conceptId = slugParts.length > 1 ? slugParts[1] : slugParts[0]
 
-    return concept
-  } catch (error) {
-    console.error('Error fetching concept:', error)
-    throw error
+  const response = await $fetch<any>(runtimeConfig.DATASET_CONFIG_URL!)
+  const data = typeof response === 'string' ? JSON.parse(response) : response
+
+  let sourceUrl: string = ''
+
+  if (conceptSchemeSlug) {
+    const scheme = data.conceptSchemes.find(
+      (s: any) => s.key === conceptSchemeSlug,
+    )
+    sourceUrl = scheme?.url
   }
-})
+
+  if (!sourceUrl) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: `Concept scheme not found: ${conceptSchemeSlug}`,
+    })
+  }
+
+  return { conceptId, sourceUrl }
+}
+
+const buildConceptResponse = async (
+  conceptId: string,
+  sourceUrl: string,
+): Promise<Concept> => {
+  const concept = await getConcept(conceptId, sourceUrl)
+
+  if (!concept) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: `Concept not found: ${conceptId}`,
+    })
+  }
+
+  return concept
+}

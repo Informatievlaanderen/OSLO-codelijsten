@@ -33,7 +33,6 @@
                 <th>Label</th>
                 <th>Definitie</th>
                 <th>Status</th>
-                <th>Concepten</th>
                 <th>Acties</th>
               </tr>
             </thead>
@@ -58,7 +57,6 @@
                   </vl-pill>
                   <span v-else>-</span>
                 </td>
-                <td>{{ scheme.topConcepts?.length ?? 0 }}</td>
                 <td>
                   <vl-link :href="`/doc/conceptscheme/${scheme.id}`">
                     Bekijk details
@@ -115,7 +113,7 @@ const { data: schemes } = await useAsyncData<ConceptScheme[]>(
   'concept-schemes',
   async () => {
     try {
-      return await $fetch('/doc/api/conceptschemes')
+      return await $fetch('/doc/api/conceptscheme')
     } catch (err) {
       console.error('Error loading concept schemes:', err)
       return []

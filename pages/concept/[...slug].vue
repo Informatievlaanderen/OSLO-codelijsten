@@ -87,7 +87,6 @@ const copyToClipboard = async (text: string) => {
     setTimeout(() => {
       showToaster.value = false
     }, 3000)
-    console.log('Copied to clipboard:', text)
   } catch (err) {
     console.error('Failed to copy:', err)
   }

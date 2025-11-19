@@ -48,10 +48,10 @@ const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 
 const { data } = await useAsyncData<ConceptScheme | null>(
-  'conceptscheme',
+  `conceptscheme-${slug.value}`,
   async () => {
     try {
-      return await $fetch(`/doc/api/conceptschemes/${slug?.value?.toString()}`)
+      return await $fetch(`/doc/api/conceptscheme/${slug.value?.toString()}`)
     } catch (err) {
       console.error('Error loading concept schemes:', err)
       return null

@@ -78,8 +78,6 @@ export const getConcept = async (
     for (const source of sources) {
       const result = await executeQuery(query, [source])
 
-      console.log(result, 'resultzz')
-
       if (!result.length) {
         continue
       }
