@@ -1,6 +1,12 @@
 import { useRdfQuery } from '~/composables/useRdfQuery'
 import { useDatasetConfig } from '~/composables/useDatasetConfig'
-import { CONCEPT_SCHEME_QUERY } from '~/constants/constants'
+import {
+  CONCEPT_SCHEME_QUERY,
+  CONCEPT_QUERY,
+  topConceptQuery,
+  schemeQuery,
+  relatedConceptsQuery,
+} from '~/constants/constants'
 import type { ConceptScheme } from '~/types/conceptScheme'
 import type { TopConcept, Concept } from '~/types/concept'
 
@@ -105,23 +111,7 @@ export class ConceptSchemeService {
       return null
     }
 
-    const query = `
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    PREFIX adms: <https://www.w3.org/ns/adms#>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-    SELECT ?concept ?label ?definition ?notation ?status ?inScheme ?topConceptOf ?broader ?narrower WHERE {
-      ?concept a skos:Concept .
-      OPTIONAL { ?concept skos:prefLabel ?label . }
-      OPTIONAL { ?concept skos:definition ?definition . }
-      OPTIONAL { ?concept skos:notation ?notation . }
-      OPTIONAL { ?concept adms:status ?status . }
-      OPTIONAL { ?concept skos:inScheme ?inScheme . }
-      OPTIONAL { ?concept skos:topConceptOf ?topConceptOf . }
-      OPTIONAL { ?concept skos:broader ?broader . }
-      OPTIONAL { ?concept skos:narrower ?narrower . }
-    }
-  `
+    const query = CONCEPT_QUERY
 
     try {
       // Try each source until we find the concept
@@ -214,16 +204,7 @@ export class ConceptSchemeService {
     sourceUrl: string,
     relation: 'broader' | 'narrower',
   ): Promise<Concept[]> {
-    const query = `
-      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-      SELECT ?relatedConcept ?label ?definition ?notation WHERE {
-        <${conceptUri}> skos:${relation} ?relatedConcept .
-        OPTIONAL { ?relatedConcept skos:prefLabel ?label . }
-        OPTIONAL { ?relatedConcept skos:definition ?definition . }
-        OPTIONAL { ?relatedConcept skos:notation ?notation . }
-      }
-    `
+    const query = relatedConceptsQuery(conceptUri, relation)
 
     try {
       const result = await this.rdfQuery.executeQuery({
@@ -249,14 +230,7 @@ export class ConceptSchemeService {
     schemeUri: string,
     sourceUrl: string,
   ): Promise<ConceptScheme | null> {
-    const query = `
-      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-      SELECT ?label ?definition WHERE {
-        <${schemeUri}> skos:prefLabel ?label .
-        OPTIONAL { <${schemeUri}> skos:definition ?definition . }
-      }
-    `
+    const query = schemeQuery(schemeUri)
 
     try {
       const result = await this.rdfQuery.executeQuery({
@@ -288,16 +262,7 @@ export class ConceptSchemeService {
     schemeUri: string,
     sourceUrl: string,
   ): Promise<TopConcept[]> {
-    const query = `
-      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-      SELECT ?concept ?label ?definition ?notation WHERE {
-        ?concept skos:topConceptOf <${schemeUri}> .
-        OPTIONAL { ?concept skos:prefLabel ?label . }
-        OPTIONAL { ?concept skos:definition ?definition . }
-        OPTIONAL { ?concept skos:notation ?notation . }
-      }
-    `
+    const query = topConceptQuery(schemeUri)
 
     try {
       const result = await this.rdfQuery.executeQuery({

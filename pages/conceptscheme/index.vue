@@ -60,7 +60,7 @@
                 </td>
                 <td>{{ scheme.topConcepts?.length ?? 0 }}</td>
                 <td>
-                  <vl-link :href="`/conceptscheme/${scheme.id}`">
+                  <vl-link :href="`/doc/conceptscheme/${scheme.id}`">
                     Bekijk details
                   </vl-link>
                 </td>
@@ -115,7 +115,7 @@ const { data: schemes } = await useAsyncData<ConceptScheme[]>(
   'concept-schemes',
   async () => {
     try {
-      return await $fetch('/api/conceptschemes')
+      return await $fetch('/doc/api/conceptschemes')
     } catch (err) {
       console.error('Error loading concept schemes:', err)
       return []
@@ -181,4 +181,8 @@ const setNextPage = () => {
     paginationIndex.value++
   }
 }
+
+useSeoHead({
+  title: 'Concepten',
+})
 </script>

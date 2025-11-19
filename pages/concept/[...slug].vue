@@ -4,6 +4,16 @@
     href="https://www.vlaanderen.be/digitaal-vlaanderen"
   />
 
+  <vl-toaster v-if="showToaster" mod-top-right fade-out>
+    <vl-alert
+      mod-small
+      icon="cross"
+      mod-success
+      mod-fade-out
+      title="URI gekopiëerd"
+    />
+  </vl-toaster>
+
   <vl-layout>
     <vl-region>
       <vl-grid mod-v-center mod-stacked>
@@ -12,8 +22,15 @@
             <vl-title mod-no-space-bottom tag-name="h1">
               {{ data?.label ?? `Concept: ${slug}` }}
             </vl-title>
-            <vl-link :href="data?.uri ?? fullUri" external class="uri-link">
-              <vl-icon icon="external" mod-before></vl-icon>
+            <vl-link
+              @click="copyToClipboard(data?.uri ?? fullUri)"
+              class="uri-link"
+            >
+              <vl-icon
+                icon="file-copy"
+                mod-before
+                @click="copyToClipboard(data?.uri ?? fullUri)"
+              ></vl-icon>
               {{ data?.uri ?? fullUri }}
             </vl-link>
           </div>
@@ -46,9 +63,10 @@
 
 <script setup lang="ts">
 import type { Concept } from '~/types/concept'
-import { useConceptSchemeService } from '~/services/comunica.service'
 import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
+
+const showToaster = ref(false)
 
 const route = useRoute()
 const slug = computed(() => {
@@ -62,12 +80,26 @@ const fullUri = computed(
   () => `https://data.vlaanderen.be/id/concept/${slug.value}`,
 )
 
-const conceptService = useConceptSchemeService()
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    showToaster.value = true
+    setTimeout(() => {
+      showToaster.value = false
+    }, 3000)
+    console.log('Copied to clipboard:', text)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
+}
 
 const { data } = await useAsyncData<Concept | null>('concept', async () => {
-  const concept = await conceptService.getConcept(slug?.value?.toString())
-
-  return concept ?? null
+  try {
+    return await $fetch(`/doc/api/concept/${slug?.value?.toString()}`)
+  } catch (err) {
+    console.error('Error loading concept schemes:', err)
+    return null
+  }
 })
 
 // Redirect to 404 in case of no data

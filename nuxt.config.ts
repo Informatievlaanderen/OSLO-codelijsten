@@ -4,12 +4,18 @@ import { fileURLToPath } from 'url'
 export default defineNuxtConfig({
   // https://nuxt.com/docs/getting-started/deployment#static-hosting
   routeRules: {
-    // serve root as ssr
+    '/api/conceptschemes': { cache: { maxAge: 60 * 10 } }, // Cache dynamic endpoints for 10 minutes
     '/': { ssr: true },
+  },
+  runtimeConfig: {
+    // private runtime env variables. Think of api keys: https://nuxt.com/docs/guide/going-further/runtime-config#environment-variables
+    // This is needed to pass the .env variables to the build process
+    DATASET_CONFIG_URL: import.meta.env.VITE_DATASET_CONFIG_URL,
+    // public runtime env variables
+    // public: {}
   },
   app: {
     baseURL: '/doc',
-
     head: {
       title: 'Codelijsten',
       htmlAttrs: {

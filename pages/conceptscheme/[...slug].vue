@@ -39,11 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import { useConceptSchemeService } from '~/services/comunica.service'
 import { openSource } from '~/utils/utils'
+import { useSeoHead } from '~/composables/useSEO'
 
 import type { ConceptScheme } from '~/types/conceptScheme'
-import { useSeoHead } from '~/composables/useSEO'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
@@ -51,13 +50,12 @@ const slug = computed(() => route.params.slug as string)
 const { data } = await useAsyncData<ConceptScheme | null>(
   'conceptscheme',
   async () => {
-    const conceptSchemeService = useConceptSchemeService()
-
-    const data = await conceptSchemeService.getConceptScheme(
-      slug?.value?.toString(),
-    )
-
-    return data
+    try {
+      return await $fetch(`/doc/api/conceptschemes/${slug?.value?.toString()}`)
+    } catch (err) {
+      console.error('Error loading concept schemes:', err)
+      return null
+    }
   },
 )
 
