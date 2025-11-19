@@ -71,4 +71,5 @@ export const schemeQuery = (schemeUri: string) => `
     }
   `
 
-  export const TEXT_TURTLE = 'text/turtle'
+export const TEXT_TURTLE = 'text/turtle'
+export const TTL = '.ttl'

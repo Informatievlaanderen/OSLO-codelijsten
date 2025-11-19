@@ -43,9 +43,15 @@ import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
 
 import type { ConceptScheme } from '~/types/conceptScheme'
+import { TTL } from '~/constants/constants'
 
 const route = useRoute()
-const slug = computed(() => route.params.slug as string)
+const slug = computed(() => {
+  const params = route.params.slug
+  // If slug is an array (from catch-all [...slug]), join it
+  // If it's a string, use it directly
+  return Array.isArray(params) ? params.join('/') : params
+})
 
 const { data } = await useAsyncData<ConceptScheme | null>(
   `conceptscheme-${slug.value}`,

@@ -32,7 +32,6 @@
                 <th>URI</th>
                 <th>Label</th>
                 <th>Definitie</th>
-                <th>Status</th>
                 <th>Acties</th>
               </tr>
             </thead>
@@ -52,26 +51,21 @@
                   {{ scheme.definition ?? 'Geen definitie beschikbaar' }}
                 </td>
                 <td>
-                  <vl-pill v-if="scheme.status" mod-success>
-                    {{ scheme.status }}
-                  </vl-pill>
-                  <span v-else>-</span>
-                </td>
-                <td>
                   <vl-link :href="`/doc/conceptscheme/${scheme.id}`">
                     Bekijk details
                   </vl-link>
                 </td>
               </tr>
               <tr v-else>
-                <td colspan="7" class="vl-u-align-center">
-                  Geen concepten gevonden
+                <td colspan="5" class="vl-u-align-center">
+                  <span v-if="isLoading">Laden...</span>
+                  <span v-else>Geen concepten gevonden</span>
                 </td>
               </tr>
             </tbody>
           </vl-data-table>
 
-          <vl-pager mod-align="center">
+          <vl-pager v-if="filteredSchemes.length" mod-align="center">
             <vl-pager-bounds
               :from="paginationFrom?.toString()"
               :to="paginationTo?.toString()"
@@ -107,19 +101,25 @@ import { ITEMS_PER_PAGE } from '~/constants/constants'
 
 const paginationIndex = ref(1)
 const searchQuery = ref('')
+const isLoading = ref(true)
 
-// Fetch all schemes from the backend API (no CORS issues)
-const { data: schemes } = await useAsyncData<ConceptScheme[]>(
-  'concept-schemes',
-  async () => {
-    try {
-      return await $fetch('/doc/api/conceptscheme')
-    } catch (err) {
-      console.error('Error loading concept schemes:', err)
-      return []
-    }
-  },
-)
+// Fetch schemes progressively
+const schemes = ref<ConceptScheme[]>([])
+
+const fetchSchemesProgressively = async () => {
+  try {
+    const response = await $fetch<ConceptScheme[]>('/doc/api/conceptscheme')
+    schemes.value = response ?? []
+  } catch (err) {
+    console.error('Error loading concept schemes:', err)
+    schemes.value = []
+  }
+}
+
+// Start loading immediately
+onMounted(() => {
+  fetchSchemesProgressively()
+})
 
 // Filter schemes based on search query
 const filteredSchemes = computed(() => {
@@ -135,7 +135,7 @@ const filteredSchemes = computed(() => {
     const idMatch = scheme.id?.toLowerCase().includes(query)
     const definitionMatch = scheme.definition?.toLowerCase().includes(query)
 
-    return labelMatch ?? uriMatch ?? idMatch ?? definitionMatch
+    return labelMatch || uriMatch || idMatch || definitionMatch
   })
 })
 
@@ -147,8 +147,8 @@ watch(searchQuery, () => {
 const pagedDatasets = (): ConceptScheme[] => {
   return (
     filteredSchemes.value?.slice(
-      paginationIndex.value - 1,
-      paginationIndex.value + ITEMS_PER_PAGE - 1,
+      (paginationIndex.value - 1) * ITEMS_PER_PAGE,
+      paginationIndex.value * ITEMS_PER_PAGE,
     ) ?? []
   )
 }
@@ -167,7 +167,6 @@ const hasNextPage = computed(() => {
   return paginationIndex.value * ITEMS_PER_PAGE < filteredSchemes.value.length
 })
 
-// Pagination methods
 const setPreviousPage = () => {
   if (paginationIndex.value > 1) {
     paginationIndex.value--
@@ -181,6 +180,6 @@ const setNextPage = () => {
 }
 
 useSeoHead({
-  title: 'Concepten',
+  title: "Conceptschema's",
 })
 </script>
