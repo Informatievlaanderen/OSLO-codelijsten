@@ -113,6 +113,8 @@ const fetchSchemesProgressively = async () => {
   } catch (err) {
     console.error('Error loading concept schemes:', err)
     schemes.value = []
+  } finally {
+    isLoading.value = false
   }
 }
 
