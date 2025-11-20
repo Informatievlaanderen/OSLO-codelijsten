@@ -36,16 +36,21 @@
           </div>
         </vl-column>
         <vl-column width="12">
-          <vl-button
-            @click="
-              () => openSource(data?.source ?? 'https://data.vlaanderen.be')
-            "
-            mod-secondary
-            mod-small
-          >
-            <vl-icon icon="download-harddisk" mod-before></vl-icon>
-            Bekijk brondata
-          </vl-button>
+          <vl-action-group mod-collapse-s>
+            <a :href="`/doc/conceptscheme/${conceptScheme}`"
+              ><vl-button type="button"
+                >Terug naar {{ conceptScheme }}</vl-button
+              ></a
+            >
+            <vl-button
+              @click="() => openSource(data?.source ?? '')"
+              mod-secondary
+              mod-small
+            >
+              <vl-icon icon="download-harddisk" mod-before></vl-icon>
+              Bekijk brondata
+            </vl-button>
+          </vl-action-group>
         </vl-column>
         <concept-info v-if="data" :concept="data" />
 
@@ -74,6 +79,12 @@ const slug = computed(() => {
     ? route.params.slug
     : [route.params.slug]
   return slugArray.join('/')
+})
+
+const conceptScheme = computed(() => {
+  return Array.isArray(route.params.slug)
+    ? route.params.slug[0]
+    : route.params.slug
 })
 
 const fullUri = computed(

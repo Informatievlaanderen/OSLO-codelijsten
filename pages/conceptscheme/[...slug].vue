@@ -7,6 +7,7 @@
   <vl-layout>
     <vl-region>
       <vl-grid mod-v-center mod-stacked>
+        <vl-column> </vl-column>
         <vl-column width="12">
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
@@ -15,14 +16,19 @@
           </div>
         </vl-column>
         <vl-column width="12">
-          <vl-button
-            @click="() => openSource(data?.source ?? '')"
-            mod-secondary
-            mod-small
-          >
-            <vl-icon icon="download-harddisk" mod-before></vl-icon>
-            Bekijk brondata
-          </vl-button>
+          <vl-action-group mod-collapse-s>
+            <a href="/doc/conceptscheme"
+              ><vl-button type="button">Terug naar overzicht</vl-button></a
+            >
+            <vl-button
+              @click="() => openSource(data?.source ?? '')"
+              mod-secondary
+              mod-small
+            >
+              <vl-icon icon="download-harddisk" mod-before></vl-icon>
+              Bekijk brondata
+            </vl-button>
+          </vl-action-group>
         </vl-column>
 
         <concept-scheme-info v-if="data" :concept-scheme="data" />
@@ -43,7 +49,6 @@ import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
 
 import type { ConceptScheme } from '~/types/conceptScheme'
-import { TTL } from '~/constants/constants'
 
 const route = useRoute()
 const slug = computed(() => {
