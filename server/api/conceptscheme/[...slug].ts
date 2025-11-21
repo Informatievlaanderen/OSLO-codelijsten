@@ -15,6 +15,10 @@ export default defineEventHandler(
         })
       }
 
+      console.log(
+        `[${new Date().toISOString()}] Fetched concept scheme config for: ${slug}`,
+      )
+
       // See if a .ttl extension is present in the slug
       const hasTtlExtension = slug.endsWith('.ttl')
       const cleanSlug = hasTtlExtension ? slug.replace(/\.ttl$/, '') : slug
@@ -33,8 +37,12 @@ export default defineEventHandler(
       // Return JSON response
       return await buildConceptSchemeResponse(config)
     } catch (error) {
-      console.error('Error fetching concept scheme:', error)
-      throw error
+      // Im not displaying the error or throwing an error to avoid cluttering the logs. It printed out the full RDF query error and HTML of the source
+      console.error('Error fetching concept scheme')
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Error fetching concept scheme',
+      })
     }
   },
 )
@@ -92,7 +100,6 @@ const buildConceptSchemeResponse = async (
     definition: binding.get('definition')?.value ?? '',
     status: binding.get('status')?.value ?? '',
     dataset: binding.get('dataset')?.value ?? '',
-    topConcepts,
     concepts: topConcepts,
     source: config.url,
   }

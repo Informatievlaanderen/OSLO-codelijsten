@@ -34,7 +34,7 @@
         <concept-scheme-info v-if="data" :concept-scheme="data" />
         <concept-scheme-concepts
           v-if="data"
-          :top-concepts="data?.topConcepts"
+          :concepts="data?.concepts"
           :conceptScheme="data.id"
         />
       </vl-grid>

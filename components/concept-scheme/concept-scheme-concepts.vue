@@ -1,5 +1,5 @@
 <template>
-  <template v-if="topConcepts?.length">
+  <template v-if="concepts?.length">
     <vl-column width="12">
       <vl-title tag-name="h2" mod-h3>Top Concepten</vl-title>
     </vl-column>
@@ -14,7 +14,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="concept in topConcepts" :key="concept.id">
+          <tr v-for="concept in concepts" :key="concept.id">
             <td>
               <vl-link :href="concept.uri" external>
                 {{ concept.uri }}
@@ -35,10 +35,10 @@
 </template>
 
 <script setup lang="ts" name="conceptSchemeConcepts">
-import type { TopConcept } from '~/types/concept'
+import type { Concept } from '~/types/concept'
 
 interface Props {
-  topConcepts?: TopConcept[]
+  concepts?: Concept[]
   conceptScheme?: string
 }
 

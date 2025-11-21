@@ -7,32 +7,24 @@ import {
 import type { Concept, TopConcept } from '~/types/concept'
 import type { ConceptScheme } from '~/types/conceptScheme'
 
-const queryEngine = new QueryEngine()
-
-export const executeQuery = (
+export const executeQuery = async (
   query: string,
   sources: string[],
 ): Promise<any[]> => {
   const bindings: any[] = []
+  const queryEngine: QueryEngine = new QueryEngine()
 
-  return new Promise<any[]>((resolve, reject) => {
-    queryEngine
-      .queryBindings(query, { sources })
-      .then((bindingsStream) => {
-        bindingsStream.on('data', (binding) => {
-          bindings.push(binding)
-        })
-
-        bindingsStream.on('end', () => {
-          resolve(bindings)
-        })
-
-        bindingsStream.on('error', (error) => {
-          reject(error)
-        })
-      })
-      .catch(reject)
+  const bindingsStream = await queryEngine.queryBindings(query, {
+    sources,
+    // use the nocache option to prevent caching of detailed concept queries
+    noCache: true,
   })
+
+  for await (const binding of bindingsStream) {
+    bindings.push(binding)
+  }
+
+  return bindings
 }
 
 export const getTopConcepts = async (

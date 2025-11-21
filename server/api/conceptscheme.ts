@@ -8,6 +8,10 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
     const runtimeConfig = useRuntimeConfig()
     const response = await $fetch<any>(runtimeConfig.DATASET_CONFIG_URL!)
 
+    console.log(
+      `[${new Date().toISOString()}] Fetched concept scheme config from:`,
+      runtimeConfig.DATASET_CONFIG_URL,
+    )
     const data = typeof response === 'string' ? JSON.parse(response) : response
     const configs: ConceptSchemeConfig[] = data.conceptSchemes
 
@@ -34,7 +38,8 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
             source: config.url,
           } as ConceptScheme
         } catch (err) {
-          console.error(`Error loading scheme ${config.key}:`, err)
+          // Im not displaying the error to avoid cluttering the logs. It printed out the full RDF query error and HTML of the source
+          console.error(`Error loading scheme ${config.key}`)
           return null
         }
       }),
@@ -42,7 +47,7 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
 
     return schemes.filter((s) => s !== null) as ConceptScheme[]
   } catch (error) {
-    console.error('Error fetching concept schemes:', error)
+    console.error('Error fetching concept schemes:')
     return []
   }
 })

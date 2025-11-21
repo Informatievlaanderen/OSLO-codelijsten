@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url'
 export default defineNuxtConfig({
   // https://nuxt.com/docs/getting-started/deployment#static-hosting
   routeRules: {
-    '/api/conceptscheme': { cache: { maxAge: 60 * 10 } }, // Cache dynamic endpoints for 10 minutes
     '/': { ssr: true },
   },
   runtimeConfig: {

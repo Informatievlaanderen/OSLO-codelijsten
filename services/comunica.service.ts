@@ -71,7 +71,7 @@ export class ConceptSchemeService {
         source: datasetEntry?.url ?? '',
       }
     } catch (error) {
-      console.error('Error fetching concept scheme:', error)
+      console.error('Error fetching concept scheme;', slug)
       return null
     }
   }

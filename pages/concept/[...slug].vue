@@ -38,9 +38,7 @@
         <vl-column width="12">
           <vl-action-group mod-collapse-s>
             <a :href="`/doc/conceptscheme/${conceptScheme}`"
-              ><vl-button type="button"
-                >Terug naar {{ conceptScheme }}</vl-button
-              ></a
+              ><vl-button type="button">Terug naar conceptschema</vl-button></a
             >
             <vl-button
               @click="() => openSource(data?.source ?? '')"

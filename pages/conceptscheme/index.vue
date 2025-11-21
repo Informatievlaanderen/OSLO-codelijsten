@@ -58,8 +58,8 @@
               </tr>
               <tr v-else>
                 <td colspan="5" class="vl-u-align-center">
-                  <span v-if="isLoading">Laden...</span>
-                  <span v-else>Geen concepten gevonden</span>
+                  <span v-if="isLoading">Conceptschema's inladen...</span>
+                  <span v-else>Geen schema's gevonden</span>
                 </td>
               </tr>
             </tbody>

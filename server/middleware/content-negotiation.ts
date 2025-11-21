@@ -14,7 +14,6 @@ export default defineEventHandler(async (event) => {
   const conceptSchemeMatch = url.pathname.match(/\/conceptscheme\/(.+)\.ttl$/)
   const conceptMatch = url.pathname.match(/\/concept\/(.+)\.ttl$/)
 
-
   // Redirect to appropriate API endpoint
   if (conceptSchemeMatch) {
     apiPath = `/doc/api/conceptscheme/${conceptSchemeMatch[1]}`
@@ -39,7 +38,7 @@ export default defineEventHandler(async (event) => {
 
     return content
   } catch (err) {
-    console.error('Error fetching TTL content:', err)
+    console.error('Error fetching TTL content:')
     // Don't throw, let it fall through to the Vue page
     return
   }
