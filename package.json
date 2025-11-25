@@ -1,19 +1,26 @@
 {
-  "name": "ovo-codes",
-  "version": "0.0.1",
-  "private": true,
-  "engines": {
-    "npm": ">=8.0.0",
-    "node": ">=22.0.0"
-  },
+  "name": "org-to-ttl-converter",
+  "version": "1.0.0",
+  "description": "Convert organization JSON data to RDF Turtle format",
+  "main": "convert-org-to-ttl.ts",
   "scripts": {
-    "start": "node index.js"
+    "convert": "ts-node convert-org-to-ttl.ts",
+    "convert:dummy": "ts-node convert-org-to-ttl.ts ./dummy.json ./output/organisations.ttl",
+    "build": "tsc",
+    "start": "node dist/convert-org-to-ttl.js"
   },
-  "dependencies": {
-    "ky": "^1.14.0"
-  },
+  "keywords": [
+    "rdf",
+    "turtle",
+    "ttl",
+    "organisation",
+    "oslo"
+  ],
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
-    "ts-node": "^10.9.1",
-    "typescript": "^5.7.3"
+    "@types/node": "^20.19.25",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
   }
 }
