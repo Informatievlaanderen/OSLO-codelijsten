@@ -28,6 +28,7 @@ export interface Dataset {
 
 export interface OrganizationData {
   id: string
+  uri: string
   name: string
   alternativeName?: string
   description?: string
@@ -35,9 +36,7 @@ export interface OrganizationData {
   foundingDate?: string
   website?: string
   seeAlso?: string[]
-  classifications?: Dataset[]
-  capacities?: Capacity[]
   contactPoints?: ContactPoint[]
   datasets?: Dataset[]
-  changes?: Dataset[]
+  source: string
 }

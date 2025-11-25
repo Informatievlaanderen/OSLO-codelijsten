@@ -21,26 +21,11 @@
         <vl-column width="12">
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
-              Vlaamse Overheid
+              {{ data?.name ?? slug }}
             </vl-title>
-            <vl-link
-              @click="
-                copyToClipboard(
-                  'https://data.vlaanderen.be/doc/organisatie/OVO002949',
-                )
-              "
-              class="uri-link"
-            >
-              <vl-icon
-                icon="file-copy"
-                mod-before
-                @click="
-                  copyToClipboard(
-                    'https://data.vlaanderen.be/doc/organisatie/OVO002949',
-                  )
-                "
-              ></vl-icon>
-              https://data.vlaanderen.be/doc/organisatie/OVO002949
+            <vl-link @click="copyToClipboard(data?.uri ?? '')" class="uri-link">
+              <vl-icon icon="file-copy" mod-before></vl-icon>
+              {{ data?.uri ?? '' }}
             </vl-link>
           </div>
         </vl-column>
@@ -48,10 +33,12 @@
         <!-- Action Buttons -->
         <vl-column width="12">
           <vl-action-group mod-collapse-s>
-            <a href="/doc/organisatie"
-              ><vl-button type="button">Terug naar overzicht</vl-button></a
+            <vl-button
+              v-if="data?.uri"
+              @click="() => window.open(`${data.uri}.ttl`, '_blank')"
+              mod-secondary
+              mod-small
             >
-            <vl-button mod-secondary mod-small>
               <vl-icon icon="download-harddisk" mod-before></vl-icon>
               Bekijk brondata
             </vl-button>
@@ -59,101 +46,10 @@
         </vl-column>
 
         <!-- Basic Information -->
-        <vl-column width="12">
-          <vl-title tag-name="h2" mod-h3>Basisgegevens</vl-title>
-          <vl-data-table>
-            <thead>
-              <tr>
-                <th>Eigenschap</th>
-                <th>Waarde</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Identificator</strong></td>
-                <td>OVO002949</td>
-              </tr>
-              <tr>
-                <td><strong>Voorkeursnaam</strong></td>
-                <td>Vlaamse Overheid</td>
-              </tr>
-              <tr>
-                <td><strong>Zie ook</strong></td>
-                <td>Dummy</td>
-              </tr>
-              <tr>
-                <td><strong>Beschrijving</strong></td>
-                <td>
-                  De Vlaamse Overheid is de uitvoerende macht van de Vlaamse
-                  Gemeenschap in België.
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Status</strong></td>
-                <td>
-                  <vl-pill type="success">Actief</vl-pill>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Oprichtingsdatum</strong></td>
-                <td><time datetime="1995-01-01">1 januari 1995</time></td>
-              </tr>
-              <tr>
-                <td><strong>Website</strong></td>
-                <td>
-                  <vl-link href="https://www.vlaanderen.be" external>
-                    https://www.vlaanderen.be
-                  </vl-link>
-                </td>
-              </tr>
-            </tbody>
-          </vl-data-table>
-        </vl-column>
+        <organization-info :organization="data" :fallback-id="slug" />
 
         <!-- Contact Information -->
-        <vl-column width="12">
-          <vl-title tag-name="h2" mod-h3>Contactinformatie</vl-title>
-          <vl-data-table>
-            <thead>
-              <tr>
-                <th>Contactpunt</th>
-                <th>Waarde</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>E-mailadres</strong></td>
-                <td>
-                  <vl-link href="mailto:info@vlaanderen.be">
-                    info@vlaanderen.be
-                  </vl-link>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Telefoonnummer</strong></td>
-                <td>
-                  <vl-link href="tel:+3214567890"> +32 1 45 67 890 </vl-link>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Website</strong></td>
-                <td>
-                  <vl-link href="https://www.vlaanderen.be" external>
-                    https://www.vlaanderen.be
-                  </vl-link>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Adres</strong></td>
-                <td>
-                  Kouter 21<br />
-                  9000 Gent<br />
-                  België
-                </td>
-              </tr>
-            </tbody>
-          </vl-data-table>
-        </vl-column>
+        <organization-contact :contact-points="data?.contactPoints" />
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -162,7 +58,16 @@
 </template>
 
 <script setup lang="ts">
+import type { OrganizationData } from '~/types/organization'
+import { useSeoHead } from '~/composables/useSEO'
+
 const showToaster = ref(false)
+
+const route = useRoute()
+const slug = computed(() => {
+  const params = route.params.slug
+  return Array.isArray(params) ? params.join('/') : params
+})
 
 const copyToClipboard = async (text: string) => {
   try {
@@ -175,4 +80,29 @@ const copyToClipboard = async (text: string) => {
     console.error('Failed to copy:', err)
   }
 }
+
+const { data } = await useAsyncData<OrganizationData | null>(
+  `organization-${slug.value}`,
+  async () => {
+    try {
+      return await $fetch(`/doc/api/organization/${slug.value}`)
+    } catch (err) {
+      console.error('Error loading organization:', err)
+      return null
+    }
+  },
+)
+
+// Redirect to 404 if no data
+if (!data?.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Organisatie niet gevonden',
+  })
+}
+
+useSeoHead({
+  title: data.value?.name ?? `Organisatie: ${slug.value}`,
+  description: data.value?.description,
+})
 </script>

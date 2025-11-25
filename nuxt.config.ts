@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     // private runtime env variables. Think of api keys: https://nuxt.com/docs/guide/going-further/runtime-config#environment-variables
     // This is needed to pass the .env variables to the build process
     DATASET_CONFIG_URL: import.meta.env.VITE_DATASET_CONFIG_URL,
+    ORGANIZATION_TTL_URL: import.meta.env.VITE_ORGANIZATION_TTL_URL,
     // public runtime env variables
     // public: {}
   },
