@@ -1,0 +1,23 @@
+<https://data.vlaanderen.be/id/organisatie/OVO000004>
+  a org:Organization ;
+  dct:identifier "OVO000004" ;
+  foaf:name "Beleidsdomein Financiën en Begroting"@nl ;
+  skos:altLabel "FB"@nl ;
+  dct:issued "2006-04-01"^^xsd:date ;
+  schema:contactPoint <https://data.vlaanderen.be/id/organisatie/OVO000004/contact/0>, <https://data.vlaanderen.be/id/organisatie/OVO000004/contact/1>, <https://data.vlaanderen.be/id/organisatie/OVO000004/contact/2> ;
+  rdfs:isDefinedBy <https://data.vlaanderen.be/doc/organisatie/OVO000004> .
+
+<https://data.vlaanderen.be/id/organisatie/OVO000004/contact/0>
+  a schema:ContactPoint ;
+  rdfs:label "Email"@nl ;
+  schema:email "onroerendevoorheffing@vlaanderen.be" .
+
+<https://data.vlaanderen.be/id/organisatie/OVO000004/contact/1>
+  a schema:ContactPoint ;
+  rdfs:label "Fax"@nl ;
+  schema:faxNumber "053-72 23 75" .
+
+<https://data.vlaanderen.be/id/organisatie/OVO000004/contact/2>
+  a schema:ContactPoint ;
+  rdfs:label "Telefoon"@nl ;
+  schema:telephone "078-15 30 15" .
