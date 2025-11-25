@@ -1,0 +1,24 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+
+<https://example.org/id/conceptscheme/SchemeA> a skos:ConceptScheme;
+    skos:prefLabel "Scheme A"@nl;
+    skos:definition "The first dummy concept scheme."@nl.
+<https://example.org/id/concept/SchemeA/Concept1> a skos:Concept;
+    skos:prefLabel "Concept 1"@nl;
+    skos:definition "First concept in Scheme A"@nl;
+    skos:notation "C1";
+    skos:inScheme <https://example.org/id/conceptscheme/SchemeA>;
+    skos:topConceptOf <https://example.org/id/conceptscheme/SchemeA>.
+<https://example.org/id/concept/SchemeA/Concept2> a skos:Concept;
+    skos:prefLabel "Concept 2"@nl;
+    skos:definition "Second concept in Scheme A"@nl;
+    skos:notation "C2";
+    skos:inScheme <https://example.org/id/conceptscheme/SchemeA>;
+    skos:topConceptOf <https://example.org/id/conceptscheme/SchemeA>.
+<https://example.org/id/concept/SchemeA/Concept3> a skos:Concept;
+    skos:prefLabel "Concept 3"@nl;
+    skos:definition "Third concept in Scheme A"@nl;
+    skos:notation "C3";
+    skos:inScheme <https://example.org/id/conceptscheme/SchemeA>;
+    skos:topConceptOf <https://example.org/id/conceptscheme/SchemeA>.
