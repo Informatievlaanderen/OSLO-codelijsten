@@ -10,15 +10,18 @@ export default defineEventHandler(async (event) => {
 
   let apiPath: string | null = null
 
-  // Match /conceptscheme/slug(.+)/.ttl or /concept/slug(.+)/.ttl
+  // Match /conceptscheme/slug(.+)/.ttl or /concept/slug(.+)/.ttl or /organisatie/slug(.+)/.ttl
   const conceptSchemeMatch = url.pathname.match(/\/conceptscheme\/(.+)\.ttl$/)
   const conceptMatch = url.pathname.match(/\/concept\/(.+)\.ttl$/)
+  const organisatieMatch = url.pathname.match(/\/organisatie\/(.+)\.ttl$/)
 
   // Redirect to appropriate API endpoint
   if (conceptSchemeMatch) {
     apiPath = `/doc/api/conceptscheme/${conceptSchemeMatch[1]}`
   } else if (conceptMatch) {
     apiPath = `/doc/api/concept/${conceptMatch[1]}`
+  } else if (organisatieMatch) {
+    apiPath = `/doc/api/organization/${organisatieMatch[1]}.ttl`
   }
 
   if (!apiPath) {
