@@ -92,5 +92,6 @@ sw.*
 
 # Generated folder of static website
 .output/
+output/
 
 PUBLISHED

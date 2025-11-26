@@ -1,3 +1,59 @@
-# OVO codes extractie
+# OVO Codes Extractie
 
 Deze repository bevat scripts voor het extraheren van OVO-codes uit de basisregisters van Vlaanderen. OVO-codes worden gebruikt om verschillende administratieve entiteiten te identificeren en te classificeren. De OVO codes worden gepubliceerd op https://data.vlaanderen.be.
+
+## Organization to TTL Converter
+
+### Overzicht
+
+De Organization to TTL Converter is een command-line tool die organisatiegegevens in JSON-formaat omzet naar RDF Turtle (TTL) formaat.
+
+### Installatie
+
+#### Lokaal gebruik
+
+```bash
+# Installeer dependencies
+npm install
+
+# Build het project
+npm run build
+```
+
+#### Als NPM package
+
+```bash
+npm install -g @oslo-flanders/org-to-ttl-converter
+```
+
+### Gebruik
+
+#### Command-line Interface
+
+De tool accepteert twee verplichte parameters via flags:
+
+```bash
+# Lange vorm
+ts-node convert-org-to-ttl.ts --input <input-file> --output <output-directory>
+
+# Korte vorm
+ts-node convert-org-to-ttl.ts -i <input-file> -o <output-directory>
+```
+
+**Parameters:**
+
+- `--input, -i`: Pad naar het input JSON-bestand met organisatiegegevens
+- `--output, -o`: Pad naar de output directory waar TTL-bestanden worden opgeslagen
+
+**Voorbeelden:**
+
+```bash
+# Converteer dummy data
+npm run convert:dummy
+
+# Converteer alle organisaties
+npm run convert:all
+
+# Custom conversie
+ts-node convert-org-to-ttl.ts -i ./data/orgs.json -o ./output/ttl
+```

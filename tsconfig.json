@@ -11,9 +11,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
+    "preserveConstEnums": true
   },
-  "include": ["*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["convert-org-to-ttl.ts", "services/**/*", "types/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

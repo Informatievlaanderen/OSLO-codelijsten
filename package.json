@@ -1,23 +1,42 @@
 {
-  "name": "org-to-ttl-converter",
-  "version": "1.0.0",
+  "name": "@oslo-flanders/org-to-ttl-converter",
+  "author": "Digitaal Vlaanderen <https://data.vlaanderen.be/id/organisatie/OVO002949>",
+  "version": "0.0.2",
   "description": "Convert organization JSON data to RDF Turtle format",
-  "main": "convert-org-to-ttl.ts",
+  "main": "dist/index.js",
+  "bin": {
+    "oslo-org-to-ttl": "dist/convert-org-to-ttl.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "convert": "ts-node convert-org-to-ttl.ts",
-    "convert:dummy": "ts-node convert-org-to-ttl.ts ./dummy.json ./output/organisations.ttl",
+    "convert:dummy": "ts-node convert-org-to-ttl.ts --input ./dummy.json --output ./output/organisations",
+    "convert:all": "ts-node convert-org-to-ttl.ts --input ./organisationd_zoekresultagen.json --output ./output/organisations",
     "build": "tsc",
-    "start": "node dist/convert-org-to-ttl.js"
+    "prepublishOnly": "npm run build",
+    "start": "node dist/convert-org-to-ttl.js",
+    "postinstall": "chmod +x dist/convert-org-to-ttl.js || true"
   },
   "keywords": [
     "rdf",
     "turtle",
     "ttl",
-    "organisation",
-    "oslo"
+    "OVO",
+    "oslo",
+    "digitaal-vlaanderen"
   ],
-  "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Informatievlaanderen/OSLO-codelijsten.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "devDependencies": {
     "@types/node": "^20.19.25",
     "ts-node": "^10.9.0",
