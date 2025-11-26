@@ -1,14 +1,8 @@
 import type { Organization } from '../types/organization'
+import type { Stats } from '../types/statistics'
 import { OrganizationToTTLService } from './organization-to-ttl.service'
 import { FileWriterService } from './file-writer.service'
 import { JsonReaderService } from './json-reader.service'
-
-export interface ConversionStats {
-  totalOrganizations: number
-  validOrganizations: number
-  successCount: number
-  overwriteCount: number
-}
 
 export class OrganizationConverterService {
   private readonly ttlConverter = new OrganizationToTTLService()
@@ -21,7 +15,7 @@ export class OrganizationConverterService {
   async convertOrganizations(
     inputPath: string,
     outputDir: string,
-  ): Promise<ConversionStats> {
+  ): Promise<Stats> {
     console.log(`Reading organizations from: ${inputPath}`)
     const organizations = this.jsonReader.readOrganizations(inputPath)
 
@@ -53,7 +47,7 @@ export class OrganizationConverterService {
   private async processOrganizations(
     organizations: Organization[],
     outputDir: string,
-  ): Promise<ConversionStats> {
+  ): Promise<Stats> {
     let successCount = 0
     let overwriteCount = 0
 
@@ -64,7 +58,7 @@ export class OrganizationConverterService {
 
         if (this.fileWriter.fileExists(filePath)) {
           console.log(
-            `⚠️  File already exists: ${fileName} (${org.name}) - Overwriting...`,
+            `File already exists: ${fileName} (${org.name}) - Overwriting...`,
           )
           overwriteCount++
         }
@@ -79,7 +73,7 @@ export class OrganizationConverterService {
           )
         }
       } catch (error) {
-        console.error(`❌ Error processing ${org.ovoNumber}:`, error)
+        console.error(`Error processing ${org.ovoNumber}:`, error)
       }
     }
 
@@ -94,13 +88,13 @@ export class OrganizationConverterService {
   /**
    * Print conversion summary
    */
-  private printSummary(stats: ConversionStats, outputDir: string): void {
+  private printSummary(stats: Stats, outputDir: string): void {
     console.log(
-      `✓ Successfully converted ${stats.successCount} organizations to individual files in ${outputDir}`,
+      `Successfully converted ${stats.successCount} organizations to individual files in ${outputDir}`,
     )
 
     if (stats.overwriteCount > 0) {
-      console.log(`⚠️  Overwrote ${stats.overwriteCount} existing file(s)`)
+      console.log(`Overwrote ${stats.overwriteCount} existing file(s)`)
     }
   }
 }

@@ -28,32 +28,20 @@ npm install -g @oslo-flanders/org-to-ttl-converter
 
 ### Gebruik
 
-#### Command-line Interface
-
-De tool accepteert twee verplichte parameters via flags:
+#### CLI
 
 ```bash
 # Lange vorm
-ts-node convert-org-to-ttl.ts --input <input-file> --output <output-directory>
-
-# Korte vorm
-ts-node convert-org-to-ttl.ts -i <input-file> -o <output-directory>
+oslo-org-to-ttl --input <input-file> --output <output-directory>
 ```
 
-**Parameters:**
+**Parameters**
 
 - `--input, -i`: Pad naar het input JSON-bestand met organisatiegegevens
 - `--output, -o`: Pad naar de output directory waar TTL-bestanden worden opgeslagen
 
-**Voorbeelden:**
+**Voorbeelden**
 
 ```bash
-# Converteer dummy data
-npm run convert:dummy
-
-# Converteer alle organisaties
-npm run convert:all
-
-# Custom conversie
-ts-node convert-org-to-ttl.ts -i ./data/orgs.json -o ./output/ttl
+oslo-org-to-ttl -i ./data/orgs.json -o ./output/ttl
 ```
