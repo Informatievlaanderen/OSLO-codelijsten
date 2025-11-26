@@ -18,6 +18,8 @@ npm install
 
 # Build het project
 npm run build
+
+node dist/convert-org-to-ttl.js --input <input-file> --output <output-directory>
 ```
 
 #### Als NPM package
