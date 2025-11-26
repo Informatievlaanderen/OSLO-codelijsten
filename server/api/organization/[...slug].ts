@@ -26,9 +26,9 @@ export default defineEventHandler(
       const hasTtlExtension = slug.endsWith('.ttl')
       const cleanSlug = hasTtlExtension ? slug.replace(/\.ttl$/, '') : slug
 
-      // Get the TTL file URL from runtime config
+      // Get the TTL file URL from runtime config and add the slug to get the correct raw file
       const runtimeConfig = useRuntimeConfig()
-      const sourceUrl = runtimeConfig.ORGANIZATION_TTL_URL
+      const sourceUrl = `${runtimeConfig.ORGANIZATION_TTL_URL}/${slug}`
 
       // Handle content negotiation
       const acceptHeader = getHeader(event, 'accept') ?? ''
@@ -41,10 +41,15 @@ export default defineEventHandler(
         if (negotiatedContent) return negotiatedContent
       }
 
+      // add .ttl to the source file of each OVO code
+      const sourceUrlWithExtension: string = `${sourceUrl}.ttl`
+
       // Fetch organization data
       const bindings = await executeQuery(ORGANIZATION_BY_ID_QUERY(cleanSlug), [
-        sourceUrl,
+        sourceUrlWithExtension,
       ])
+
+      console.log(bindings.length, 'bingindgsss')
 
       if (!bindings.length) {
         throw createError({
@@ -58,7 +63,7 @@ export default defineEventHandler(
 
       // Fetch contact points
       const contactBindings = await executeQuery(CONTACT_POINTS_QUERY(orgUri), [
-        sourceUrl,
+        sourceUrlWithExtension,
       ])
 
       const contactPoints: ContactPoint[] = contactBindings.map(
@@ -72,11 +77,6 @@ export default defineEventHandler(
         }),
       )
 
-      // Group seeAlso values
-      const seeAlsoValues = bindings
-        .map((b) => b.get('seeAlso')?.value)
-        .filter((v, i, a) => v && a.indexOf(v) === i) as string[]
-
       const organization: OrganizationData = {
         id: cleanSlug,
         uri: orgUri,
@@ -86,12 +86,14 @@ export default defineEventHandler(
         status: binding.get('status')?.value,
         foundingDate: binding.get('issued')?.value,
         website: binding.get('homepage')?.value,
-        seeAlso: seeAlsoValues.length > 0 ? seeAlsoValues : undefined,
+        seeAlso: binding.get('seeAlso')?.value,
+        source: sourceUrlWithExtension,
         contactPoints,
       }
 
       return organization
     } catch (error) {
+      console.log(error)
       console.error('Error fetching organization')
       throw createError({
         statusCode: 500,

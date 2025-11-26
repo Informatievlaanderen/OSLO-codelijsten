@@ -35,7 +35,7 @@ export interface OrganizationData {
   status?: string
   foundingDate?: string
   website?: string
-  seeAlso?: string[]
+  seeAlso?: string
   contactPoints?: ContactPoint[]
   datasets?: Dataset[]
   source: string

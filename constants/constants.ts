@@ -71,50 +71,53 @@ export const schemeQuery = (schemeUri: string) => `
     }
   `
 
-export const ORGANIZATION_QUERY = `
-  PREFIX dct: <http://purl.org/dc/terms/>
-  PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-  PREFIX org: <http://www.w3.org/ns/org#>
-  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-  PREFIX adms: <https://www.w3.org/ns/adms#>
-  PREFIX schema: <http://schema.org/>
-  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-  SELECT DISTINCT ?org ?name ?altLabel ?description ?status ?issued ?valid ?homepage ?seeAlso WHERE {
-    ?org a org:Organization .
-    OPTIONAL { ?org foaf:name ?name . }
-    OPTIONAL { ?org skos:altLabel ?altLabel . }
-    OPTIONAL { ?org dct:description ?description . }
-    OPTIONAL { ?org adms:status ?status . }
-    OPTIONAL { ?org dct:issued ?issued . }
-    OPTIONAL { ?org dct:valid ?valid . }
-    OPTIONAL { ?org foaf:homepage ?homepage . }
-    OPTIONAL { ?org rdfs:seeAlso ?seeAlso . }
-  }
-`
-
 export const ORGANIZATION_BY_ID_QUERY = (orgId: string) => `
   PREFIX dct: <http://purl.org/dc/terms/>
   PREFIX foaf: <http://xmlns.com/foaf/0.1/>
   PREFIX org: <http://www.w3.org/ns/org#>
   PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-  PREFIX adms: <https://www.w3.org/ns/adms#>
+  PREFIX adms: <http://www.w3.org/ns/adms#>
   PREFIX schema: <http://schema.org/>
   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-  SELECT DISTINCT ?org ?identifier ?name ?altLabel ?description ?status ?issued ?valid ?homepage ?seeAlso WHERE {
+  SELECT DISTINCT
+    ?org ?identifier ?name ?altLabel ?description ?status ?issued ?valid ?homepage ?seeAlso
+    ?identifierNode ?notation ?identifierCreator ?identifierSchemaAgency ?identifierIssued
+    ?contactPoint ?isDefinedBy
+  WHERE {
     ?org a org:Organization .
-    ?org dct:identifier "${orgId}" .
+    {
+      ?org dct:identifier "${orgId}" .
+    }
+    UNION
+    {
+      ?org adms:identifier ?identifierNodeMatch .
+      ?identifierNodeMatch skos:notation "${orgId}" .
+    }
     OPTIONAL { ?org dct:identifier ?identifier . }
+
+    OPTIONAL { ?org skos:prefLabel ?name . }
     OPTIONAL { ?org foaf:name ?name . }
     OPTIONAL { ?org skos:altLabel ?altLabel . }
     OPTIONAL { ?org dct:description ?description . }
     OPTIONAL { ?org adms:status ?status . }
     OPTIONAL { ?org dct:issued ?issued . }
+    OPTIONAL { ?org rdfs:seeAlso ?seeAlso . }
     OPTIONAL { ?org dct:valid ?valid . }
     OPTIONAL { ?org foaf:homepage ?homepage . }
-    OPTIONAL { ?org rdfs:seeAlso ?seeAlso . }
+
+    OPTIONAL {
+      ?org adms:identifier ?identifierNode .
+      OPTIONAL { ?identifierNode skos:notation ?notation . }
+      OPTIONAL { ?identifierNode dct:creator ?identifierCreator . }
+      OPTIONAL { ?identifierNode adms:schemaAgency ?identifierSchemaAgency . }
+      OPTIONAL { ?identifierNode dct:issued ?identifierIssued . }
+    }
+
+    OPTIONAL { ?org schema:contactPoint ?contactPoint . }
+    OPTIONAL { ?org rdfs:isDefinedBy ?isDefinedBy . }
   }
+  LIMIT 1
 `
 
 export const CONTACT_POINTS_QUERY = (orgUri: string) => `

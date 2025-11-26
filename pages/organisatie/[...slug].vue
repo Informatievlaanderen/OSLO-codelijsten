@@ -34,8 +34,7 @@
         <vl-column width="12">
           <vl-action-group mod-collapse-s>
             <vl-button
-              v-if="data?.uri"
-              @click="() => window.open(`${data.uri}.ttl`, '_blank')"
+              @click="() => openSource(data?.source ?? '')"
               mod-secondary
               mod-small
             >
@@ -46,7 +45,11 @@
         </vl-column>
 
         <!-- Basic Information -->
-        <organization-info :organization="data" :fallback-id="slug" />
+        <organization-info
+          v-if="data"
+          :organization="data"
+          :fallback-id="slug"
+        />
 
         <!-- Contact Information -->
         <organization-contact :contact-points="data?.contactPoints" />
@@ -59,6 +62,7 @@
 
 <script setup lang="ts">
 import type { OrganizationData } from '~/types/organization'
+import { TTL } from '~/constants/constants'
 import { useSeoHead } from '~/composables/useSEO'
 
 const showToaster = ref(false)
