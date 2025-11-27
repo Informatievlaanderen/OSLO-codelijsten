@@ -93,6 +93,7 @@ sw.*
 # Generated folder of static website
 .output/
 output/
-./organisaties.json
 
+organisaties.json
+organisations.json
 PUBLISHED

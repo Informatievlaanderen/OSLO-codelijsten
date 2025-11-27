@@ -1,10 +1,11 @@
 #!/bin/bash
+# filepath: scripts/fetch-and-convert-OVO.sh
 
 set -e  # Exit on error
 
 # Parse command-line arguments
-OUTPUT_DIR=$1
-JSON_FILE=$2
+OUTPUT_DIR="${1:-/tmp/output/organisations}"
+JSON_FILE="${2:-/tmp/organisaties.json}"
 
 echo "=========================================="
 echo "Fetching organizations from Wegwijs API"
@@ -12,7 +13,7 @@ echo "=========================================="
 
 # Define variables
 API_URL="https://api.wegwijs.vlaanderen.be/v1/powerbi/search/organisations"
-REPO_URL="https://github.com/Informatievlaanderen/OSLO-codelistgenerated.git"
+REPO_URL="git@github.com:Informatievlaanderen/OSLO-codelistgenerated.git"
 REPO_BRANCH="OVO"
 REPO_DIR="./OSLO-codelistgenerated"
 
@@ -28,7 +29,7 @@ mkdir -p "$OUTPUT_DIR"
 # Download organizations from Wegwijs API
 echo "Downloading organizations from Wegwijs API..."
 echo "This may take a while..."
-curl --progress-bar -o "$JSON_FILE" "$API_URL"
+curl -s --progress-bar -o "$JSON_FILE" "$API_URL"
 
 if [ ! -f "$JSON_FILE" ]; then
     echo "Error: Failed to download organizations from API"
@@ -72,21 +73,12 @@ echo "=========================================="
 git config --global user.name "OSLO-support"
 git config --global user.email "OSLO-support@vlaanderen.be"
 
-# Clone the target repository
+# Clone the target repository using SSH
 echo "=========================================="
 echo "Cloning target repository"
 echo "=========================================="
 
-# Check if GITHUB_TOKEN is set
-if [ -z "$GITHUB_TOKEN" ]; then
-    echo "Error: GITHUB_TOKEN environment variable is not set"
-    exit 1
-fi
-
-# Clone using token authentication
-git clone --branch "$REPO_BRANCH" --single-branch \
-    "https://${GITHUB_TOKEN}@github.com/Informatievlaanderen/OSLO-codelistgenerated.git" \
-    "$REPO_DIR"
+git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to clone repository"
@@ -104,12 +96,14 @@ echo "=========================================="
 mkdir -p OVO
 
 # Remove old TTL files
+echo "Removing old TTL files..."
 rm -f OVO/*.ttl
 
 # Copy all TTL files
-cp "$OUTPUT_DIR"/*.ttl OVO/
+echo "Copying new TTL files..."
+find "$OUTPUT_DIR" -name "*.ttl" -type f -print0 | xargs -0 -I {} cp {} OVO/
 
-TTL_COUNT=$(ls -1 OVO/*.ttl 2>/dev/null | wc -l)
+TTL_COUNT=$(find OVO -name "*.ttl" -type f | wc -l)
 echo "✓ Copied $TTL_COUNT TTL files"
 
 # Check if there are changes
@@ -124,7 +118,8 @@ echo "=========================================="
 echo "Committing and pushing changes"
 echo "=========================================="
 
-git add OVO/*.ttl
+# Add files in batches to avoid argument list too long
+find OVO -name "*.ttl" -type f -print0 | xargs -0 git add
 
 # Get statistics
 ADDED=$(git diff --cached --numstat | awk '{sum+=$1} END {print sum}')
@@ -152,3 +147,12 @@ fi
 cd ..
 rm -rf "$REPO_DIR"
 rm -f "$JSON_FILE"
+
+echo "=========================================="
+echo "Process completed successfully!"
+echo "=========================================="
+echo "Summary:"
+echo "  - Downloaded: $TOTAL_ORGS organizations"
+echo "  - Converted: $TTL_COUNT TTL files"
+echo "  - Repository: https://github.com/Informatievlaanderen/OSLO-codelistgenerated/tree/$REPO_BRANCH/OVO"
+echo "=========================================="
