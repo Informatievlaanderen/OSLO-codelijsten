@@ -25,7 +25,6 @@ export class OrganizationToTTLService {
     const parts = [
       this.generateOrganizationResource(org, orgResourceUri, docResourceUri),
       this.generateContactPoints(org),
-      this.generateDocumentResource(org, orgResourceUri, docResourceUri),
     ]
 
     return this.helper.joinNonEmpty(parts)
@@ -47,7 +46,7 @@ export class OrganizationToTTLService {
       this.generateIdentifiers(org),
       this.generateWegwijsLink(org),
       this.generateContactPointReferences(org),
-      `  rdfs:isDefinedBy ${docResourceUri} .`,
+      `.`,
     ]
 
     return this.helper.joinNonEmpty(properties)
@@ -193,7 +192,7 @@ export class OrganizationToTTLService {
 
     if (contact.contactTypeName) {
       properties.push(
-        `  rdfs:label "${this.helper.escapeString(contact.contactTypeName)}"@nl ;`,
+        `  schema:contactType "${this.helper.escapeString(contact.contactTypeName)}"@nl ;`,
       )
     }
 
@@ -210,7 +209,7 @@ export class OrganizationToTTLService {
     const value = this.helper.escapeString(contact.value)
 
     if (typeName.includes('email')) {
-      return `  schema:email "${value}" .`
+      return `  schema:email "mailto:${value}" .`
     }
 
     if (typeName.includes('telefoon') || typeName.includes('telephone')) {
@@ -225,25 +224,15 @@ export class OrganizationToTTLService {
       return `  schema:faxNumber "${value}" .`
     }
 
-    if (typeName.includes('website') || typeName.includes('homepage')) {
+    if (
+      typeName.includes('website') ||
+      typeName.includes('homepage') ||
+      typeName.includes('intranetsite')
+    ) {
       return `  schema:url <${contact.value}> .`
     }
 
     return `  rdfs:comment "${value}"@nl .`
-  }
-
-  /**
-   * Generate document resource
-   */
-  private generateDocumentResource(
-    org: Organization,
-    orgResourceUri: string,
-    docResourceUri: string,
-  ): string {
-    return `\n${docResourceUri}
-  a foaf:Document ;
-  rdfs:label "Document voor ${this.helper.escapeString(org.name)}"@nl ;
-  foaf:primaryTopic ${orgResourceUri} .`
   }
 
   /**
