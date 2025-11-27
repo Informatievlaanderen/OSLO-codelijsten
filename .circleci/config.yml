@@ -29,7 +29,7 @@ jobs:
           name: Configure Git
           command: |
             git config --global user.name "OSLO-support"
-            git config --global user.email OSLO-support@vlaanderen.be"
+            git config --global user.email "OSLO-support@vlaanderen.be"
 
       - run:
           name: Install OVO converter
@@ -48,7 +48,7 @@ workflows:
   update-ovo-daily:
     triggers:
       - schedule:
-          cron: '5 10 * * *' # Run daily at 2 AM UTC
+          cron: '9 10 * * *' # Run daily at 2 AM UTC
           filters:
             branches:
               only:
