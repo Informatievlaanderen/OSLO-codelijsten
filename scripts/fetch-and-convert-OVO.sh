@@ -107,7 +107,7 @@ mkdir -p OVO
 rm -f OVO/*.ttl
 
 # Copy all TTL files
-cp ../"$OUTPUT_DIR"/*.ttl OVO/
+cp "$OUTPUT_DIR"/*.ttl OVO/
 
 TTL_COUNT=$(ls -1 OVO/*.ttl 2>/dev/null | wc -l)
 echo "✓ Copied $TTL_COUNT TTL files"

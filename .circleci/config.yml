@@ -48,7 +48,7 @@ workflows:
   update-ovo-daily:
     triggers:
       - schedule:
-          cron: '13 10 * * *' # Run daily at 2 AM UTC
+          cron: '41 10 * * *' # Run daily at 2 AM UTC
           filters:
             branches:
               only:
