@@ -33,7 +33,7 @@ jobs:
 
       - run:
           name: Install OVO converter
-          command: npm install -g @oslo-flanders/org-to-ttl-converter
+          command: sudo npm install -g @oslo-flanders/org-to-ttl-converter
 
       - run:
           name: Fetch and convert OVO organizations
@@ -48,7 +48,7 @@ workflows:
   update-ovo-daily:
     triggers:
       - schedule:
-          cron: '9 10 * * *' # Run daily at 2 AM UTC
+          cron: '13 10 * * *' # Run daily at 2 AM UTC
           filters:
             branches:
               only:
