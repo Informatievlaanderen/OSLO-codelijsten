@@ -1,7 +1,11 @@
 import { CONCEPT_SCHEME_QUERY, topConceptQuery } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import { handleContentNegotiation } from '~/services/content-negotiation.service'
-import type { ConceptScheme, ConceptSchemeConfig } from '~/types/conceptScheme'
+import type {
+  ConceptScheme,
+  ConceptSchemeConfig,
+  DatasetConfig,
+} from '~/types/conceptScheme'
 
 export default defineEventHandler(
   async (event): Promise<ConceptScheme | string | null> => {
@@ -30,7 +34,7 @@ export default defineEventHandler(
       const negotiatedContent = await handleContentNegotiation(
         event,
         acceptHeader,
-        config.url,
+        config.sourceUrl,
       )
       if (negotiatedContent) return negotiatedContent
 
@@ -52,9 +56,10 @@ const getConceptSchemeConfig = async (
 ): Promise<ConceptSchemeConfig> => {
   const runtimeConfig = useRuntimeConfig()
   const response = await $fetch<any>(runtimeConfig.DATASET_CONFIG_URL!)
-  const data = typeof response === 'string' ? JSON.parse(response) : response
+  const data: DatasetConfig =
+    typeof response === 'string' ? JSON.parse(response) : response
 
-  const config = data.conceptSchemes.find((c: any) => c.key === slug)
+  const config = data.conceptSchemes.find((c: any) => c.urlRef === slug)
 
   if (!config) {
     throw createError({
@@ -69,12 +74,12 @@ const getConceptSchemeConfig = async (
 const buildConceptSchemeResponse = async (
   config: ConceptSchemeConfig,
 ): Promise<ConceptScheme> => {
-  const bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [config.url])
+  const bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [config.sourceUrl])
 
   if (!bindings.length) {
     throw createError({
       statusCode: 404,
-      statusMessage: `No data found for concept scheme: ${config.key}`,
+      statusMessage: `No data found for concept scheme: ${config.urlRef}`,
     })
   }
 
@@ -82,7 +87,9 @@ const buildConceptSchemeResponse = async (
   const schemeUri = binding.get('scheme')?.value ?? ''
 
   const topConceptsQuery = topConceptQuery(schemeUri)
-  const topConceptBindings = await executeQuery(topConceptsQuery, [config.url])
+  const topConceptBindings = await executeQuery(topConceptsQuery, [
+    config.sourceUrl,
+  ])
 
   const topConcepts = topConceptBindings.map((b) => ({
     id: b.get('concept')?.value.split('/').pop() ?? '',
@@ -90,17 +97,17 @@ const buildConceptSchemeResponse = async (
     label: b.get('label')?.value ?? '',
     definition: b.get('definition')?.value ?? '',
     notation: b.get('notation')?.value ?? '',
-    source: config.url,
+    source: config.sourceUrl,
   }))
 
   return {
-    id: config.key,
+    id: config.urlRef,
     uri: schemeUri,
-    label: binding.get('label')?.value ?? config.key,
+    label: binding.get('label')?.value ?? config.urlRef,
     definition: binding.get('definition')?.value ?? '',
     status: binding.get('status')?.value ?? '',
     dataset: binding.get('dataset')?.value ?? '',
     concepts: topConcepts,
-    source: config.url,
+    source: config.sourceUrl,
   }
 }

@@ -13,9 +13,8 @@ export interface ConceptScheme {
 }
 
 export interface ConceptSchemeConfig {
-  key: string
-  type: 'file-import' | 'organisation'
-  url: string
+  urlRef: string
+  sourceUrl: string
 }
 
 export interface DatasetConfig {

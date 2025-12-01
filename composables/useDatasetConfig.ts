@@ -31,7 +31,7 @@ export const useDatasetConfig = () => {
   ): Promise<ConceptSchemeConfig | undefined> => {
     const data = await fetchConfig()
     return data?.conceptSchemes.find(
-      (scheme: ConceptSchemeConfig) => scheme.key === key,
+      (scheme: ConceptSchemeConfig) => scheme.urlRef === key,
     )
   }
 

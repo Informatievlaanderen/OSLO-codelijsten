@@ -20,7 +20,7 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
       configs.map(async (config) => {
         try {
           const bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [
-            config.url,
+            config.sourceUrl,
           ])
 
           if (!bindings.length) return null
@@ -28,18 +28,18 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
           const binding = bindings[0]
 
           return {
-            id: config.key,
+            id: config.urlRef,
             uri: binding.get('scheme')?.value ?? '',
-            label: binding.get('label')?.value ?? config.key,
+            label: binding.get('label')?.value ?? config.urlRef,
             definition: binding.get('definition')?.value ?? '',
             status: binding.get('status')?.value ?? '',
             dataset: binding.get('dataset')?.value ?? '',
             topConcepts: [],
-            source: config.url,
+            source: config.sourceUrl,
           } as ConceptScheme
         } catch (err) {
           // Im not displaying the error to avoid cluttering the logs. It printed out the full RDF query error and HTML of the source
-          console.error(`Error loading scheme ${config.key}`)
+          console.error(`Error loading scheme ${config.urlRef}`)
           return null
         }
       }),

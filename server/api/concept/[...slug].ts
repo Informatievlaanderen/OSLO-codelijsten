@@ -1,6 +1,7 @@
 import { getConcept } from '~/server/services/rdfquery.service'
 import { handleContentNegotiation } from '~/services/content-negotiation.service'
 import type { Concept } from '~/types/concept'
+import type { ConceptSchemeConfig, DatasetConfig } from '~/types/conceptScheme'
 
 export default defineEventHandler(
   async (event): Promise<Concept | string | null> => {
@@ -58,15 +59,16 @@ const getConceptConfig = async (slug: string): Promise<ConceptConfig> => {
   const conceptId = slugParts.length > 1 ? slugParts[1] : slugParts[0]
 
   const response = await $fetch<any>(runtimeConfig.DATASET_CONFIG_URL!)
-  const data = typeof response === 'string' ? JSON.parse(response) : response
+  const data: DatasetConfig =
+    typeof response === 'string' ? JSON.parse(response) : response
 
   let sourceUrl: string = ''
 
   if (conceptSchemeSlug) {
     const scheme = data.conceptSchemes.find(
-      (s: any) => s.key === conceptSchemeSlug,
+      (s: any) => s.urlRef === conceptSchemeSlug,
     )
-    sourceUrl = scheme?.url
+    sourceUrl = scheme?.sourceUrl ?? ''
   }
 
   if (!sourceUrl) {

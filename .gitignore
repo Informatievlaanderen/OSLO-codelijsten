@@ -92,5 +92,7 @@ sw.*
 
 # Generated folder of static website
 .output/
+output/
+organisations.json
 
 PUBLISHED
