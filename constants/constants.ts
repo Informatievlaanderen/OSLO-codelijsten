@@ -37,6 +37,24 @@ export const CONCEPT_QUERY = `
     }
   `
 
+export const LICENSE_QUERY = `
+  PREFIX dct: <http://purl.org/dc/terms/>
+  PREFIX cc: <https://creativecommons.org/ns#>
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+  SELECT ?license ?title ?description ?type ?seeAlso ?requires ?versionInfo WHERE {
+    ?license a dct:LicenseDocument .
+    OPTIONAL { ?license dct:title ?title . }
+    OPTIONAL { ?license dct:description ?description . }
+    OPTIONAL { ?license dct:type ?type . }
+    OPTIONAL { ?license rdfs:seeAlso ?seeAlso . }
+    OPTIONAL { ?license cc:requires ?requires . }
+    OPTIONAL { ?license owl:versionInfo ?versionInfo . }
+  }
+`
+
 export const topConceptQuery = (schemeUri: string) => `
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
@@ -131,6 +149,25 @@ export const CONTACT_POINTS_QUERY = (orgUri: string) => `
     OPTIONAL { ?contactPoint schema:telephone ?telephone . }
     OPTIONAL { ?contactPoint schema:faxNumber ?faxNumber . }
     OPTIONAL { ?contactPoint schema:url ?url . }
+  }
+`
+
+export const LICENSE_BY_ID_QUERY = (licenseId: string) => `
+  PREFIX dct: <http://purl.org/dc/terms/>
+  PREFIX cc: <https://creativecommons.org/ns#>
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+  SELECT ?license ?title ?description ?type ?seeAlso ?requires ?versionInfo WHERE {
+    ?license a dct:LicenseDocument .
+    FILTER(CONTAINS(STR(?license), "${licenseId}"))
+    OPTIONAL { ?license dct:title ?title . }
+    OPTIONAL { ?license dct:description ?description . }
+    OPTIONAL { ?license dct:type ?type . }
+    OPTIONAL { ?license rdfs:seeAlso ?seeAlso . }
+    OPTIONAL { ?license cc:requires ?requires . }
+    OPTIONAL { ?license owl:versionInfo ?versionInfo . }
   }
 `
 

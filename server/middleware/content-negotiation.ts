@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
   const conceptSchemeMatch = url.pathname.match(/\/conceptscheme\/(.+)\.ttl$/)
   const conceptMatch = url.pathname.match(/\/concept\/(.+)\.ttl$/)
   const organisatieMatch = url.pathname.match(/\/organisatie\/(.+)\.ttl$/)
+  const licentieMatch = url.pathname.match(/\/licentie\/(.+)\.ttl$/)
 
   // Redirect to appropriate API endpoint
   if (conceptSchemeMatch) {
@@ -22,6 +23,8 @@ export default defineEventHandler(async (event) => {
     apiPath = `/doc/api/concept/${conceptMatch[1]}`
   } else if (organisatieMatch) {
     apiPath = `/doc/api/organization/${organisatieMatch[1]}.ttl`
+  } else if (licentieMatch) {
+    apiPath = `/doc/api/license/${licentieMatch[1]}.ttl`
   }
 
   if (!apiPath) {

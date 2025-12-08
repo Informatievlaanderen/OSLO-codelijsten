@@ -1,6 +1,6 @@
 <template>
   <content-header
-    title="Conceptschema"
+    title="Licentie"
     href="https://www.vlaanderen.be/digitaal-vlaanderen"
   />
 
@@ -10,13 +10,13 @@
         <vl-column width="12">
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
-              {{ data?.label ?? `Conceptschema: ${slug}` }}
+              {{ data?.title ?? `Licentie: ${slug}` }}
             </vl-title>
           </div>
         </vl-column>
         <vl-column width="12">
           <vl-action-group mod-collapse-s>
-            <a href="/doc/conceptscheme"
+            <a href="/doc/licentie"
               ><vl-button type="button">Terug naar overzicht</vl-button></a
             >
             <vl-button
@@ -30,12 +30,7 @@
           </vl-action-group>
         </vl-column>
 
-        <concept-scheme-info v-if="data" :concept-scheme="data" />
-        <concept-scheme-concepts
-          v-if="data"
-          :concepts="data?.concepts"
-          :conceptScheme="data.id"
-        />
+        <license-info :license="data"></license-info>
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -46,8 +41,7 @@
 <script setup lang="ts">
 import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
-
-import type { ConceptScheme } from '~/types/conceptScheme'
+import type { License } from '~/types/license'
 
 const route = useRoute()
 const slug = computed(() => {
@@ -57,11 +51,11 @@ const slug = computed(() => {
   return Array.isArray(params) ? params.join('/') : params
 })
 
-const { data } = await useAsyncData<ConceptScheme | null>(
-  `conceptscheme-${slug.value}`,
+const { data } = await useAsyncData<License | null>(
+  `licentie-${slug.value}`,
   async () => {
     try {
-      return await $fetch(`/doc/api/conceptscheme/${slug.value?.toString()}`)
+      return await $fetch(`/doc/api/license/${slug.value?.toString()}`)
     } catch (err) {
       console.error('Error loading concept schemes:', err)
       return null
@@ -70,7 +64,7 @@ const { data } = await useAsyncData<ConceptScheme | null>(
 )
 
 // Redirect to 404 in case of no data
-if (!data?.value?.label) {
+if (!data?.value?.title) {
   throw createError({
     statusCode: 404,
     statusMessage: 'Page not found',
@@ -78,6 +72,6 @@ if (!data?.value?.label) {
 }
 
 useSeoHead({
-  title: data.value?.label ?? `Conceptschema: ${slug.value}`,
+  title: data.value?.title ?? `Conceptschema: ${slug.value}`,
 })
 </script>

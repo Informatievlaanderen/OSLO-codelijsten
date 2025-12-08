@@ -49,8 +49,6 @@ export default defineEventHandler(
         sourceUrlWithExtension,
       ])
 
-      console.log(bindings.length, 'bingindgsss')
-
       if (!bindings.length) {
         throw createError({
           statusCode: 404,
