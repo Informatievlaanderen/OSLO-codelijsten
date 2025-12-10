@@ -26,7 +26,7 @@
 import type { Header } from '~/types/header'
 onMounted(() => {
   const headerScript = document.createElement('script')
-  switch (import.meta.env.VITE_ENVIRONMENT) {
+  switch (process.env.ENVIRONMENT ?? import.meta.env.VITE_ENVIRONMENT) {
     case 'Test':
       headerScript.src =
         'https://tni.widgets.burgerprofiel.dev-vlaanderen.be/api/v1/widget/99790a73-9a6b-4927-94ad-5df8ae9adf78/embed'

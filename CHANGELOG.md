@@ -6,3 +6,11 @@
 - 1.12.0
 
 Finalised the migration to Nuxt 3 for codelists and added a catch-all path for basisregister urls
+
+- 1.13.0
+
+* Make codelist dataset.json variable come from docker compose env
+
+- 1.13.4
+
+* Fix environment variable on deployed version

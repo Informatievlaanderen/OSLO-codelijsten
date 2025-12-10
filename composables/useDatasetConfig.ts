@@ -10,9 +10,9 @@ export const useDatasetConfig = () => {
     }
 
     try {
-      const response = await $fetch<DatasetConfig>(
-        import.meta.env.VITE_DATASET_CONFIG_URL!,
-      )
+      const DATASET_CONFIG_URL: string =
+        process.env.DATASET_CONFIG_URL ?? import.meta.env.DATASET_CONFIG_URL
+      const response = await $fetch<DatasetConfig>(DATASET_CONFIG_URL)
 
       // Parse the response if it's a string since Github raw URLs return strings
       const data =

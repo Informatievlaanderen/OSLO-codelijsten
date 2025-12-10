@@ -26,9 +26,10 @@ export default defineEventHandler(
 
       // Get the TTL file URL from runtime config
       const runtimeConfig = useRuntimeConfig()
-      const sourceUrl = runtimeConfig.LICENSE_TTL_URL
+      const LICENSE_TTL_URL =
+        process.env.LICENSE_TTL_URL ?? runtimeConfig.LICENSE_TTL_URL
 
-      if (!sourceUrl) {
+      if (!LICENSE_TTL_URL) {
         throw createError({
           statusCode: 400,
           statusMessage: 'LICENSE_TTL_URL is not configured',
@@ -41,14 +42,14 @@ export default defineEventHandler(
         const negotiatedContent = await handleContentNegotiation(
           event,
           acceptHeader,
-          sourceUrl,
+          LICENSE_TTL_URL,
         )
         if (negotiatedContent) return negotiatedContent
       }
 
       // Fetch license data
       const bindings = await executeQuery(LICENSE_BY_ID_QUERY(cleanSlug), [
-        sourceUrl,
+        LICENSE_TTL_URL,
       ])
 
       console.log(bindings.length, 'license bindings found')
@@ -128,7 +129,7 @@ export default defineEventHandler(
         requires: Array.from(requires),
         versionInfo,
         sameAs,
-        source: sourceUrl,
+        source: LICENSE_TTL_URL,
       }
 
       console.log('License fetched successfully:', license.uri)

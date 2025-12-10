@@ -28,7 +28,9 @@ export default defineEventHandler(
 
       // Get the TTL file URL from runtime config and add the slug to get the correct raw file
       const runtimeConfig = useRuntimeConfig()
-      const sourceUrl = `${runtimeConfig.ORGANIZATION_TTL_URL}/${slug}`
+      const ORGANIZATION_URL =
+        process.env.ORGANIZATION_TTL_URL ?? runtimeConfig.ORGANIZATION_TTL_URL
+      const sourceUrl = `${ORGANIZATION_URL}/${slug}`
 
       // Handle content negotiation
       const acceptHeader = getHeader(event, 'accept') ?? ''

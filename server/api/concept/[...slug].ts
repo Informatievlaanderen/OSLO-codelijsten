@@ -57,8 +57,10 @@ const getConceptConfig = async (slug: string): Promise<ConceptConfig> => {
   const slugParts = slug.split('/')
   const conceptSchemeSlug = slugParts.length > 1 ? slugParts[0] : null
   const conceptId = slugParts.length > 1 ? slugParts[1] : slugParts[0]
+  const DATASET_CONFIG_URL: string =
+    process.env.DATASET_CONFIG_URL ?? runtimeConfig.DATASET_CONFIG_URL
 
-  const response = await $fetch<any>(runtimeConfig.DATASET_CONFIG_URL!)
+  const response = await $fetch<any>(DATASET_CONFIG_URL)
   const data: DatasetConfig =
     typeof response === 'string' ? JSON.parse(response) : response
 

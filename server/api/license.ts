@@ -8,10 +8,11 @@ export default defineEventHandler(async (_event): Promise<License[]> => {
 
     // Get the TTL file URL from runtime config
     const runtimeConfig = useRuntimeConfig()
-    const sourceUrl = runtimeConfig.LICENSE_TTL_URL
+    const LICENSE_TTL_URL =
+      process.env.LICENSE_TTL_URL ?? runtimeConfig.LICENSE_TTL_URL
 
     // Fetch license data
-    const bindings = await executeQuery(LICENSE_QUERY, [sourceUrl])
+    const bindings = await executeQuery(LICENSE_QUERY, [LICENSE_TTL_URL])
 
     if (!bindings.length) {
       return []
@@ -78,7 +79,7 @@ export default defineEventHandler(async (_event): Promise<License[]> => {
           requires: Array.from(requires),
           versionInfo,
           sameAs,
-          source: sourceUrl,
+          source: LICENSE_TTL_URL,
         } as License
       },
     )

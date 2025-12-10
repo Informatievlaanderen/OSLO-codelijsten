@@ -55,7 +55,9 @@ const getConceptSchemeConfig = async (
   slug: string,
 ): Promise<ConceptSchemeConfig> => {
   const runtimeConfig = useRuntimeConfig()
-  const response = await $fetch<any>(runtimeConfig.DATASET_CONFIG_URL!)
+  const DATASET_CONFIG_URL: string =
+    process.env.DATASET_CONFIG_URL ?? runtimeConfig.DATASET_CONFIG_URL
+  const response = await $fetch<any>(DATASET_CONFIG_URL)
   const data: DatasetConfig =
     typeof response === 'string' ? JSON.parse(response) : response
 

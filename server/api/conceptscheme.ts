@@ -4,13 +4,15 @@ import type { ConceptScheme, ConceptSchemeConfig } from '~/types/conceptScheme'
 
 export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
   try {
-    // Env variable access during build time
     const runtimeConfig = useRuntimeConfig()
-    const response = await $fetch<any>(runtimeConfig.DATASET_CONFIG_URL!)
+    // Env variable access during build time
+    const DATASET_CONFIG_URL: string =
+      process.env.DATASET_CONFIG_URL ?? runtimeConfig.DATASET_CONFIG_URL
+    const response = await $fetch<any>(DATASET_CONFIG_URL)
 
     console.log(
       `[${new Date().toISOString()}] Fetched concept scheme config from:`,
-      runtimeConfig.DATASET_CONFIG_URL,
+      DATASET_CONFIG_URL,
     )
     const data = typeof response === 'string' ? JSON.parse(response) : response
     const configs: ConceptSchemeConfig[] = data.conceptSchemes
