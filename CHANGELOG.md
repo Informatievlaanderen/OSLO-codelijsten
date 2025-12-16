@@ -14,3 +14,7 @@ Finalised the migration to Nuxt 3 for codelists and added a catch-all path for b
 - 1.13.4
 
 * Fix environment variable on deployed version
+
+- 1.13.5
+
+* Allow content-negotiation for codelists
