@@ -1,13 +1,12 @@
-# OSLO-frontend-template
+# OSLO-codelijsten
 
-This repository should be used as the starting point for every frontend-related project that gets build for the government of Flanders. This project is built using [Nuxt 3.x](https://nuxt.com/) and [Vue 3.x](https://vuejs.org/). Ever since these newer versions of these libraries got released, the government of Flanders also released a third version of their webcomponents which works with these newer versions. The needed configuration has already been set up, so that you can start using these components immediately. The libraries are
+This repository serves as the frontend application for the codelijsten under https://data.vlaanderen.be/conceptscheme.
+It is built using [Nuxt 3](https://nuxt.com/) and uses the design system libraries from the Flemish government: `@govflanders/vl-ui-design-system-style` and `@govflanders/vl-ui-design-system-vue3`.
 
 ```json
 "@govflanders/vl-ui-design-system-style"
 "@govflanders/vl-ui-design-system-vue3"
 ```
-
-Documentation about these webcomponents can be found in [Storybook page](https://642e92e0cda6c627a0601f07-bpunzfpjnm.chromatic.com/?path=/docs/about-getting-started--docs). If the link does not work anymore, feel free to contact someone from the development team via their Slack channel `#design-system-vue3-alpha`.
 
 ## Build Setup
 
@@ -38,17 +37,6 @@ More information about the usage of this directory in [the documentation](https:
 ### `components`
 
 The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
-
-### `content`
-
-The content directory serves as the file-based CMS of the whole project. We use a library called `nuxt/content` that allows us to import all the content of our website into components/pages across the project.
-More information about the usage of this directory in [the documentation](https://content.nuxtjs.org/).
-
-### `layouts`
-
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxt.com/docs/guide/directory-structure/layouts#layouts-directory).
 
 ### `pages`
 

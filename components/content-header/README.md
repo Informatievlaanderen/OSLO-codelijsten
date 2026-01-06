@@ -16,7 +16,7 @@ In this component we import the generic header component from the Burgerprofiel-
 
 ```js
 const headerScript = document.createElement('script')
-switch (import.meta.env.VITE_ENVIRONMENT) {
+switch (process.env.ENVIRONMENT ?? import.meta.env.VITE_ENVIRONMENT) {
   case 'Test':
     headerScript.setAttribute(
       'src',
