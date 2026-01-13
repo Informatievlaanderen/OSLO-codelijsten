@@ -13,7 +13,9 @@ export default defineNuxtConfig({
     ORGANIZATION_TTL_URL: import.meta.env.VITE_ORGANIZATION_TTL_URL,
     LICENSE_TTL_URL: import.meta.env.VITE_LICENSE_TTL_URL,
     // public runtime env variables
-    // public: {}
+    public: {
+      ENVIRONMENT: process.env.ENVIRONMENT || 'Production',
+    },
   },
   app: {
     baseURL: '/doc',
