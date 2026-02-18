@@ -13,6 +13,6 @@
     "declaration": true,
     "preserveConstEnums": true
   },
-  "include": ["convert-org-to-ttl.ts", "services/**/*", "types/**/*"],
+  "include": ["convert-company-to-json.ts", "services/**/*", "types/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

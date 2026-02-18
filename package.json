@@ -5,7 +5,7 @@
   "description": "Convert organization JSON data to RDF Turtle format",
   "main": "dist/index.js",
   "bin": {
-    "oslo-org-to-ttl": "dist/convert-org-to-ttl.js"
+    "oslo-company-to-json": "dist/convert-company-to-json.js"
   },
   "files": [
     "dist",
@@ -13,12 +13,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "convert:dummy": "ts-node convert-org-to-ttl.ts --input ./dummy.json --output ./output/organisations",
-    "convert:all": "ts-node convert-org-to-ttl.ts --input ./organisationd_zoekresultagen.json --output ./output/organisations",
+    "convert:dummy": "ts-node convert-company-to-json.ts --input ./dummy.json --output ./output/organisations",
+    "convert:all": "ts-node convert-company-to-json.ts --input ./organisationd_zoekresultagen.json --output ./output/organisations",
     "build": "tsc",
     "prepublishOnly": "npm run build",
-    "start": "node dist/convert-org-to-ttl.js",
-    "postinstall": "chmod +x dist/convert-org-to-ttl.js || true"
+    "start": "node dist/convert-company-to-json.js",
+    "postinstall": "chmod +x dist/convert-company-to-json.js || true"
   },
   "keywords": [
     "rdf",

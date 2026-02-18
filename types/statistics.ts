@@ -1,6 +1,6 @@
 export interface Stats {
-  totalOrganizations: number
-  validOrganizations: number
+  totalCompanies: number
+  validCompanies: number
   successCount: number
   overwriteCount: number
 }
