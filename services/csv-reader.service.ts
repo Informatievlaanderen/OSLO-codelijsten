@@ -1,8 +1,33 @@
 import * as fs from 'fs'
-import type { Company } from '../types/company'
+import type { Company, Code } from '../types/company'
 import * as path from 'path'
 
 export class CsvReaderService {
+  readCodes(inputPath: string): any {
+    const codeData = fs.readFileSync(path.join(inputPath, 'code.csv'), 'utf-8')
+    const codeLines: string[] = codeData.split(/\r?\n/).slice(1)
+    const codeLookup: any = {}
+    for (const line of codeLines) {
+      if (line == '') continue
+
+      const raw = line.replace(/"/g, '').split(',')
+      const category = raw[0]
+      const code = raw[1]
+      if (!(category in codeLookup)) {
+        codeLookup[category] = []
+      }
+
+      codeLookup[category].push({
+        category: raw[0],
+        code: raw[1],
+        language: raw[2],
+        description: raw[3],
+      })
+    }
+
+    return codeLookup
+  }
+
   /**
    * Read and parse companies from CSV file
    */
@@ -13,22 +38,6 @@ export class CsvReaderService {
       'utf-8',
     )
     const companyLines: string[] = companyData.split(/\r?\n/).slice(1)
-    const companyLookup: any = {}
-    for (const line of companyLines) {
-      if (line == '') continue
-
-      const raw = line.replace(/"/g, '').split(',')
-      const id = raw[0]
-      companyLookup[id] = {
-        id: raw[0],
-        status: raw[1],
-        juridicalSituation: raw[2],
-        type: raw[3],
-        juridicalForm: raw[4],
-        juridicalFormCAC: raw[5],
-        startDate: raw[6],
-      }
-    }
     const denominationData = fs.readFileSync(
       path.join(inputPath, 'denomination.csv'),
       'utf-8',
@@ -174,14 +183,14 @@ export class CsvReaderService {
 
       const raw = line.replace(/"/g, '').split(',')
       const identifier = raw[0]
-      console.log(`${identifier}`);
+      console.log(`${identifier}`)
 
       const company: Company = {
         identifier: identifier,
         name: [],
         juridicalState: raw[1],
-        rechtstoestand: raw[2],
-        rechtspersoonlijkheid: raw[3],
+        juridicalSituation: raw[2],
+        juridicalEntity: raw[3],
         juridicalForm: raw[4],
         juridicalFormCAC: raw[5],
         startDate: raw[6],
@@ -192,10 +201,11 @@ export class CsvReaderService {
         mainAddress: {},
       }
 
+      const codeLookup = this.readCodes(inputPath)
       this.parseEstablishment(company, establishmentLookup)
       this.parseDenomination(company, denominationLookup)
       this.parseBranch(company, branchLookup)
-      this.parseActivity(company, activityLookup)
+      this.parseActivity(company, activityLookup, codeLookup)
       this.parseContact(company, contactLookup)
       this.parseAddress(company, addressLookup)
 
@@ -251,19 +261,30 @@ export class CsvReaderService {
         company.branch.push({
           identifier: entity['id'],
           startDate: entity['startDate'],
+          address: {},
         })
       }
     }
   }
 
-  parseActivity(company: Company, activity: any): void {
+  parseActivity(company: Company, activity: any, codes: any): void {
     /* Hoofdzetel */
     if (activity[company.identifier]) {
       for (const entity of activity[company.identifier]) {
+        const descriptionNl = codes[`Nace${entity['naceVersion']}`].find(
+          (element: any) =>
+            element.code == entity['naceCode'] && element.language == 'NL',
+        ).description
+        const descriptionFr = codes[`Nace${entity['naceVersion']}`].find(
+          (element: any) =>
+            element.code == entity['naceCode'] && element.language == 'FR',
+        ).description
         company.activity.push({
           group: entity['group'],
           naceVersion: entity['naceVersion'],
           naceCode: entity['naceCode'],
+          naceDescriptionNl: descriptionNl,
+          naceDescriptionFr: descriptionFr,
           classification: entity['classification'],
         })
       }
@@ -272,10 +293,19 @@ export class CsvReaderService {
     for (const establishment of company.establishment) {
       if (activity[establishment.identifier]) {
         for (const entity of activity[establishment.identifier]) {
+          let descriptionNl = codes[`Nace${entity['naceVersion']}`].find(
+            (element: any) => element.code == entity['naceCode'],
+          ).description
+          const descriptionFr = codes[`Nace${entity['naceVersion']}`].find(
+            (element: any) =>
+              element.code == entity['naceCode'] && element.language == 'FR',
+          ).description
           establishment.activity.push({
             group: entity['group'],
             naceVersion: entity['naceVersion'],
             naceCode: entity['naceCode'],
+            naceDescriptionNl: descriptionNl,
+            naceDescriptionFr: descriptionFr,
             classification: entity['classification'],
           })
         }
@@ -401,6 +431,40 @@ export class CsvReaderService {
             address[establishment.identifier]['endDate'] == ''
               ? undefined
               : address[establishment.identifier]['endDate'],
+        }
+      }
+    }
+
+    /* Bijkantoren */
+    for (const branch of company.branch) {
+      if (address[branch.identifier]) {
+        branch.address = {
+          countryNl:
+            address[branch.identifier]['countryNl'] == ''
+              ? 'België'
+              : address[branch.identifier]['countryNl'],
+          countryFr:
+            address[branch.identifier]['countryFr'] == ''
+              ? 'Belgique'
+              : address[branch.identifier]['countryFr'],
+          zipcode: address[branch.identifier]['zipcode'],
+          municipalityNl: address[branch.identifier]['municipalityNl'],
+          municipalityFr: address[branch.identifier]['municipalityFr'],
+          streetNl: address[branch.identifier]['streetNl'],
+          streetFr: address[branch.identifier]['streetFr'],
+          houseNumber: address[branch.identifier]['houseNumber'],
+          box:
+            address[branch.identifier]['box'] == ''
+              ? undefined
+              : address[branch.identifier]['box'],
+          extraAddressInfo:
+            address[branch.identifier]['extraAddressInfo'] == ''
+              ? undefined
+              : address[branch.identifier]['extraAddressInfo'],
+          endDate:
+            address[branch.identifier]['endDate'] == ''
+              ? undefined
+              : address[branch.identifier]['endDate'],
         }
       }
     }

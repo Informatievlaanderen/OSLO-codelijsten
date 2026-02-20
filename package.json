@@ -39,7 +39,19 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.25",
+    "@types/streamify-array": "^1.0.3",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@oslo-flanders/core": "^1.0.15",
+    "inversify": "^6.0.1",
+    "n3": "^1.16.2",
+    "rdf-data-factory": "^1.1.1",
+    "rdf-parse": "^2.3.2",
+    "rdf-serialize": "^2.2.2",
+    "streamify-array": "^1.0.1",
+    "streamify-string": "^1.0.1",
+    "yargs": "^18.0.0"
   }
 }

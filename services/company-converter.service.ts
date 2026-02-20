@@ -1,13 +1,14 @@
 import type { Company } from '../types/company'
 import type { Stats } from '../types/statistics'
-//import { KBOToTTLService } from './kbo-to-ttl.service'
 import { FileWriterService } from './file-writer.service'
 import { CsvReaderService } from './csv-reader.service'
+import { CompanyToTTLService } from './company-to-ttl.service'
 
 export class CompanyConverterService {
   //  private readonly ttlConverter = new KBOToTTLService()
   private readonly fileWriter = new FileWriterService()
   private readonly csvReader = new CsvReaderService()
+  private readonly ttlConverter = new CompanyToTTLService()
 
   /**
    * Convert companies from CSV to JSON files
@@ -15,8 +16,11 @@ export class CompanyConverterService {
   async convertCompanies(inputDir: string, outputDir: string): Promise<Stats> {
     console.log(`Reading KBO companies from: ${inputDir}`)
     const companies = this.csvReader.readCompanies(inputDir)
+    const codes = this.csvReader.readCodes(inputDir)
 
     console.log(`Converting ${companies.length} companies...`)
+    for (const company of companies) this.ttlConverter.convertToRDF(company)
+    this.ttlConverter.convertCodes(codes);
 
     this.fileWriter.ensureDirectoryExists(outputDir)
 
@@ -39,7 +43,7 @@ export class CompanyConverterService {
 
     for (const comp of companies) {
       try {
-        const fileName = `${comp.identifier}.json`
+        const fileName = `${comp.identifier}.ttl`
         const filePath = this.fileWriter.getFilePath(outputDir, fileName)
 
         if (this.fileWriter.fileExists(filePath)) {
@@ -49,8 +53,10 @@ export class CompanyConverterService {
           overwriteCount++
         }
 
-        //const ttlContent = this.ttlConverter.convertToTTLWithPrefixes(comp)
-        this.fileWriter.writeFile(filePath, JSON.stringify(comp, null, 2))
+        const ttlContent = await this.ttlConverter.exportRDFAsTurtle(
+          comp.identifier,
+        )
+        this.fileWriter.writeFile(filePath, ttlContent)
         successCount++
 
         if (successCount % 10 === 0) {

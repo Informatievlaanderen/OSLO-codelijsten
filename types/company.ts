@@ -1,9 +1,16 @@
+export interface Code {
+  category: string
+  code: string
+  language: string
+  description: string
+}
+
 export interface Company {
   identifier: string
   name: Name[]
   juridicalState: string
-  rechtstoestand: string
-  rechtspersoonlijkheid: string
+  juridicalSituation: string
+  juridicalEntity: string
   juridicalForm: string
   juridicalFormCAC: string
   startDate: string
@@ -32,12 +39,15 @@ export interface Establishment {
 export interface Branch {
   identifier: string
   startDate: string
+  address: Address
 }
 
 export interface Activity {
   group: string
   naceVersion: string
   naceCode: string
+  naceDescriptionNl: string
+  naceDescriptionFr: string
   classification: string
 }
 
