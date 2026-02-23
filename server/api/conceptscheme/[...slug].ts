@@ -69,8 +69,6 @@ const getConceptSchemeConfig = async (
 
   const config = data.conceptSchemes.find((c: any) => c.urlRef === slug)
 
-  console.log(extension, 'lololol')
-
   // throw an error if it's explicitally stated to use an extension but it's not the correct one (jsonld versus ttl for example)
   if (extension && !config?.sourceUrl.endsWith(extension)) {
     throw createError({

@@ -6,22 +6,15 @@ export const handleContentNegotiation = async (
   sourceUrl: string,
 ) => {
   const url = getRequestURL(event)
-  console.log(url, 'url')
   const pathname = url.pathname
 
   // Detect file extension first
 
-  console.log(pathname)
   const extensionMatch = pathname.match(/\.(\w+)$/)
-  console.log(extensionMatch, 'extensionMatch')
   const fileExtension = extensionMatch ? extensionMatch[1].toLowerCase() : null
   const requestedFormat = fileExtension
     ? SUPPORTED_FORMATS[fileExtension as keyof typeof SUPPORTED_FORMATS]
     : null
-
-  console.log(requestedFormat, 'requestedForamt')
-  console.log(requestedFormat, 'requestedForamt')
-  console.log(requestedFormat, 'requestedForamt')
 
   // Check for supported format
   const supportedFormats = Object.values(SUPPORTED_FORMATS)

@@ -1,4 +1,8 @@
-import { SUPPORTED_EXTENSIONS, SUPPORTED_FORMATS } from '~/constants/constants'
+import {
+  SUPPORTED_EXTENSIONS,
+  SUPPORTED_FORMATS,
+  TTL,
+} from '~/constants/constants'
 
 export default defineEventHandler(async (event) => {
   const url: string = getRequestURL(event).pathname
@@ -11,20 +15,23 @@ export default defineEventHandler(async (event) => {
   const acceptHeader: string | undefined = getRequestHeader(event, 'accept')
 
   // Check if URL ends with any supported extension
-  const extension: string | undefined = SUPPORTED_EXTENSIONS.find(
-    (ext: string) => url.endsWith(ext),
+  let extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext: string) =>
+    url.endsWith(ext),
   )
 
-  // if there is no extension, we don't need to do any CN
-  if (!extension) return
+  // If no extension in URL, derive it from accept header
+  if (!extension && acceptHeader) {
+    for (const [key, mimeType] of Object.entries(SUPPORTED_FORMATS)) {
+      if (acceptHeader.includes(mimeType)) {
+        extension = `.${key}`
+        break
+      }
+    }
+  }
 
   // remove the . from .ttl, .jsonld,...
-  const contentType: string = SUPPORTED_FORMATS[extension?.replace('.', '')]
-
-  console.log(acceptHeader, 'acceptheader')
-  console.log(acceptHeader, 'acceptheader')
-  console.log(acceptHeader, 'acceptheader')
-  console.log(acceptHeader, 'acceptheader')
+  const contentType: string =
+    SUPPORTED_FORMATS[(extension ?? TTL)?.replace('.', '')]
 
   if (extension || acceptHeader) {
     let apiPath: string | null = null
@@ -38,7 +45,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Match paths for different resource types
+    // Match peaths for different resource types
     const conceptSchemeMatch = cleanPath.match(/\/conceptscheme\/(.+)$/)
     const conceptMatch = cleanPath.match(/\/concept\/(.+)$/)
     const organisatieMatch = cleanPath.match(/\/organisatie\/(.+)$/)
@@ -55,15 +62,9 @@ export default defineEventHandler(async (event) => {
       apiPath = `/doc/api/license/${licentieMatch[1]}${extension}`
     }
 
-    console.log(apiPath, 'apipath')
-    console.log(apiPath, 'apipath')
-    console.log(apiPath, 'apipath')
-
     if (!apiPath) {
       return
     }
-
-    console.log(apiPath)
 
     try {
       // Fetch from API with Turtle accept header
