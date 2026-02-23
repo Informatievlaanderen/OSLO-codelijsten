@@ -1,8 +1,8 @@
-import { SUPPORTED_EXTENSIONS } from '~/constants/constants'
+import { SUPPORTED_EXTENSIONS, SUPPORTED_FORMATS } from '~/constants/constants'
 import { getConcept } from '~/server/services/rdfquery.service'
-import { handleContentNegotiation } from '~/services/content-negotiation.service'
 import type { Concept } from '~/types/concept'
 import type { DatasetConfig } from '~/types/conceptScheme'
+import { serializeConcept } from '~/services/serialization-service'
 
 export default defineEventHandler(
   async (event): Promise<Concept | string | null> => {
@@ -28,14 +28,28 @@ export default defineEventHandler(
 
       const config = await getConceptConfig(cleanSlug)
 
-      // Handle content negotiation
+      // Handle content negotiation - serialize only this concept
       const acceptHeader = getHeader(event, 'accept') ?? ''
-      const negotiatedContent = await handleContentNegotiation(
-        event,
-        acceptHeader,
-        config.sourceUrl,
-      )
-      if (negotiatedContent) return negotiatedContent
+      const extensionFormat = extension
+        ? SUPPORTED_FORMATS[
+            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+          ]
+        : null
+      const requestedFormat =
+        extensionFormat ||
+        Object.values(SUPPORTED_FORMATS).find((fmt) =>
+          acceptHeader.includes(fmt),
+        )
+
+      if (requestedFormat) {
+        const serialized = await serializeConcept(
+          config.conceptId,
+          config.sourceUrl,
+          requestedFormat,
+        )
+        setHeader(event, 'Content-Type', requestedFormat)
+        return serialized
+      }
 
       // Return JSON response
       return await buildConceptResponse(config.conceptId, config.sourceUrl)
