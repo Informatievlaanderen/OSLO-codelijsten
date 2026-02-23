@@ -1,4 +1,4 @@
-import { TEXT_TURTLE, TTL } from '~/constants/constants'
+import { SUPPORTED_EXTENSIONS, SUPPORTED_FORMATS } from '~/constants/constants'
 
 export default defineEventHandler(async (event) => {
   const url: string = getRequestURL(event).pathname
@@ -10,11 +10,33 @@ export default defineEventHandler(async (event) => {
 
   const acceptHeader: string | undefined = getRequestHeader(event, 'accept')
 
-  if (url.endsWith(TTL) || acceptHeader === TEXT_TURTLE) {
+  // Check if URL ends with any supported extension
+  const extension: string | undefined = SUPPORTED_EXTENSIONS.find(
+    (ext: string) => url.endsWith(ext),
+  )
+
+  // if there is no extension, we don't need to do any CN
+  if (!extension) return
+
+  // remove the . from .ttl, .jsonld,...
+  const contentType: string = SUPPORTED_FORMATS[extension?.replace('.', '')]
+
+  console.log(acceptHeader, 'acceptheader')
+  console.log(acceptHeader, 'acceptheader')
+  console.log(acceptHeader, 'acceptheader')
+  console.log(acceptHeader, 'acceptheader')
+
+  if (extension || acceptHeader) {
     let apiPath: string | null = null
 
-    // Remove .ttl extension if present for matching
-    const cleanPath = url.replace(/\.ttl$/, '')
+    // Remove any supported extension if present for matching
+    let cleanPath = url
+    for (const ext of SUPPORTED_EXTENSIONS) {
+      if (cleanPath.endsWith(ext)) {
+        cleanPath = cleanPath.slice(0, -ext.length)
+        break
+      }
+    }
 
     // Match paths for different resource types
     const conceptSchemeMatch = cleanPath.match(/\/conceptscheme\/(.+)$/)
@@ -24,28 +46,34 @@ export default defineEventHandler(async (event) => {
 
     // Redirect to appropriate API endpoint
     if (conceptSchemeMatch) {
-      apiPath = `/doc/api/conceptscheme/${conceptSchemeMatch[1]}`
+      apiPath = `/doc/api/conceptscheme/${conceptSchemeMatch[1]}${extension}`
     } else if (conceptMatch) {
-      apiPath = `/doc/api/concept/${conceptMatch[1]}`
+      apiPath = `/doc/api/concept/${conceptMatch[1]}${extension}`
     } else if (organisatieMatch) {
-      apiPath = `/doc/api/organization/${organisatieMatch[1]}.ttl`
+      apiPath = `/doc/api/organization/${organisatieMatch[1]}${extension}`
     } else if (licentieMatch) {
-      apiPath = `/doc/api/license/${licentieMatch[1]}.ttl`
+      apiPath = `/doc/api/license/${licentieMatch[1]}${extension}`
     }
+
+    console.log(apiPath, 'apipath')
+    console.log(apiPath, 'apipath')
+    console.log(apiPath, 'apipath')
 
     if (!apiPath) {
       return
     }
 
+    console.log(apiPath)
+
     try {
       // Fetch from API with Turtle accept header
       const content = await $fetch<string>(apiPath, {
         headers: {
-          Accept: TEXT_TURTLE,
+          Accept: contentType,
         },
       })
 
-      setHeader(event, 'Content-Type', TEXT_TURTLE)
+      setHeader(event, 'Content-Type', contentType)
       setResponseStatus(event, 200)
 
       return content

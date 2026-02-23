@@ -1,4 +1,8 @@
-import { CONCEPT_SCHEME_QUERY, topConceptQuery } from '~/constants/constants'
+import {
+  CONCEPT_SCHEME_QUERY,
+  topConceptQuery,
+  SUPPORTED_EXTENSIONS,
+} from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import { handleContentNegotiation } from '~/services/content-negotiation.service'
 import type {
@@ -19,15 +23,17 @@ export default defineEventHandler(
         })
       }
 
+      // Detect supported file extension
+      const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
+        slug.endsWith(ext),
+      )
+      const cleanSlug = extension ? slug.replace(extension, '') : slug
+
       console.log(
-        `[${new Date().toISOString()}] Fetched concept scheme config for: ${slug}`,
+        `[${new Date().toISOString()}] Fetched concept scheme config for: ${cleanSlug}`,
       )
 
-      // See if a .ttl extension is present in the slug
-      const hasTtlExtension = slug.endsWith('.ttl')
-      const cleanSlug = hasTtlExtension ? slug.replace(/\.ttl$/, '') : slug
-
-      const config = await getConceptSchemeConfig(cleanSlug)
+      const config = await getConceptSchemeConfig(cleanSlug, extension)
 
       // Handle content negotiation
       const acceptHeader = getHeader(event, 'accept') ?? ''
@@ -41,7 +47,6 @@ export default defineEventHandler(
       // Return JSON response
       return await buildConceptSchemeResponse(config)
     } catch (error) {
-      // Im not displaying the error or throwing an error to avoid cluttering the logs. It printed out the full RDF query error and HTML of the source
       console.error('Error fetching concept scheme')
       throw createError({
         statusCode: 400,
@@ -53,6 +58,7 @@ export default defineEventHandler(
 
 const getConceptSchemeConfig = async (
   slug: string,
+  extension?: string,
 ): Promise<ConceptSchemeConfig> => {
   const runtimeConfig = useRuntimeConfig()
   const DATASET_CONFIG_URL: string =
@@ -62,6 +68,16 @@ const getConceptSchemeConfig = async (
     typeof response === 'string' ? JSON.parse(response) : response
 
   const config = data.conceptSchemes.find((c: any) => c.urlRef === slug)
+
+  console.log(extension, 'lololol')
+
+  // throw an error if it's explicitally stated to use an extension but it's not the correct one (jsonld versus ttl for example)
+  if (extension && !config?.sourceUrl.endsWith(extension)) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: `Concept scheme not found in the requested content type: ${slug}, ${extension}`,
+    })
+  }
 
   if (!config) {
     throw createError({
