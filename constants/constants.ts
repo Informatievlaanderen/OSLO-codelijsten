@@ -179,7 +179,6 @@ export const SUPPORTED_FORMATS: { [key: string]: string } = {
   rdf: 'application/rdf+xml',
   jsonld: 'application/ld+json',
   nt: 'application/n-triples',
-  xml: 'application/xml',
   json: 'application/json',
 }
 
@@ -188,6 +187,5 @@ export const SUPPORTED_EXTENSIONS = [
   '.rdf',
   '.jsonld',
   '.nt',
-  '.xml',
   '.json',
 ]

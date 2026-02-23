@@ -19,6 +19,17 @@ export default defineEventHandler(async (event) => {
     url.endsWith(ext),
   )
 
+  const supportsFormat =
+    extension ||
+    (acceptHeader &&
+      Object.values(SUPPORTED_FORMATS).some((fmt) =>
+        acceptHeader.includes(fmt),
+      ))
+
+  if (!supportsFormat) {
+    return
+  }
+
   // If no extension in URL, derive it from accept header
   if (!extension && acceptHeader) {
     for (const [key, mimeType] of Object.entries(SUPPORTED_FORMATS)) {
