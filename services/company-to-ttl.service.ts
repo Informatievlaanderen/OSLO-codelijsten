@@ -317,7 +317,7 @@ export class CompanyToTTLService {
         ),
         this.df.quad(
           contactBlanknode,
-          ns.rdf('type'),
+          ns.dcterms('type'),
           this.df.namedNode(
             'https://data.vlaanderen.be/id/concept/EntityContact/ENT',
           ),
@@ -375,7 +375,7 @@ export class CompanyToTTLService {
         this.df.quad(addressBlanknode, ns.rdf('type'), ns2.locn('Address')),
         this.df.quad(
           contactBlanknode,
-          ns.rdf('type'),
+          ns.dcterms('type'),
           this.df.namedNode(
             'https://data.vlaanderen.be/id/concept/TypeOfAddress/REGO',
           ),
@@ -607,7 +607,7 @@ export class CompanyToTTLService {
           ),
           this.df.quad(
             contactBlanknode,
-            ns.rdf('type'),
+            ns.dcterms('type'),
             this.df.namedNode(
               'https://data.vlaanderen.be/id/concept/EntityContact/EST',
             ),
@@ -670,7 +670,7 @@ export class CompanyToTTLService {
           this.df.quad(addressBlanknode, ns.rdf('type'), ns2.locn('Address')),
           this.df.quad(
             contactBlanknode,
-            ns.rdf('type'),
+            ns.dcterms('type'),
             this.df.namedNode(
               'https://data.vlaanderen.be/id/concept/TypeOfAddress/BAET',
             ),
@@ -877,7 +877,7 @@ export class CompanyToTTLService {
           ),
           this.df.quad(
             contactBlanknode,
-            ns.rdf('type'),
+            ns.dcterms('type'),
             this.df.namedNode(
               'https://data.vlaanderen.be/id/concept/EntityContact/BRA',
             ),
@@ -894,7 +894,7 @@ export class CompanyToTTLService {
           this.df.quad(addressBlanknode, ns.rdf('type'), ns2.locn('Address')),
           this.df.quad(
             contactBlanknode,
-            ns.rdf('type'),
+            ns.dcterms('type'),
             this.df.namedNode(
               'https://data.vlaanderen.be/id/concept/TypeOfAddress/ABBR',
             ),
@@ -1005,7 +1005,7 @@ export class CompanyToTTLService {
         (q.object.termType === 'NamedNode' ||
           q.object.termType === 'BlankNode') &&
         store.findObject(q.object, ns.rdf('type'))?.value !=
-          ns2.reorg('RegisteredOrganization').value 
+          ns2.reorg('RegisteredOrganization').value
       )
         this.discoverCompany(q.object, quads, store)
     }

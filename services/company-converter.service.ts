@@ -15,16 +15,21 @@ export class CompanyConverterService {
    */
   async convertCompanies(inputDir: string, outputDir: string): Promise<Stats> {
     console.log(`Reading KBO companies from: ${inputDir}`)
-    const companies = this.csvReader.readCompanies(inputDir)
-    const codes = this.csvReader.readCodes(inputDir)
+    const result = await this.csvReader.readCompanies(inputDir, outputDir)
+    const codes = await this.csvReader.readCodes(inputDir)
 
-    console.log(`Converting ${companies.length} companies...`)
-    for (const company of companies) this.ttlConverter.convertToRDF(company)
-    this.ttlConverter.convertCodes(codes);
+    this.ttlConverter.convertCodes(codes)
 
-    this.fileWriter.ensureDirectoryExists(outputDir)
+    console.log(
+      `✓ Processed ${result.total} companies in ${result.batches} batches`,
+    )
 
-    const stats = await this.processCompanies(companies, outputDir)
+    const stats: Stats = {
+      total: result.total,
+      success: result.total,
+      errors: 0,
+      overwritten: 0,
+    }
 
     this.printSummary(stats, outputDir)
 
@@ -32,59 +37,17 @@ export class CompanyConverterService {
   }
 
   /**
-   * Process all companies and write to files
-   */
-  private async processCompanies(
-    companies: Company[],
-    outputDir: string,
-  ): Promise<Stats> {
-    let successCount = 0
-    let overwriteCount = 0
-
-    for (const comp of companies) {
-      try {
-        const fileName = `${comp.identifier}.ttl`
-        const filePath = this.fileWriter.getFilePath(outputDir, fileName)
-
-        if (this.fileWriter.fileExists(filePath)) {
-          console.log(
-            `File already exists: ${fileName} (${comp.name}) - Overwriting...`,
-          )
-          overwriteCount++
-        }
-
-        const ttlContent = await this.ttlConverter.exportRDFAsTurtle(
-          comp.identifier,
-        )
-        this.fileWriter.writeFile(filePath, ttlContent)
-        successCount++
-
-        if (successCount % 10 === 0) {
-          console.log(`Processed ${successCount}/${companies.length} files...`)
-        }
-      } catch (error) {
-        console.error(`Error processing ${comp.identifier}:`, error)
-      }
-    }
-
-    return {
-      totalCompanies: companies.length,
-      validCompanies: companies.length,
-      successCount,
-      overwriteCount,
-    }
-  }
-
-  /**
    * Print conversion summary
    */
   private printSummary(stats: Stats, outputDir: string): void {
-    console.log(
-      `Successfully converted ${stats.successCount} companies to individual files in ${outputDir}`,
-    )
-
-    if (stats.overwriteCount > 0) {
-      console.log(`Overwrote ${stats.overwriteCount} existing file(s)`)
-    }
+    console.log('\n========================================')
+    console.log('Conversion Summary')
+    console.log('========================================')
+    console.log(`Total companies: ${stats.total}`)
+    console.log(`Successfully converted: ${stats.success}`)
+    console.log(`Errors: ${stats.errors}`)
+    console.log(`Overwritten: ${stats.overwritten}`)
+    console.log(`Output directory: ${outputDir}`)
+    console.log('========================================\n')
   }
 }
