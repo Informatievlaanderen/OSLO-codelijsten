@@ -1,7 +1,8 @@
+import { SUPPORTED_EXTENSIONS } from '~/constants/constants'
 import { getConcept } from '~/server/services/rdfquery.service'
 import { handleContentNegotiation } from '~/services/content-negotiation.service'
 import type { Concept } from '~/types/concept'
-import type { ConceptSchemeConfig, DatasetConfig } from '~/types/conceptScheme'
+import type { DatasetConfig } from '~/types/conceptScheme'
 
 export default defineEventHandler(
   async (event): Promise<Concept | string | null> => {
@@ -19,9 +20,11 @@ export default defineEventHandler(
         `[${new Date().toISOString()}] Fetched concept scheme config for: ${slug}`,
       )
 
-      // See if a .ttl extension is present in the slug
-      const hasTtlExtension = slug.endsWith('.ttl')
-      const cleanSlug = hasTtlExtension ? slug.replace(/\.ttl$/, '') : slug
+      // Detect supported file extension
+      const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
+        slug.endsWith(ext),
+      )
+      const cleanSlug = extension ? slug.replace(extension, '') : slug
 
       const config = await getConceptConfig(cleanSlug)
 
@@ -55,8 +58,20 @@ interface ConceptConfig {
 const getConceptConfig = async (slug: string): Promise<ConceptConfig> => {
   const runtimeConfig = useRuntimeConfig()
   const slugParts = slug.split('/')
-  const conceptSchemeSlug = slugParts.length > 1 ? slugParts[0] : null
-  const conceptId = slugParts.length > 1 ? slugParts[1] : slugParts[0]
+
+  // Handle both formats: "schemeId/conceptId" or just "conceptId"
+  let conceptSchemeSlug: string | null = null
+  let conceptId: string
+
+  if (slugParts.length > 1) {
+    // Format: schemeId/conceptId
+    conceptSchemeSlug = slugParts[0]
+    conceptId = slugParts[1]
+  } else {
+    // Single part - just the concept ID
+    conceptId = slugParts[0]
+  }
+
   const DATASET_CONFIG_URL: string =
     process.env.DATASET_CONFIG_URL ?? runtimeConfig.DATASET_CONFIG_URL
 
@@ -67,6 +82,7 @@ const getConceptConfig = async (slug: string): Promise<ConceptConfig> => {
   let sourceUrl: string = ''
 
   if (conceptSchemeSlug) {
+    // Look up the scheme to get its source URL
     const scheme = data.conceptSchemes.find(
       (s: any) => s.urlRef === conceptSchemeSlug,
     )

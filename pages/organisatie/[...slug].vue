@@ -62,7 +62,6 @@
 
 <script setup lang="ts">
 import type { OrganizationData } from '~/types/organization'
-import { TTL } from '~/constants/constants'
 import { useSeoHead } from '~/composables/useSEO'
 
 const showToaster = ref(false)

@@ -1,4 +1,4 @@
-import { TEXT_TURTLE } from '~/constants/constants'
+import { SUPPORTED_FORMATS } from '~/constants/constants'
 
 export const handleContentNegotiation = async (
   event: any,
@@ -8,13 +8,24 @@ export const handleContentNegotiation = async (
   const url = getRequestURL(event)
   const pathname = url.pathname
 
-  // Check for .ttl extension and accept header
-  const hasTtlExtension = pathname.endsWith('.ttl')
-  const acceptsTurtle = acceptHeader.includes(TEXT_TURTLE)
+  // Detect file extension first
 
-  if (hasTtlExtension || acceptsTurtle) {
+  const extensionMatch = pathname.match(/\.(\w+)$/)
+  const fileExtension = extensionMatch ? extensionMatch[1].toLowerCase() : null
+  const requestedFormat = fileExtension
+    ? SUPPORTED_FORMATS[fileExtension as keyof typeof SUPPORTED_FORMATS]
+    : null
+
+  // Check for supported format
+  const supportedFormats = Object.values(SUPPORTED_FORMATS)
+  const shouldFetchRaw =
+    requestedFormat ||
+    supportedFormats.some((fmt) => acceptHeader.includes(fmt))
+
+  if (shouldFetchRaw) {
     const content = await $fetch<string>(sourceUrl)
-    setHeader(event, 'Content-Type', TEXT_TURTLE)
+    const contentType = requestedFormat || 'text/turtle'
+    setHeader(event, 'Content-Type', contentType)
     return content
   }
 
