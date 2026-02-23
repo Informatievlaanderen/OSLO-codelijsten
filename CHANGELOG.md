@@ -18,3 +18,7 @@ Finalised the migration to Nuxt 3 for codelists and added a catch-all path for b
 - 1.13.5
 
 * Allow content-negotiation for codelists
+
+  1.14.0
+
+* Add support for jsonld codelists
