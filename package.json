@@ -1,6 +1,6 @@
 {
   "name": "oslo-codelijsten",
-  "version": "1.14.3",
+  "version": "1.14.4",
   "private": true,
   "engines": {
     "npm": ">=8.0.0",
@@ -22,6 +22,7 @@
     "@govflanders/vl-ui-design-system-style": "^3.2.1",
     "@govflanders/vl-ui-design-system-vue3": "^7.1.1",
     "@govflanders/vl-widget-polyfill": "^1.4.1",
+    "@oslo-flanders/core": "^1.0.15",
     "core-js": "^3.15.1",
     "rdf-serialize": "^5.1.0",
     "sass": "^1.85.0",
