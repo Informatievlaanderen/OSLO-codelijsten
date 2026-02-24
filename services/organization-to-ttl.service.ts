@@ -129,7 +129,7 @@ export class OrganizationToTTLService {
     return `  [
     a adms:Identifier ;
     skos:notation "${org.kboNumber}" ;
-    dct:creator <${this.orgUri}/OVO002734> ;
+    dct:creator <${this.orgUri}/OVO027341> ;
     adms:schemaAgency "Kruispuntenbank van Ondernemingen"@nl ;
     dct:issued ${this.helper.formatXsdDate(issuedDate)}
   ]`
