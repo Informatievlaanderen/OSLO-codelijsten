@@ -171,21 +171,12 @@ export const LICENSE_BY_ID_QUERY = (licenseId: string) => `
   }
 `
 
-export const TEXT_TURTLE = 'text/turtle'
 export const TTL = '.ttl'
 
 export const SUPPORTED_FORMATS: { [key: string]: string } = {
   ttl: 'text/turtle',
-  rdf: 'application/rdf+xml',
   jsonld: 'application/ld+json',
   nt: 'application/n-triples',
-  json: 'application/json',
 }
 
-export const SUPPORTED_EXTENSIONS = [
-  '.ttl',
-  '.rdf',
-  '.jsonld',
-  '.nt',
-  '.json',
-]
+export const SUPPORTED_EXTENSIONS = ['.ttl', '.jsonld', '.nt']

@@ -1,6 +1,7 @@
 import {
   ORGANIZATION_BY_ID_QUERY,
   CONTACT_POINTS_QUERY,
+  SUPPORTED_FORMATS,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import { handleContentNegotiation } from '~/services/content-negotiation.service'
@@ -34,7 +35,7 @@ export default defineEventHandler(
 
       // Handle content negotiation
       const acceptHeader = getHeader(event, 'accept') ?? ''
-      if (hasTtlExtension || acceptHeader.includes('text/turtle')) {
+      if (hasTtlExtension || acceptHeader.includes(SUPPORTED_FORMATS.ttl)) {
         const negotiatedContent = await handleContentNegotiation(
           event,
           acceptHeader,

@@ -1,4 +1,8 @@
-import { LICENSE_BY_ID_QUERY, TEXT_TURTLE, TTL } from '~/constants/constants'
+import {
+  LICENSE_BY_ID_QUERY,
+  SUPPORTED_FORMATS,
+  TTL,
+} from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import { handleContentNegotiation } from '~/services/content-negotiation.service'
 import type { License } from '~/types/license'
@@ -38,7 +42,7 @@ export default defineEventHandler(
 
       // Handle content negotiation
       const acceptHeader = getHeader(event, 'accept') ?? ''
-      if (hasTtlExtension || acceptHeader.includes(TEXT_TURTLE)) {
+      if (hasTtlExtension || acceptHeader.includes(SUPPORTED_FORMATS.ttl)) {
         const negotiatedContent = await handleContentNegotiation(
           event,
           acceptHeader,

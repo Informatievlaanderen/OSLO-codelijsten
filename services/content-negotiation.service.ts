@@ -1,5 +1,8 @@
 import { SUPPORTED_FORMATS } from '~/constants/constants'
-import { serializeConcept, serializeConceptScheme } from '~/services/serialization-service'
+import {
+  serializeConcept,
+  serializeConceptScheme,
+} from '~/services/serialization-service'
 
 export const handleContentNegotiation = async (
   event: any,
@@ -26,14 +29,15 @@ export const handleContentNegotiation = async (
     return null
   }
 
-  const contentType = requestedFormat ||
+  const contentType =
+    requestedFormat ||
     supportedFormats.find((fmt) => acceptHeader.includes(fmt)) ||
-    'text/turtle'
+    SUPPORTED_FORMATS.ttl
 
   setHeader(event, 'Content-Type', contentType)
 
   // If the requested format matches the source format, return raw
-  if (contentType === 'text/turtle' && sourceUrl.endsWith('.ttl')) {
+  if (contentType === SUPPORTED_FORMATS.ttl && sourceUrl.endsWith('.ttl')) {
     const content = await $fetch<string>(sourceUrl)
     return content
   }

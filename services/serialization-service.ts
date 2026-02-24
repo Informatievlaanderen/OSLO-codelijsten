@@ -1,5 +1,6 @@
 import { QueryEngine } from '@comunica/query-sparql'
 import { rdfSerializer } from 'rdf-serialize'
+import { SUPPORTED_FORMATS } from '~/constants/constants'
 
 const queryEngine = new QueryEngine()
 
@@ -42,7 +43,19 @@ export const serializeConcept = async (
     chunks.push(chunk.toString())
   }
 
-  return chunks.join('')
+  const result: string = chunks.join('')
+  // For JSON-LD, unwrap the array if it contains a single concept
+  if (contentType === SUPPORTED_FORMATS.jsonld) {
+    try {
+      const parsed = JSON.parse(result)
+      if (Array.isArray(parsed) && parsed.length === 1) {
+        return JSON.stringify(parsed[0], null, 2)
+      }
+    } catch {
+      // If parsing fails, return the raw result
+    }
+  }
+  return result
 }
 
 /**

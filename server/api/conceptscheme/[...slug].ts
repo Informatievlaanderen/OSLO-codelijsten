@@ -2,9 +2,14 @@ import {
   CONCEPT_SCHEME_QUERY,
   topConceptQuery,
   SUPPORTED_EXTENSIONS,
+  SUPPORTED_FORMATS,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import { handleContentNegotiation } from '~/services/content-negotiation.service'
+import {
+  serializeConcept,
+  serializeConceptScheme,
+} from '~/services/serialization-service'
 import type {
   ConceptScheme,
   ConceptSchemeConfig,
@@ -27,22 +32,35 @@ export default defineEventHandler(
       const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
         slug.endsWith(ext),
       )
+
       const cleanSlug = extension ? slug.replace(extension, '') : slug
 
       console.log(
         `[${new Date().toISOString()}] Fetched concept scheme config for: ${cleanSlug}`,
       )
 
-      const config = await getConceptSchemeConfig(cleanSlug, extension)
+      const config = await getConceptSchemeConfig(cleanSlug)
 
-      // Handle content negotiation
+      // Handle content negotiation - serialize only this concept
       const acceptHeader = getHeader(event, 'accept') ?? ''
-      const negotiatedContent = await handleContentNegotiation(
-        event,
-        acceptHeader,
-        config.sourceUrl,
-      )
-      if (negotiatedContent) return negotiatedContent
+      const extensionFormat = extension
+        ? SUPPORTED_FORMATS[
+            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+          ]
+        : null
+      const requestedFormat =
+        extensionFormat ||
+        Object.values(SUPPORTED_FORMATS).find((fmt) =>
+          acceptHeader.includes(fmt),
+        )
+      if (requestedFormat) {
+        const serialized = await serializeConceptScheme(
+          config.sourceUrl,
+          requestedFormat,
+        )
+        setHeader(event, 'Content-Type', requestedFormat)
+        return serialized
+      }
 
       // Return JSON response
       return await buildConceptSchemeResponse(config)
@@ -68,7 +86,6 @@ const getConceptSchemeConfig = async (
     typeof response === 'string' ? JSON.parse(response) : response
 
   const config = data.conceptSchemes.find((c: any) => c.urlRef === slug)
-
 
   // throw an error if it's explicitally stated to use an extension but it's not the correct one (jsonld versus ttl for example)
   if (extension && !config?.sourceUrl.endsWith(extension)) {
