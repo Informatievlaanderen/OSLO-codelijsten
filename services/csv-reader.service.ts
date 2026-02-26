@@ -432,10 +432,7 @@ export class CsvReaderService {
     companies: Company[],
   ): Promise<void> {
     const writePromises = companies.map(async (company) => {
-      // remove the . from the filename so that we can use it as path /onderneming/{id}
-      const sanitizedId = company.identifier.replace(/\./g, '')
-      const fileName = `${sanitizedId}.ttl`
-      const filePath = path.join(outputDir, fileName)
+      const filePath = path.join(outputDir, `${company.identifier}.ttl`)
       const ttlConverter = new CompanyToTTLService()
       ttlConverter.convertToRDF(company)
       const content = await ttlConverter.exportRDFAsTurtle(company.identifier)
