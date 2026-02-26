@@ -104,7 +104,7 @@
             <vl-data-table>
               <tbody>
                 <tr v-if="data.registration.notation">
-                  <td><strong>Notatie</strong></td>
+                  <td><strong>Identificator</strong></td>
                   <td>{{ data.registration.notation }}</td>
                 </tr>
                 <tr v-if="data.registration.creator">
@@ -116,11 +116,11 @@
                   </td>
                 </tr>
                 <tr v-if="data.registration.schemaAgency">
-                  <td><strong>Schema agency</strong></td>
+                  <td><strong>Toegekend door</strong></td>
                   <td>{{ data.registration.schemaAgency }}</td>
                 </tr>
                 <tr v-if="data.registration.issued">
-                  <td><strong>Uitgegeven</strong></td>
+                  <td><strong>Toegekend Op</strong></td>
                   <td>{{ data.registration.issued }}</td>
                 </tr>
               </tbody>
@@ -183,9 +183,9 @@
               <thead>
                 <tr>
                   <th>URI</th>
-                  <th>Aangemaakt</th>
+                  <th>Aangemaakt op</th>
                   <th>Notatie</th>
-                  <th>Schema agency</th>
+                  <th>Toegekend door</th>
                 </tr>
               </thead>
               <tbody>

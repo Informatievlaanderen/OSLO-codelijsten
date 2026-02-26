@@ -146,8 +146,9 @@ export const KBO_BY_ID_QUERY = (kboId: string) => `
   PREFIX reorg: <http://www.w3.org/ns/regorg#>
   PREFIX adres: <https://data.vlaanderen.be/ns/adres#>
   PREFIX org: <http://www.w3.org/ns/org#>
+  PREFIX organisatie: <https://data.vlaanderen.be/ns/organisatie#>
 
-  SELECT DISTINCT ?organization ?legalName ?contactType ?contactEmail ?contactTelephone ?addressThoroughfare ?addressPostCode ?addressMunicipality ?addressCountry ?registrationNotation ?registrationCreator ?registrationSchemaAgency ?registrationIssued ?site ?siteCreated ?siteRegNotation ?siteRegCreator ?siteRegSchemaAgency ?siteRegIssued
+  SELECT DISTINCT ?organization ?legalName ?rechtspersoonlijkheid ?rechtstoestand ?rechtsvorm ?contactType ?contactEmail ?contactTelephone ?addressThoroughfare ?addressPostCode ?addressMunicipality ?addressCountry ?registrationNotation ?registrationCreator ?registrationSchemaAgency ?registrationIssued ?site ?siteCreated ?siteRegNotation ?siteRegCreator ?siteRegSchemaAgency ?siteRegIssued ?issued
   WHERE {
     ?organization a reorg:RegisteredOrganization .
     {
@@ -160,6 +161,10 @@ export const KBO_BY_ID_QUERY = (kboId: string) => `
     }
 
     OPTIONAL { ?organization reorg:legalName ?legalName . }
+    OPTIONAL { ?organization organisatie:rechtspersoonlijkheid ?rechtspersoonlijkheid . }
+    OPTIONAL { ?organization organisatie:rechtstoestand ?rechtstoestand . }
+    OPTIONAL { ?organization organisatie:rechtsvorm ?rechtsvorm . }
+    OPTIONAL { ?organization dcterms:issued ?issued . }
 
     OPTIONAL {
       ?organization schema:contactinfo ?contactPoint .
