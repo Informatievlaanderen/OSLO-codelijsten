@@ -433,7 +433,6 @@ export class CsvReaderService {
   ): Promise<void> {
     const writePromises = companies.map(async (company) => {
       // remove the . from the filename so that we can use it as path /onderneming/{id}
-      console.log(company.identifier)
       const sanitizedId = company.identifier.replace(/\./g, '')
       const fileName = `${sanitizedId}.ttl`
       const filePath = path.join(outputDir, fileName)

@@ -50,7 +50,7 @@
     "n3": "^1.16.2",
     "rdf-data-factory": "^1.1.1",
     "rdf-parse": "^2.3.2",
-    "rdf-serialize": "^2.2.2",
+    "rdf-serialize": "^5.1.0",
     "streamify-array": "^1.0.1",
     "streamify-string": "^1.0.1",
     "yargs": "^18.0.0"

@@ -47,18 +47,21 @@ export class TtlHelperService {
   /**
    * Generate RDF prefixes
    */
-  generatePrefixes(): string {
-    return `@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix dct: <http://purl.org/dc/terms/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix org: <http://www.w3.org/ns/org#> .
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix schema: <http://schema.org/> .
-@prefix adms: <http://www.w3.org/ns/adms#> .
-
-`
+  generatePrefixes(): Record<string, string> {
+    return {
+      rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+      rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+      xsd: 'http://www.w3.org/2001/XMLSchema#',
+      dcterms: 'http://purl.org/dc/terms/',
+      skos: 'http://www.w3.org/2004/02/skos/core#',
+      adms: 'http://www.w3.org/ns/adms#',
+      locn: 'http://www.w3.org/ns/locn#',
+      schema: 'https://schema.org/',
+      org: 'http://www.w3.org/ns/org#',
+      reorg: 'http://www.w3.org/ns/regorg#',
+      organisatie: 'https://data.vlaanderen.be/ns/organisatie#',
+      adres: 'https://data.vlaanderen.be/ns/adres#',
+    }
   }
 
   /**
@@ -75,4 +78,3 @@ export class TtlHelperService {
     return `"${date}"^^xsd:date`
   }
 }
-

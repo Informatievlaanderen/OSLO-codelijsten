@@ -9,19 +9,22 @@ import { QuadStore, ns } from '@oslo-flanders/core'
 import { DataFactory } from 'rdf-data-factory'
 import { ns2 } from './namespaces'
 import type * as RDF from '@rdfjs/types'
-import rdfSerializer from 'rdf-serialize'
+import { rdfSerializer } from 'rdf-serialize'
 import streamifyArray from 'streamify-array'
 import { text } from 'stream/consumers'
 import { mapLanguage, quadSort } from '../utils/company.utils'
+import { TtlHelperService } from './ttl-helper.service'
 
 export class CompanyToTTLService {
   private readonly baseUri = 'https://data.vlaanderen.be'
   private store: QuadStore
   private df: DataFactory
+  private ttl: TtlHelperService
 
   public constructor() {
     this.store = new QuadStore()
     this.df = new DataFactory()
+    this.ttl = new TtlHelperService()
   }
 
   public convertCodes(codes: any): void {
@@ -48,10 +51,39 @@ export class CompanyToTTLService {
       this.store,
     )
     quads = quads.sort(quadSort)
+
+    // Filter prefixes to only include those actually used in the quads
+    const usedUris = new Set<string>()
+    for (const quad of quads) {
+      for (const term of [
+        quad.subject,
+        quad.predicate,
+        quad.object,
+        quad.graph,
+      ]) {
+        if (term.termType === 'NamedNode') {
+          usedUris.add(term.value)
+        }
+      }
+    }
+    const usedPrefixes: Record<string, string> = {}
+    for (const [prefix, namespace] of Object.entries(
+      this.ttl.generatePrefixes(),
+    )) {
+      for (const uri of usedUris) {
+        if (uri.startsWith(namespace)) {
+          usedPrefixes[prefix] = namespace
+          break
+        }
+      }
+    }
+
     const quadStream = streamifyArray(quads)
     const outputStream = rdfSerializer.serialize(quadStream, {
       contentType: 'text/turtle',
+      prefixes: usedPrefixes,
     })
+
     return text(outputStream)
   }
 
