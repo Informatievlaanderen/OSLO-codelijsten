@@ -190,12 +190,11 @@
               </thead>
               <tbody>
                 <tr v-for="site in data.registeredSites" :key="site.uri">
-                  <!-- Temp commented since uris do not exist yet -->
-                  <!-- <td>
+                  <td>
                     <vl-link :href="site.uri" external>
                       {{ site.uri }}
                     </vl-link>
-                  </td> -->
+                  </td>
                   <td>{{ site.created ?? '-' }}</td>
                   <td>{{ site.registration?.notation ?? '-' }}</td>
                   <td>{{ site.registration?.schemaAgency ?? '-' }}</td>
