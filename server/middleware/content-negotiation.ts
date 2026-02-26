@@ -61,18 +61,26 @@ export default defineEventHandler(async (event) => {
     const conceptMatch = cleanPath.match(/\/concept\/(.+)$/)
     const organisatieMatch = cleanPath.match(/\/organisatie\/(.+)$/)
     const licentieMatch = cleanPath.match(/\/licentie\/(.+)$/)
+    const ondernemingMatch = cleanPath.match(/\/onderneming\/(.+)$/)
 
     // Redirect to appropriate API endpoint
-    if (conceptSchemeMatch) {
-      apiPath = `/doc/api/conceptscheme/${conceptSchemeMatch[1]}${extension}`
-    } else if (conceptMatch) {
-      apiPath = `/doc/api/concept/${conceptMatch[1]}${extension}`
-    } else if (organisatieMatch) {
-      apiPath = `/doc/api/organization/${organisatieMatch[1]}${extension}`
-    } else if (licentieMatch) {
-      apiPath = `/doc/api/license/${licentieMatch[1]}${extension}`
+    switch (true) {
+      case !!conceptSchemeMatch:
+        apiPath = `/doc/api/conceptscheme/${conceptSchemeMatch![1]}${extension}`
+        break
+      case !!conceptMatch:
+        apiPath = `/doc/api/concept/${conceptMatch![1]}${extension}`
+        break
+      case !!organisatieMatch:
+        apiPath = `/doc/api/organization/${organisatieMatch![1]}${extension}`
+        break
+      case !!licentieMatch:
+        apiPath = `/doc/api/license/${licentieMatch![1]}${extension}`
+        break
+      case !!ondernemingMatch:
+        apiPath = `/doc/api/enterprise/${ondernemingMatch![1]}${extension}`
+        break
     }
-
     if (!apiPath) {
       return
     }

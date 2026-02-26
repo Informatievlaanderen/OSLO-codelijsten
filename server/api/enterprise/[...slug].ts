@@ -1,11 +1,10 @@
 import {
-  CONTACT_POINTS_QUERY,
   SUPPORTED_FORMATS,
   SUPPORTED_EXTENSIONS,
   KBO_BY_ID_QUERY,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import { serializeKboData } from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization-service'
 import type {
   KboData,
   KboContactPoint,
@@ -53,11 +52,7 @@ export default defineEventHandler(
         )
 
       if (requestedFormat) {
-        const serialized = await serializeKboData(
-          cleanSlug,
-          sourceUrl,
-          requestedFormat,
-        )
+        const serialized = await serializeAllTriples(sourceUrl, requestedFormat)
         setHeader(event, 'Content-Type', requestedFormat)
         return serialized
       }
