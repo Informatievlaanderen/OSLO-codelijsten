@@ -120,7 +120,7 @@
                   <td>{{ data.registration.schemaAgency }}</td>
                 </tr>
                 <tr v-if="data.registration.issued">
-                  <td><strong>Toegekend Op</strong></td>
+                  <td><strong>Toegekend op</strong></td>
                   <td>{{ data.registration.issued }}</td>
                 </tr>
               </tbody>
