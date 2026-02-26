@@ -13,8 +13,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "convert:dummy": "ts-node convert-company-to-json.ts --input ./dummy.json --output ./output/organisations",
-    "convert:all": "ts-node convert-company-to-json.ts --input ./organisationd_zoekresultagen.json --output ./output/organisations",
+    "convert:dummy": "ts-node convert-company-to-json.ts --input ./KboOpenData_0274_2026_02_16_Dummy --output ./output",
+    "convert:all": "ts-node convert-company-to-json.ts --input ./KboOpenData_0274_2026_02_16_Full --output ./output",
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "start": "node dist/convert-company-to-json.js",

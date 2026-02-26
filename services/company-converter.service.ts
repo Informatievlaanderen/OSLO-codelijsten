@@ -1,4 +1,3 @@
-import type { Company } from '../types/company'
 import type { Stats } from '../types/statistics'
 import { FileWriterService } from './file-writer.service'
 import { CsvReaderService } from './csv-reader.service'
@@ -16,7 +15,7 @@ export class CompanyConverterService {
   async convertCompanies(inputDir: string, outputDir: string): Promise<Stats> {
     console.log(`Reading KBO companies from: ${inputDir}`)
     const result = await this.csvReader.readCompanies(inputDir, outputDir)
-    const codes = await this.csvReader.readCodes(inputDir)
+    const codes = this.csvReader.readCodes(inputDir)
 
     this.ttlConverter.convertCodes(codes)
 
