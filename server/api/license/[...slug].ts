@@ -56,8 +56,6 @@ export default defineEventHandler(
         LICENSE_TTL_URL,
       ])
 
-      console.log(bindings.length, 'license bindings found')
-
       if (!bindings.length) {
         throw createError({
           statusCode: 404,

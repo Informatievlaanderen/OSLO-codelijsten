@@ -1,0 +1,68 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix dcterms: <http://purl.org/dc/terms/>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix adms: <http://www.w3.org/ns/adms#>.
+@prefix locn: <http://www.w3.org/ns/locn#>.
+@prefix schema: <https://schema.org/>.
+@prefix org: <http://www.w3.org/ns/org#>.
+@prefix reorg: <http://www.w3.org/ns/regorg#>.
+@prefix organisatie: <https://data.vlaanderen.be/ns/organisatie#>.
+@prefix adres: <https://data.vlaanderen.be/ns/adres#>.
+
+<http://vocab.belgif.be/auth/nace2008/41101> a skos:Concept;
+    skos:broader <http://data.europa.eu/ux2/nace2/4110>, <http://vocab.belgif.be/auth/nace2008/4110>;
+    skos:definition "Ontwikkeling van residentiële bouwprojecten"@nl, "Promotion immobilière résidentielle"@fr;
+    skos:prefLabel "41101".
+<http://vocab.belgif.be/auth/nace2008/84130> a skos:Concept;
+    skos:broader <http://data.europa.eu/ux2/nace2/8413>, <http://vocab.belgif.be/auth/nace2008/8413>;
+    skos:definition "Openbaar bestuur op het gebied van het bedrijfsleven; stimuleren van het bedrijfsleven"@nl, "Administration publique (tutelle) des activités économiques"@fr;
+    skos:prefLabel "84130".
+<http://vocab.belgif.be/auth/nace2025/68121> a skos:Concept;
+    skos:broader <http://data.europa.eu/ux2/nace2.1/6812>, <http://vocab.belgif.be/auth/nace2025/6812>;
+    skos:definition "Ontwikkeling van residentiële bouwprojecten"@nl, "Promotion immobilière résidentielle"@fr;
+    skos:prefLabel "68121".
+<http://vocab.belgif.be/auth/nace2025/82990> a skos:Concept;
+    skos:broader <http://data.europa.eu/ux2/nace2.1/8299>, <http://vocab.belgif.be/auth/nace2025/8299>;
+    skos:definition "Overige zakelijke dienstverlening, n.e.g."@nl, "Autres activités de soutien aux entreprises n.c.a."@fr;
+    skos:prefLabel "82990".
+<http://vocab.belgif.be/auth/nace2025/84130> a skos:Concept;
+    skos:broader <http://data.europa.eu/ux2/nace2.1/8413>, <http://vocab.belgif.be/auth/nace2025/8413>;
+    skos:definition "Openbaar bestuur op het gebied van het bedrijfsleven; stimuleren van het bedrijfsleven"@nl, "Administration publique (tutelle) des activités économiques"@fr;
+    skos:prefLabel "84130".
+<https://data.vlaanderen.be/id/onderneming/0200.065.765> a reorg:RegisteredOrganization;
+    organisatie:rechtspersoonlijkheid <https://data.vlaanderen.be/id/concept/TypeOfEnterprise/2>;
+    organisatie:rechtstoestand <https://data.vlaanderen.be/id/concept/JuridicalSituation/AC>;
+    organisatie:rechtsvorm <https://data.vlaanderen.be/id/concept/JuridicalForm/416>;
+    dcterms:created "09-08-1960"^^<http://www.w3.org/2001/XMLSchema#date>;
+    reorg:registration _:registration_company_0200.065.765;
+    reorg:orgActivity <https://data.vlaanderen.be/id/concept/ActivitityGroup/006>, <http://vocab.belgif.be/auth/nace2025/84130>, <https://data.vlaanderen.be/id/concept/ActivitityGroup/001>, <http://vocab.belgif.be/auth/nace2025/68121>, <http://vocab.belgif.be/auth/nace2025/82990>, _:nace_2003_70111, <http://vocab.belgif.be/auth/nace2008/84130>, <http://vocab.belgif.be/auth/nace2008/41101>;
+    org:classification <https://data.vlaanderen.be/id/concept/Classification/MAIN>, <https://data.vlaanderen.be/id/concept/Classification/SECO>;
+    schema:contactinfo _:contact_0200.065.765;
+    reorg:legalName "Intergemeentelijke Vereniging Veneco"@nl, "Veneco"@nl;
+    org:hasRegisteredSite <https://data.vlaanderen.be/id/vestiging/2.251.273.097>.
+<https://data.vlaanderen.be/id/vestiging/2.251.273.097> a org:Site;
+    dcterms:created "01-12-2015"^^<http://www.w3.org/2001/XMLSchema#date>;
+    reorg:registration _:registration_establishment_2.251.273.097.
+_:address_contact_0200.065.765 a locn:Address;
+    locn:thoroughfare "Panhuisstraat"@nl, "Panhuisstraat"@fr;
+    rdfs:label "1";
+    locn:postCode "9070";
+    adres:Gemeentenaam "Destelbergen"@nl, "Destelbergen"@fr;
+    adres:land "België"@nl, "Belgique"@fr.
+_:contact_0200.065.765 a schema:ContactPoint;
+    dcterms:type <https://data.vlaanderen.be/id/concept/EntityContact/ENT>, <https://data.vlaanderen.be/id/concept/TypeOfAddress/REGO>;
+    locn:address _:address_contact_0200.065.765.
+_:nace_2003_70111 a skos:Concept;
+    skos:definition "Projectontwikkeling voor woningbouw"@nl, "Promotion immobilière de logements"@fr;
+    skos:prefLabel "70111".
+_:registration_company_0200.065.765 a adms:Identifier;
+    skos:notation "0200.065.765";
+    dcterms:creator <https://data.vlaanderen.be/id/organisatie/OVO027341>;
+    adms:schemaAgency "Kruispuntbank van Ondernemingen (KBO)"@nl;
+    dcterms:issued "09-08-1960"^^<http://www.w3.org/2001/XMLSchema#date>.
+_:registration_establishment_2.251.273.097 a adms:Identifier;
+    skos:notation "2.251.273.097";
+    dcterms:creator <https://data.vlaanderen.be/id/organisatie/OVO027341>;
+    adms:schemaAgency "Kruispuntbank van Ondernemingen (KBO)"@nl;
+    dcterms:issued "09-08-1960"^^<http://www.w3.org/2001/XMLSchema#date>.

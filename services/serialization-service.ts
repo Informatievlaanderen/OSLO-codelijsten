@@ -1,47 +1,11 @@
 import { QueryEngine } from '@comunica/query-sparql'
 import { rdfSerializer } from 'rdf-serialize'
-import { SUPPORTED_FORMATS } from '~/constants/constants'
 import { getPrefixes } from '@oslo-flanders/core'
 import * as RDF from '@rdfjs/types'
 import { Readable } from 'stream'
+import { filterPrefixes, unwrapJsonLdArray } from '../utils/serialization.utils'
 
 const queryEngine = new QueryEngine()
-
-/**
- * Filters a prefix map to only include prefixes whose namespace URI
- * appears in the given set of quads.
- */
-const filterPrefixes = (
-  prefixes: Record<string, string>,
-  quads: RDF.Quad[],
-): Record<string, string> => {
-  // Collect all URIs used in the quads
-  const usedUris = new Set<string>()
-  for (const quad of quads) {
-    for (const term of [
-      quad.subject,
-      quad.predicate,
-      quad.object,
-      quad.graph,
-    ]) {
-      if (term.termType === 'NamedNode') {
-        usedUris.add(term.value)
-      }
-    }
-  }
-
-  // Keep only prefixes where at least one URI starts with the namespace
-  const filtered: Record<string, string> = {}
-  for (const [prefix, namespace] of Object.entries(prefixes)) {
-    for (const uri of usedUris) {
-      if (uri.startsWith(namespace)) {
-        filtered[prefix] = namespace
-        break
-      }
-    }
-  }
-  return filtered
-}
 
 /**
  * Queries a specific concept by slug from the source and serializes
@@ -93,19 +57,7 @@ export const serializeConcept = async (
     chunks.push(typeof chunk === 'string' ? chunk : chunk.toString())
   }
 
-  const result: string = chunks.join('')
-  // For JSON-LD, unwrap the array if it contains a single concept
-  if (contentType === SUPPORTED_FORMATS.jsonld) {
-    try {
-      const parsed = JSON.parse(result)
-      if (Array.isArray(parsed) && parsed.length === 1) {
-        return JSON.stringify(parsed[0], null, 2)
-      }
-    } catch {
-      // If parsing fails, return the raw result
-    }
-  }
-  return result
+  return unwrapJsonLdArray(chunks.join(''), contentType)
 }
 
 /**
@@ -143,5 +95,195 @@ export const serializeConceptScheme = async (
     chunks.push(typeof chunk === 'string' ? chunk : chunk.toString())
   }
 
+  return unwrapJsonLdArray(chunks.join(''), contentType)
+}
+
+export const serializeOrganization = async (
+  orgSlug: string,
+  sourceUrl: string,
+  contentType: string,
+): Promise<string> => {
+  const query = `
+    PREFIX dct: <http://purl.org/dc/terms/>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX org: <http://www.w3.org/ns/org#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    PREFIX adms: <http://www.w3.org/ns/adms#>
+    PREFIX schema: <http://schema.org/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+    CONSTRUCT {
+      ?org ?p ?o .
+      ?org schema:contactPoint ?cp .
+      ?cp ?cpPred ?cpObj .
+      ?org adms:identifier ?idNode .
+      ?idNode ?idPred ?idObj .
+    } WHERE {
+      ?org a org:Organization .
+      {
+        ?org dct:identifier "${orgSlug}" .
+      }
+      UNION
+      {
+        ?org adms:identifier ?identifierNodeMatch .
+        ?identifierNodeMatch skos:notation "${orgSlug}" .
+      }
+      ?org ?p ?o .
+      OPTIONAL {
+        ?org schema:contactPoint ?cp .
+        ?cp ?cpPred ?cpObj .
+      }
+      OPTIONAL {
+        ?org adms:identifier ?idNode .
+        ?idNode ?idPred ?idObj .
+      }
+    }
+  `
+
+  const quadStream = await queryEngine.queryQuads(query, {
+    sources: [sourceUrl],
+    noCache: true,
+  })
+
+  const quads = await quadStream.toArray()
+  const allPrefixes = await getPrefixes()
+  const usedPrefixes = filterPrefixes(allPrefixes, quads)
+
+  const quadReadable = Readable.from(quads)
+  const textStream = rdfSerializer.serialize(quadReadable, {
+    contentType,
+    prefixes: usedPrefixes,
+  })
+
+  const chunks: string[] = []
+  for await (const chunk of textStream) {
+    chunks.push(typeof chunk === 'string' ? chunk : chunk.toString())
+  }
+
   return chunks.join('')
+}
+
+/**
+ * Queries a specific license by slug from the source and serializes
+ * the result in the requested content type.
+ */
+export const serializeLicense = async (
+  licenseSlug: string,
+  sourceUrl: string,
+  contentType: string,
+): Promise<string> => {
+  const query = `
+    PREFIX dct: <http://purl.org/dc/terms/>
+    PREFIX cc: <https://creativecommons.org/ns#>
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+    CONSTRUCT {
+      ?license ?p ?o .
+    } WHERE {
+      ?license a dct:LicenseDocument .
+      FILTER(CONTAINS(STR(?license), "${licenseSlug}"))
+      ?license ?p ?o .
+    }
+  `
+
+  const quadStream = await queryEngine.queryQuads(query, {
+    sources: [sourceUrl],
+    noCache: true,
+  })
+
+  const quads = await quadStream.toArray()
+  const allPrefixes = await getPrefixes()
+  const usedPrefixes = filterPrefixes(allPrefixes, quads)
+
+  const quadReadable = Readable.from(quads)
+  const textStream = rdfSerializer.serialize(quadReadable, {
+    contentType,
+    prefixes: usedPrefixes,
+  })
+
+  const chunks: string[] = []
+  for await (const chunk of textStream) {
+    chunks.push(typeof chunk === 'string' ? chunk : chunk.toString())
+  }
+
+  return unwrapJsonLdArray(chunks.join(''), contentType)
+}
+
+/**
+ * Queries a specific license by slug from the source and serializes
+ * the result in the requested content type.
+ */
+
+export const serializeKboData = async (
+  kboSlug: string,
+  sourceUrl: string,
+  contentType: string,
+): Promise<string> => {
+  const query = `
+    PREFIX dct: <http://purl.org/dc/terms/>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX org: <http://www.w3.org/ns/org#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    PREFIX adms: <http://www.w3.org/ns/adms#>
+    PREFIX schema: <http://schema.org/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+
+    CONSTRUCT {
+      ?organization ?p ?o .
+      ?organization schema:contactPoint ?cp .
+      ?cp ?cpPred ?cpObj .
+      ?cp vcard:hasAddress ?addr .
+      ?addr ?addrPred ?addrObj .
+      ?organization adms:identifier ?idNode .
+      ?idNode ?idPred ?idObj .
+    } WHERE {
+      ?organization a org:Organization .
+      {
+        ?organization dct:identifier "${kboSlug}" .
+      }
+      UNION
+      {
+        ?organization adms:identifier ?identifierNodeMatch .
+        ?identifierNodeMatch skos:notation "${kboSlug}" .
+      }
+      ?organization ?p ?o .
+      OPTIONAL {
+        ?organization schema:contactPoint ?cp .
+        ?cp ?cpPred ?cpObj .
+        OPTIONAL {
+          ?cp vcard:hasAddress ?addr .
+          ?addr ?addrPred ?addrObj .
+        }
+      }
+      OPTIONAL {
+        ?organization adms:identifier ?idNode .
+        ?idNode ?idPred ?idObj .
+      }
+    }
+  `
+
+  const quadStream = await queryEngine.queryQuads(query, {
+    sources: [sourceUrl],
+    noCache: true,
+  })
+
+  const quads = await quadStream.toArray()
+  const allPrefixes = await getPrefixes()
+  const usedPrefixes = filterPrefixes(allPrefixes, quads)
+
+  const quadReadable = Readable.from(quads)
+  const textStream = rdfSerializer.serialize(quadReadable, {
+    contentType,
+    prefixes: usedPrefixes,
+  })
+
+  const chunks: string[] = []
+  for await (const chunk of textStream) {
+    chunks.push(typeof chunk === 'string' ? chunk : chunk.toString())
+  }
+
+  return unwrapJsonLdArray(chunks.join(''), contentType)
 }

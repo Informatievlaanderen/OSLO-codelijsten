@@ -5,7 +5,6 @@ import {
   SUPPORTED_FORMATS,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import { handleContentNegotiation } from '~/services/content-negotiation.service'
 import {
   serializeConcept,
   serializeConceptScheme,

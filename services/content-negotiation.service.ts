@@ -2,12 +2,16 @@ import { SUPPORTED_FORMATS } from '~/constants/constants'
 import {
   serializeConcept,
   serializeConceptScheme,
+  serializeOrganization,
+  serializeLicense,
 } from '~/services/serialization-service'
 
 export const handleContentNegotiation = async (
   event: any,
   acceptHeader: string,
   sourceUrl: string,
+  entityType?: 'concept' | 'conceptscheme' | 'organization' | 'license',
+  slug?: string,
 ) => {
   const url = getRequestURL(event)
   const pathname = url.pathname
@@ -34,22 +38,30 @@ export const handleContentNegotiation = async (
     supportedFormats.find((fmt) => acceptHeader.includes(fmt)) ||
     SUPPORTED_FORMATS.ttl
 
-  setHeader(event, 'Content-Type', contentType)
+    console.log(contentType, sourceUrl, 'contentypeee')
+    console.log(contentType, sourceUrl, 'contentypeee')
 
-  // If the requested format matches the source format, return raw
-  if (contentType === SUPPORTED_FORMATS.ttl && sourceUrl.endsWith('.ttl')) {
-    const content = await $fetch<string>(sourceUrl)
-    return content
+  if (entityType && slug) {
+    let serialized: string | null = null
+
+    switch (entityType) {
+      case 'concept':
+        serialized = await serializeConcept(slug, sourceUrl, contentType)
+        break
+      case 'conceptscheme':
+        serialized = await serializeConceptScheme(slug, sourceUrl)
+        break
+      case 'organization':
+        serialized = await serializeOrganization(slug, sourceUrl, contentType)
+        break
+      case 'license':
+        serialized = await serializeLicense(slug, sourceUrl, contentType)
+        break
+    }
+
+    if (serialized) {
+      setHeader(event, 'Content-Type', contentType)
+      return serialized
+    }
   }
-
-  // Otherwise, use Comunica to serialize to the requested format
-  // Determine the resource type from the URL path
-  const conceptMatch = pathname.match(/\/concept\/(.+?)(?:\.\w+)?$/)
-  if (conceptMatch) {
-    const slug = conceptMatch[1]
-    return await serializeConcept(slug, sourceUrl, contentType)
-  }
-
-  // For concept schemes or other resources, serialize the whole source
-  return await serializeConceptScheme(sourceUrl, contentType)
 }

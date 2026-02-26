@@ -2,9 +2,10 @@ import {
   ORGANIZATION_BY_ID_QUERY,
   CONTACT_POINTS_QUERY,
   SUPPORTED_FORMATS,
+  SUPPORTED_EXTENSIONS,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import { handleContentNegotiation } from '~/services/content-negotiation.service'
+import { serializeOrganization } from '~/services/serialization-service'
 import type { OrganizationData, ContactPoint } from '~/types/organization'
 
 export default defineEventHandler(
@@ -23,33 +24,46 @@ export default defineEventHandler(
         `[${new Date().toISOString()}] Fetching organization: ${slug}`,
       )
 
-      // Handle .ttl extension
-      const hasTtlExtension = slug.endsWith('.ttl')
-      const cleanSlug = hasTtlExtension ? slug.replace(/\.ttl$/, '') : slug
+      // Detect supported file extension (.ttl, .jsonld, .nt)
+      const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
+        slug.endsWith(ext),
+      )
+      const cleanSlug = extension ? slug.replace(extension, '') : slug
 
       // Get the TTL file URL from runtime config and add the slug to get the correct raw file
       const runtimeConfig = useRuntimeConfig()
       const ORGANIZATION_URL =
         process.env.ORGANIZATION_TTL_URL ?? runtimeConfig.ORGANIZATION_TTL_URL
-      const sourceUrl = `${ORGANIZATION_URL}/${slug}`
+      const sourceUrl = `${ORGANIZATION_URL}/${cleanSlug}.ttl`
 
-      // Handle content negotiation
+      // Handle content negotiation - serialize in requested format
       const acceptHeader = getHeader(event, 'accept') ?? ''
-      if (hasTtlExtension || acceptHeader.includes(SUPPORTED_FORMATS.ttl)) {
-        const negotiatedContent = await handleContentNegotiation(
-          event,
-          acceptHeader,
-          sourceUrl,
+      const extensionFormat = extension
+        ? SUPPORTED_FORMATS[
+            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+          ]
+        : null
+      const requestedFormat =
+        extensionFormat ||
+        Object.values(SUPPORTED_FORMATS).find((fmt) =>
+          acceptHeader.includes(fmt),
         )
-        if (negotiatedContent) return negotiatedContent
+
+      console.log(cleanSlug, requestedFormat, 'cleanslug')
+
+      if (requestedFormat) {
+        const serialized = await serializeOrganization(
+          cleanSlug,
+          sourceUrl,
+          requestedFormat,
+        )
+        setHeader(event, 'Content-Type', requestedFormat)
+        return serialized
       }
 
-      // add .ttl to the source file of each OVO code
-      const sourceUrlWithExtension: string = `${sourceUrl}.ttl`
-
-      // Fetch organization data
+      // Fetch organization data as JSON
       const bindings = await executeQuery(ORGANIZATION_BY_ID_QUERY(cleanSlug), [
-        sourceUrlWithExtension,
+        sourceUrl,
       ])
 
       if (!bindings.length) {
@@ -64,7 +78,7 @@ export default defineEventHandler(
 
       // Fetch contact points
       const contactBindings = await executeQuery(CONTACT_POINTS_QUERY(orgUri), [
-        sourceUrlWithExtension,
+        sourceUrl,
       ])
 
       const contactPoints: ContactPoint[] = contactBindings.map(
@@ -88,7 +102,7 @@ export default defineEventHandler(
         foundingDate: binding.get('issued')?.value,
         website: binding.get('homepage')?.value,
         seeAlso: binding.get('seeAlso')?.value,
-        source: sourceUrlWithExtension,
+        source: sourceUrl,
         contactPoints,
       }
 

@@ -138,6 +138,50 @@ export const ORGANIZATION_BY_ID_QUERY = (orgId: string) => `
   LIMIT 1
 `
 
+export const KBO_BY_ID_QUERY = (kboId: string) => `
+  PREFIX dct: <http://purl.org/dc/terms/>
+  PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+  PREFIX org: <http://www.w3.org/ns/org#>
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+  PREFIX adms: <http://www.w3.org/ns/adms#>
+  PREFIX schema: <http://schema.org/>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+
+  SELECT DISTINCT
+    ?organization ?identifier ?name ?altLabel ?description ?status ?issued ?valid ?homepage
+    ?contactPoint ?email ?telephone ?address ?legalForm ?activityDescription
+  WHERE {
+    ?organization a org:Organization .
+    {
+      ?organization dct:identifier "${kboId}" .
+    }
+    UNION
+    {
+      ?organization adms:identifier ?identifierNodeMatch .
+      ?identifierNodeMatch skos:notation "${kboId}" .
+    }
+
+    OPTIONAL { ?organization dct:identifier ?identifier . }
+    OPTIONAL { ?organization skos:prefLabel ?name . }
+    OPTIONAL { ?organization foaf:name ?name . }
+    OPTIONAL { ?organization skos:altLabel ?altLabel . }
+    OPTIONAL { ?organization dct:description ?description . }
+    OPTIONAL { ?organization adms:status ?status . }
+    OPTIONAL { ?organization dct:issued ?issued . }
+    OPTIONAL { ?organization dct:valid ?valid . }
+    OPTIONAL { ?organization foaf:homepage ?homepage . }
+    OPTIONAL { ?organization org:legalForm ?legalForm . }
+    OPTIONAL { ?organization dct:description ?activityDescription . }
+
+    OPTIONAL { ?organization schema:contactPoint ?contactPoint . }
+    OPTIONAL { ?contactPoint schema:email ?email . }
+    OPTIONAL { ?contactPoint schema:telephone ?telephone . }
+    OPTIONAL { ?contactPoint vcard:hasAddress ?address . }
+  }
+  LIMIT 1
+`
+
 export const CONTACT_POINTS_QUERY = (orgUri: string) => `
   PREFIX schema: <http://schema.org/>
   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
