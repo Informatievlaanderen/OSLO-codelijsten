@@ -137,49 +137,64 @@ export const ORGANIZATION_BY_ID_QUERY = (orgId: string) => `
   }
   LIMIT 1
 `
-
 export const KBO_BY_ID_QUERY = (kboId: string) => `
-  PREFIX dct: <http://purl.org/dc/terms/>
-  PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-  PREFIX org: <http://www.w3.org/ns/org#>
+  PREFIX dcterms: <http://purl.org/dc/terms/>
   PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
   PREFIX adms: <http://www.w3.org/ns/adms#>
-  PREFIX schema: <http://schema.org/>
-  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-  PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+  PREFIX schema: <https://schema.org/>
+  PREFIX locn: <http://www.w3.org/ns/locn#>
+  PREFIX reorg: <http://www.w3.org/ns/regorg#>
+  PREFIX adres: <https://data.vlaanderen.be/ns/adres#>
+  PREFIX org: <http://www.w3.org/ns/org#>
 
-  SELECT DISTINCT
-    ?organization ?identifier ?name ?altLabel ?description ?status ?issued ?valid ?homepage
-    ?contactPoint ?email ?telephone ?address ?legalForm ?activityDescription
+  SELECT DISTINCT ?organization ?legalName ?contactType ?contactEmail ?contactTelephone ?addressThoroughfare ?addressPostCode ?addressMunicipality ?addressCountry ?registrationNotation ?registrationCreator ?registrationSchemaAgency ?registrationIssued ?site ?siteCreated ?siteRegNotation ?siteRegCreator ?siteRegSchemaAgency ?siteRegIssued
   WHERE {
-    ?organization a org:Organization .
+    ?organization a reorg:RegisteredOrganization .
     {
-      ?organization dct:identifier "${kboId}" .
+      ?organization reorg:registration ?registration .
+      ?registration skos:notation "${kboId}" .
     }
     UNION
     {
-      ?organization adms:identifier ?identifierNodeMatch .
-      ?identifierNodeMatch skos:notation "${kboId}" .
+      FILTER(STRENDS(STR(?organization), "${kboId}"))
     }
 
-    OPTIONAL { ?organization dct:identifier ?identifier . }
-    OPTIONAL { ?organization skos:prefLabel ?name . }
-    OPTIONAL { ?organization foaf:name ?name . }
-    OPTIONAL { ?organization skos:altLabel ?altLabel . }
-    OPTIONAL { ?organization dct:description ?description . }
-    OPTIONAL { ?organization adms:status ?status . }
-    OPTIONAL { ?organization dct:issued ?issued . }
-    OPTIONAL { ?organization dct:valid ?valid . }
-    OPTIONAL { ?organization foaf:homepage ?homepage . }
-    OPTIONAL { ?organization org:legalForm ?legalForm . }
-    OPTIONAL { ?organization dct:description ?activityDescription . }
+    OPTIONAL { ?organization reorg:legalName ?legalName . }
 
-    OPTIONAL { ?organization schema:contactPoint ?contactPoint . }
-    OPTIONAL { ?contactPoint schema:email ?email . }
-    OPTIONAL { ?contactPoint schema:telephone ?telephone . }
-    OPTIONAL { ?contactPoint vcard:hasAddress ?address . }
+    OPTIONAL {
+      ?organization schema:contactinfo ?contactPoint .
+      OPTIONAL { ?contactPoint dcterms:type ?contactType . }
+      OPTIONAL { ?contactPoint schema:email ?contactEmail . }
+      OPTIONAL { ?contactPoint schema:telephone ?contactTelephone . }
+      OPTIONAL {
+        ?contactPoint locn:address ?address .
+        OPTIONAL { ?address locn:thoroughfare ?addressThoroughfare . }
+        OPTIONAL { ?address locn:postCode ?addressPostCode . }
+        OPTIONAL { ?address adres:Gemeentenaam ?addressMunicipality . }
+        OPTIONAL { ?address adres:land ?addressCountry . }
+      }
+    }
+
+    OPTIONAL {
+      ?organization reorg:registration ?reg .
+      OPTIONAL { ?reg skos:notation ?registrationNotation . }
+      OPTIONAL { ?reg dcterms:creator ?registrationCreator . }
+      OPTIONAL { ?reg adms:schemaAgency ?registrationSchemaAgency . }
+      OPTIONAL { ?reg dcterms:issued ?registrationIssued . }
+    }
+
+    OPTIONAL {
+      ?organization org:hasRegisteredSite ?site .
+      OPTIONAL { ?site dcterms:created ?siteCreated . }
+      OPTIONAL {
+        ?site reorg:registration ?siteReg .
+        OPTIONAL { ?siteReg skos:notation ?siteRegNotation . }
+        OPTIONAL { ?siteReg dcterms:creator ?siteRegCreator . }
+        OPTIONAL { ?siteReg adms:schemaAgency ?siteRegSchemaAgency . }
+        OPTIONAL { ?siteReg dcterms:issued ?siteRegIssued . }
+      }
+    }
   }
-  LIMIT 1
 `
 
 export const CONTACT_POINTS_QUERY = (orgUri: string) => `

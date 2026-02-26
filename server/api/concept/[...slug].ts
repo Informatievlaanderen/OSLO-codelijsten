@@ -2,7 +2,7 @@ import { SUPPORTED_EXTENSIONS, SUPPORTED_FORMATS } from '~/constants/constants'
 import { getConcept } from '~/server/services/rdfquery.service'
 import type { Concept } from '~/types/concept'
 import type { DatasetConfig } from '~/types/conceptScheme'
-import { serializeConcept } from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization-service'
 
 export default defineEventHandler(
   async (event): Promise<Concept | string | null> => {
@@ -42,8 +42,7 @@ export default defineEventHandler(
         )
 
       if (requestedFormat) {
-        const serialized = await serializeConcept(
-          config.conceptId,
+        const serialized = await serializeAllTriples(
           config.sourceUrl,
           requestedFormat,
         )

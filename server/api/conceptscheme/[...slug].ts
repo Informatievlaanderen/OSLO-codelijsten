@@ -5,10 +5,7 @@ import {
   SUPPORTED_FORMATS,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import {
-  serializeConcept,
-  serializeConceptScheme,
-} from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization-service'
 import type {
   ConceptScheme,
   ConceptSchemeConfig,
@@ -53,7 +50,7 @@ export default defineEventHandler(
           acceptHeader.includes(fmt),
         )
       if (requestedFormat) {
-        const serialized = await serializeConceptScheme(
+        const serialized = await serializeAllTriples(
           config.sourceUrl,
           requestedFormat,
         )

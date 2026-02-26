@@ -1,16 +1,10 @@
 import { SUPPORTED_FORMATS } from '~/constants/constants'
-import {
-  serializeConcept,
-  serializeConceptScheme,
-  serializeOrganization,
-  serializeLicense,
-} from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization-service'
 
 export const handleContentNegotiation = async (
   event: any,
   acceptHeader: string,
   sourceUrl: string,
-  entityType?: 'concept' | 'conceptscheme' | 'organization' | 'license',
   slug?: string,
 ) => {
   const url = getRequestURL(event)
@@ -38,26 +32,8 @@ export const handleContentNegotiation = async (
     supportedFormats.find((fmt) => acceptHeader.includes(fmt)) ||
     SUPPORTED_FORMATS.ttl
 
-    console.log(contentType, sourceUrl, 'contentypeee')
-    console.log(contentType, sourceUrl, 'contentypeee')
-
-  if (entityType && slug) {
-    let serialized: string | null = null
-
-    switch (entityType) {
-      case 'concept':
-        serialized = await serializeConcept(slug, sourceUrl, contentType)
-        break
-      case 'conceptscheme':
-        serialized = await serializeConceptScheme(slug, sourceUrl)
-        break
-      case 'organization':
-        serialized = await serializeOrganization(slug, sourceUrl, contentType)
-        break
-      case 'license':
-        serialized = await serializeLicense(slug, sourceUrl, contentType)
-        break
-    }
+  if (slug) {
+    const serialized = serializeAllTriples(sourceUrl, contentType)
 
     if (serialized) {
       setHeader(event, 'Content-Type', contentType)

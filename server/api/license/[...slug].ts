@@ -1,10 +1,11 @@
 import {
   LICENSE_BY_ID_QUERY,
+  SUPPORTED_EXTENSIONS,
   SUPPORTED_FORMATS,
   TTL,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import { handleContentNegotiation } from '~/services/content-negotiation.service'
+import { serializeAllTriples } from '~/services/serialization-service'
 import type { License } from '~/types/license'
 
 export default defineEventHandler(
@@ -23,11 +24,11 @@ export default defineEventHandler(
 
       // Handle slug array and .ttl extension
       const slugString = Array.isArray(slug) ? slug.join('/') : slug
-      const hasTtlExtension = slugString.endsWith(TTL)
-      const cleanSlug = hasTtlExtension
-        ? slugString.replace(/\.ttl$/, '')
-        : slugString
-
+      // Detect supported file extension (.ttl, .jsonld, .nt)
+      const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
+        slug.endsWith(ext),
+      )
+      const cleanSlug = extension ? slug.replace(extension, '') : slug
       // Get the TTL file URL from runtime config
       const runtimeConfig = useRuntimeConfig()
       const LICENSE_TTL_URL =
@@ -40,15 +41,26 @@ export default defineEventHandler(
         })
       }
 
-      // Handle content negotiation
+      // Handle content negotiation - serialize in requested format
       const acceptHeader = getHeader(event, 'accept') ?? ''
-      if (hasTtlExtension || acceptHeader.includes(SUPPORTED_FORMATS.ttl)) {
-        const negotiatedContent = await handleContentNegotiation(
-          event,
-          acceptHeader,
-          LICENSE_TTL_URL,
+      const extensionFormat = extension
+        ? SUPPORTED_FORMATS[
+            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+          ]
+        : null
+      const requestedFormat =
+        extensionFormat ||
+        Object.values(SUPPORTED_FORMATS).find((fmt) =>
+          acceptHeader.includes(fmt),
         )
-        if (negotiatedContent) return negotiatedContent
+
+      if (requestedFormat) {
+        const serialized = await serializeAllTriples(
+          LICENSE_TTL_URL,
+          requestedFormat,
+        )
+        setHeader(event, 'Content-Type', requestedFormat)
+        return serialized
       }
 
       // Fetch license data

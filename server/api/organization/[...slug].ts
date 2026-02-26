@@ -5,7 +5,7 @@ import {
   SUPPORTED_EXTENSIONS,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import { serializeOrganization } from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization-service'
 import type { OrganizationData, ContactPoint } from '~/types/organization'
 
 export default defineEventHandler(
@@ -49,14 +49,8 @@ export default defineEventHandler(
           acceptHeader.includes(fmt),
         )
 
-      console.log(cleanSlug, requestedFormat, 'cleanslug')
-
       if (requestedFormat) {
-        const serialized = await serializeOrganization(
-          cleanSlug,
-          sourceUrl,
-          requestedFormat,
-        )
+        const serialized = await serializeAllTriples(sourceUrl, requestedFormat)
         setHeader(event, 'Content-Type', requestedFormat)
         return serialized
       }
