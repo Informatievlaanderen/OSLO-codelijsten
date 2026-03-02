@@ -431,13 +431,59 @@ export class CsvReaderService {
     outputDir: string,
     companies: Company[],
   ): Promise<void> {
-    const writePromises = companies.map(async (company) => {
-      const filePath = path.join(outputDir, `${company.identifier}.ttl`)
+    const organisationsDir = path.join(outputDir, 'organisations')
+    if (!fs.existsSync(organisationsDir)) {
+      fs.mkdirSync(organisationsDir, { recursive: true })
+    }
+
+    const branchesDir = path.join(outputDir, 'branches')
+    if (!fs.existsSync(branchesDir)) {
+      fs.mkdirSync(branchesDir, { recursive: true })
+    }
+
+    const writePromises = companies.flatMap((company) => {
       const ttlConverter = new CompanyToTTLService()
       ttlConverter.convertToRDF(company)
-      const content = await ttlConverter.exportRDFAsTurtle(company.identifier)
 
-      return fs.promises.writeFile(filePath, content, 'utf8')
+      const promises: Promise<void>[] = []
+
+      // Write the main company file to organisations directory
+      const companyFilePath = path.join(
+        organisationsDir,
+        `${company.identifier}.ttl`,
+      )
+      const companyPromise = ttlConverter
+        .exportRDFAsTurtle(company.identifier)
+        .then((content) =>
+          fs.promises.writeFile(companyFilePath, content, 'utf8'),
+        )
+      promises.push(companyPromise)
+
+      // Write establishment (vestiging) files to branches directory
+      for (const identifier of ttlConverter.getEstablishmentIdentifiers(
+        company,
+      )) {
+        const estFilePath = path.join(branchesDir, `${identifier}.ttl`)
+        const estPromise = ttlConverter
+          .exportEstablishmentAsTurtle(identifier)
+          .then((content) =>
+            fs.promises.writeFile(estFilePath, content, 'utf8'),
+          )
+        promises.push(estPromise)
+      }
+
+      // Write branch (bijkantoor) files to branches directory
+      for (const identifier of ttlConverter.getBranchIdentifiers(company)) {
+        const branchFilePath = path.join(branchesDir, `${identifier}.ttl`)
+        const branchPromise = ttlConverter
+          .exportBranchAsTurtle(identifier)
+          .then((content) =>
+            fs.promises.writeFile(branchFilePath, content, 'utf8'),
+          )
+        promises.push(branchPromise)
+      }
+
+      return promises
     })
 
     await Promise.all(writePromises)

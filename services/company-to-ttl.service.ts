@@ -626,8 +626,6 @@ export class CompanyToTTLService {
     }
   }
 
-  // ── Graph traversal ──────────────────────────────────────────────────
-
   private discoverCompany(
     nodeId: RDF.NamedNode | RDF.BlankNode,
     quads: RDF.Quad[],
@@ -644,5 +642,116 @@ export class CompanyToTTLService {
         this.discoverCompany(q.object, quads, store)
       }
     }
+  }
+
+  /**
+   * Export RDF for a specific establishment as Turtle
+   */
+  public async exportEstablishmentAsTurtle(
+    establishmentIdentifier: string,
+  ): Promise<string> {
+    let quads: RDF.Quad[] = []
+    this.discoverCompany(
+      this.df.namedNode(
+        `${this.baseUri}/id/vestiging/${establishmentIdentifier}`,
+      ),
+      quads,
+      this.store,
+    )
+    quads = quads.sort(quadSort)
+
+    // Filter prefixes to only include those actually used in the quads
+    const usedUris = new Set<string>()
+    for (const quad of quads) {
+      for (const term of [
+        quad.subject,
+        quad.predicate,
+        quad.object,
+        quad.graph,
+      ]) {
+        if (term.termType === 'NamedNode') {
+          usedUris.add(term.value)
+        }
+      }
+    }
+    const usedPrefixes: Record<string, string> = {}
+    for (const [prefix, namespace] of Object.entries(
+      this.ttl.generatePrefixes(),
+    )) {
+      for (const uri of usedUris) {
+        if (uri.startsWith(namespace)) {
+          usedPrefixes[prefix] = namespace
+          break
+        }
+      }
+    }
+
+    const quadStream = streamifyArray(quads)
+    const outputStream = rdfSerializer.serialize(quadStream, {
+      contentType: 'text/turtle',
+      prefixes: usedPrefixes,
+    })
+
+    return text(outputStream)
+  }
+
+  /**
+   * Export RDF for a specific branch as Turtle
+   */
+  public async exportBranchAsTurtle(branchIdentifier: string): Promise<string> {
+    let quads: RDF.Quad[] = []
+    this.discoverCompany(
+      this.df.namedNode(`${this.baseUri}/id/bijkantoor/${branchIdentifier}`),
+      quads,
+      this.store,
+    )
+    quads = quads.sort(quadSort)
+
+    const usedUris = new Set<string>()
+    for (const quad of quads) {
+      for (const term of [
+        quad.subject,
+        quad.predicate,
+        quad.object,
+        quad.graph,
+      ]) {
+        if (term.termType === 'NamedNode') {
+          usedUris.add(term.value)
+        }
+      }
+    }
+    const usedPrefixes: Record<string, string> = {}
+    for (const [prefix, namespace] of Object.entries(
+      this.ttl.generatePrefixes(),
+    )) {
+      for (const uri of usedUris) {
+        if (uri.startsWith(namespace)) {
+          usedPrefixes[prefix] = namespace
+          break
+        }
+      }
+    }
+
+    const quadStream = streamifyArray(quads)
+    const outputStream = rdfSerializer.serialize(quadStream, {
+      contentType: 'text/turtle',
+      prefixes: usedPrefixes,
+    })
+
+    return text(outputStream)
+  }
+
+  /**
+   * Get all establishment identifiers for the current company
+   */
+  public getEstablishmentIdentifiers(company: Company): string[] {
+    return company.establishment.map((e) => e.identifier)
+  }
+
+  /**
+   * Get all branch identifiers for the current company
+   */
+  public getBranchIdentifiers(company: Company): string[] {
+    return company.branch.map((b) => b.identifier)
   }
 }

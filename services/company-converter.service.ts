@@ -4,8 +4,6 @@ import { CsvReaderService } from './csv-reader.service'
 import { CompanyToTTLService } from './company-to-ttl.service'
 
 export class CompanyConverterService {
-  //  private readonly ttlConverter = new KBOToTTLService()
-  private readonly fileWriter = new FileWriterService()
   private readonly csvReader = new CsvReaderService()
   private readonly ttlConverter = new CompanyToTTLService()
 
