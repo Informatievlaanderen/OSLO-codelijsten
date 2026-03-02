@@ -211,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import type { KboData } from '~/types/KBO'
+import type { KboOrganizationData } from '~/types/KBO'
 import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
 
@@ -235,7 +235,7 @@ const copyToClipboard = async (text: string) => {
   }
 }
 
-const { data } = await useAsyncData<KboData | null>(
+const { data } = await useAsyncData<KboOrganizationData | null>(
   `enterprise-${slug.value}`,
   async () => {
     try {

@@ -137,7 +137,7 @@ export const ORGANIZATION_BY_ID_QUERY = (orgId: string) => `
   }
   LIMIT 1
 `
-export const KBO_BY_ID_QUERY = (kboId: string) => `
+export const KBO_ORGANIZATION_BY_ID_QUERY = (kboId: string) => `
   PREFIX dcterms: <http://purl.org/dc/terms/>
   PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
   PREFIX adms: <http://www.w3.org/ns/adms#>
@@ -198,6 +198,28 @@ export const KBO_BY_ID_QUERY = (kboId: string) => `
         OPTIONAL { ?siteReg adms:schemaAgency ?siteRegSchemaAgency . }
         OPTIONAL { ?siteReg dcterms:issued ?siteRegIssued . }
       }
+    }
+  }
+`
+
+export const KBO_BRANCH_BY_ID_QUERY = (slug: string) => `
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  PREFIX dcterms: <http://purl.org/dc/terms/>
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+  PREFIX adms: <http://www.w3.org/ns/adms#>
+  PREFIX org: <http://www.w3.org/ns/org#>
+  PREFIX reorg: <http://www.w3.org/ns/regorg#>
+
+  SELECT ?site ?type ?created ?regNotation ?regCreator ?regSchemaAgency ?regIssued WHERE {
+    ?site a ?type .
+    FILTER(CONTAINS(STR(?site), "${slug}"))
+    OPTIONAL { ?site dcterms:created ?created . }
+    OPTIONAL {
+      ?site reorg:registration ?reg .
+      OPTIONAL { ?reg skos:notation ?regNotation . }
+      OPTIONAL { ?reg dcterms:creator ?regCreator . }
+      OPTIONAL { ?reg adms:schemaAgency ?regSchemaAgency . }
+      OPTIONAL { ?reg dcterms:issued ?regIssued . }
     }
   }
 `

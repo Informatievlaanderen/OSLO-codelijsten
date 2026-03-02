@@ -22,3 +22,7 @@ Finalised the migration to Nuxt 3 for codelists and added a catch-all path for b
   1.14.0
 
 * Add support for jsonld codelists
+
+1.15.0
+
+ADD ALL KBO DATA

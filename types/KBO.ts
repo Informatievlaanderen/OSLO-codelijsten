@@ -24,7 +24,7 @@ export interface KboSite {
   registration?: KboRegistration
 }
 
-export interface KboData {
+export interface KboOrganizationData {
   id: string
   uri?: string
   legalName?: string[]
@@ -35,5 +35,21 @@ export interface KboData {
   contactPoints?: KboContactPoint[]
   registration?: KboRegistration
   registeredSites?: KboSite[]
+  source: string
+}
+
+export interface KBOBranchRegistration {
+  notation?: string
+  creator?: string
+  schemaAgency?: string
+  issued?: string
+}
+
+export interface KBOBranchData {
+  id: string
+  uri?: string
+  type?: string
+  created?: string
+  registration?: KBOBranchRegistration
   source: string
 }

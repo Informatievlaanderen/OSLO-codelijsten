@@ -1,19 +1,19 @@
 import {
   SUPPORTED_FORMATS,
   SUPPORTED_EXTENSIONS,
-  KBO_BY_ID_QUERY,
+  KBO_ORGANIZATION_BY_ID_QUERY,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import { serializeAllTriples } from '~/services/serialization-service'
 import type {
-  KboData,
+  KboOrganizationData,
   KboContactPoint,
   KboRegistration,
   KboSite,
 } from '~/types/KBO'
 
 export default defineEventHandler(
-  async (event): Promise<KboData | string | null> => {
+  async (event): Promise<KboOrganizationData | string | null> => {
     try {
       const slug = getRouterParam(event, 'slug')
 
@@ -24,7 +24,7 @@ export default defineEventHandler(
         })
       }
 
-      console.log(`[${new Date().toISOString()}] Fetching KBO: ${slug}`)
+      console.log(`[${new Date().toISOString()}] Fetching KBO enterprise: ${slug}`)
 
       // Detect supported file extension (.ttl, .jsonld, .nt)
       const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
@@ -36,7 +36,7 @@ export default defineEventHandler(
       const runtimeConfig = useRuntimeConfig()
       const KBO_TTL_URL = runtimeConfig.KBO_TTL_URL ?? process.env.KBO_TTL_URL
 
-      const sourceUrl = `${KBO_TTL_URL}/${cleanSlug}.ttl`
+      const sourceUrl = `${KBO_TTL_URL}/organisations/${cleanSlug}.ttl`
 
       // Handle content negotiation - serialize in requested format
       const acceptHeader = getHeader(event, 'accept') ?? ''
@@ -58,14 +58,14 @@ export default defineEventHandler(
       }
 
       // Fetch KBO data as JSON
-      const bindings = await executeQuery(KBO_BY_ID_QUERY(cleanSlug), [
+      const bindings = await executeQuery(KBO_ORGANIZATION_BY_ID_QUERY(cleanSlug), [
         sourceUrl,
       ])
 
       if (!bindings.length) {
         throw createError({
           statusCode: 404,
-          statusMessage: `KBO not found: ${cleanSlug}`,
+          statusMessage: `KBO enterprise not found: ${cleanSlug}`,
         })
       }
 
@@ -175,7 +175,7 @@ export default defineEventHandler(
             }
           : undefined
 
-      const kboData: KboData = {
+      const kboData: KboOrganizationData = {
         id: cleanSlug,
         uri,
         legalName: legalNames.size ? Array.from(legalNames) : undefined,

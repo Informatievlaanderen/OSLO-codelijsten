@@ -62,6 +62,7 @@ export default defineEventHandler(async (event) => {
     const organisatieMatch = cleanPath.match(/\/organisatie\/(.+)$/)
     const licentieMatch = cleanPath.match(/\/licentie\/(.+)$/)
     const ondernemingMatch = cleanPath.match(/\/onderneming\/(.+)$/)
+    const vestigingMatch = cleanPath.match(/\/vestiging\/(.+)$/)
 
     // Redirect to appropriate API endpoint
     switch (true) {
@@ -79,6 +80,9 @@ export default defineEventHandler(async (event) => {
         break
       case !!ondernemingMatch:
         apiPath = `/doc/api/enterprise/${ondernemingMatch![1]}${extension}`
+        break
+      case !!vestigingMatch:
+        apiPath = `/doc/api/branch/${vestigingMatch![1]}${extension}`
         break
     }
     if (!apiPath) {
