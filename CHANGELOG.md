@@ -23,6 +23,14 @@ Finalised the migration to Nuxt 3 for codelists and added a catch-all path for b
 
 * Add support for jsonld codelists
 
-1.15.0
+  1.15.0
 
 ADD ALL KBO DATA
+
+1.16.0
+
+- Add support for nested codelists
+  {
+  "urlRef": "IT001/Dossierstatus",
+  "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT001-Dossierstatus.ttl"
+  },

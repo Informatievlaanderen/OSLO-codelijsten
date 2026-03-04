@@ -26,6 +26,11 @@ export default defineEventHandler(
       )
       const cleanSlug = extension ? slug.replace(extension, '') : slug
 
+      console.log(cleanSlug, 'clean')
+      console.log(cleanSlug, 'clean')
+      console.log(cleanSlug, 'clean')
+      console.log(cleanSlug, 'clean')
+
       const config = await getConceptConfig(cleanSlug)
 
       // Handle content negotiation - serialize only this concept
@@ -77,9 +82,10 @@ const getConceptConfig = async (slug: string): Promise<ConceptConfig> => {
   let conceptId: string
 
   if (slugParts.length > 1) {
-    // Format: schemeId/conceptId
-    conceptSchemeSlug = slugParts[0]
-    conceptId = slugParts[1]
+    // Format: schemeId/.../conceptId
+    // The last part is the concept ID, everything else is the scheme path
+    conceptId = slugParts[slugParts.length - 1]
+    conceptSchemeSlug = slugParts.slice(0, -1).join('/')
   } else {
     // Single part - just the concept ID
     conceptId = slugParts[0]

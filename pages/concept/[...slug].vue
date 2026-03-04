@@ -80,9 +80,10 @@ const slug = computed(() => {
 })
 
 const conceptScheme = computed(() => {
-  return Array.isArray(route.params.slug)
-    ? route.params.slug[0]
-    : route.params.slug
+  const slugArray = Array.isArray(route.params.slug)
+    ? route.params.slug
+    : [route.params.slug]
+  return slugArray.length > 1 ? slugArray.slice(0, -1).join('/') : slugArray[0]
 })
 
 const fullUri = computed(
