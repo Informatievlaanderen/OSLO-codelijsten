@@ -46,3 +46,7 @@ ADD ALL KBO DATA
     "urlRef": "IT141/Gezinsrelatie",
     "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141-Gezinsrelatietype.ttl"
     },
+
+    1.16.2
+
+    - Fix for root conceptscheme showing the information of a child conceptscheme

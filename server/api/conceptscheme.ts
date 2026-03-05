@@ -1,4 +1,4 @@
-import { CONCEPT_SCHEME_QUERY } from '~/constants/constants'
+import { CONCEPT_SCHEME_QUERY, CONCEPT_SCHEME_BY_ID_QUERY } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import type { ConceptScheme, ConceptSchemeConfig } from '~/types/conceptScheme'
 
@@ -21,9 +21,17 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
     const schemes = await Promise.all(
       configs.map(async (config) => {
         try {
-          const bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [
+          // First try filtered query to find the exact scheme matching the urlRef
+          let bindings = await executeQuery(CONCEPT_SCHEME_BY_ID_QUERY(config.urlRef), [
             config.sourceUrl,
           ])
+
+          // Fallback to generic query if filtered returns nothing
+          if (!bindings.length) {
+            bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [
+              config.sourceUrl,
+            ])
+          }
 
           if (!bindings.length) return null
 
