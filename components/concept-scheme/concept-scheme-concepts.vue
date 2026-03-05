@@ -20,10 +20,11 @@
                 {{ concept.uri }}
               </vl-link>
             </td>
+
             <td>{{ concept.label }}</td>
             <td>{{ concept.definition ?? 'Niet beschikbaar' }}</td>
             <td v-if="conceptScheme">
-              <vl-link :href="`/doc/concept/${conceptScheme}/${concept.id}`">
+              <vl-link :href="`/doc/${extractConcept(concept.uri)}`">
                 Bekijk details
               </vl-link>
             </td>
@@ -36,6 +37,7 @@
 
 <script setup lang="ts" name="conceptSchemeConcepts">
 import type { Concept } from '~/types/concept'
+import type { extractConcept } from '~/utils/utils'
 
 interface Props {
   concepts?: Concept[]

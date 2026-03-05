@@ -125,8 +125,6 @@ const buildConceptSchemeResponse = async (
   const binding = bindings[0]
   const schemeUri = binding.get('scheme')?.value ?? ''
 
-  console.log(schemeUri, 'schemeURI')
-
   const topConceptsQuery = topConceptQuery(schemeUri)
   const topConceptBindings = await executeQuery(topConceptsQuery, [
     config.sourceUrl,
@@ -140,8 +138,6 @@ const buildConceptSchemeResponse = async (
     notation: b.get('notation')?.value ?? '',
     source: config.sourceUrl,
   }))
-
-  console.log(topConcepts, 'topConcepts')
 
   return {
     id: config.urlRef,

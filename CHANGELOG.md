@@ -50,3 +50,7 @@ ADD ALL KBO DATA
     1.16.2
 
     - Fix for root conceptscheme showing the information of a child conceptscheme
+
+      1.16.3
+
+    - Fix for links to concept or conceptschemes
