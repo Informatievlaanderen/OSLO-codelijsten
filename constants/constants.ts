@@ -89,6 +89,22 @@ export const schemeQuery = (schemeUri: string) => `
     }
   `
 
+export const CONCEPT_SCHEME_BY_ID_QUERY = (schemeId: string) => `
+      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+      PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+      PREFIX adms: <https://www.w3.org/ns/adms#>
+      PREFIX dct: <http://purl.org/dc/terms/>
+
+      SELECT ?scheme ?label ?definition ?status ?dataset WHERE {
+        ?scheme a skos:ConceptScheme .
+        FILTER(STR(?scheme) = "https://data.vlaanderen.be/id/conceptscheme/${schemeId}")
+        OPTIONAL { ?scheme skos:prefLabel ?label . }
+        OPTIONAL { ?scheme skos:definition ?definition . }
+        OPTIONAL { ?scheme adms:status ?status . }
+        OPTIONAL { ?scheme dct:isPartOf ?dataset . }
+      }
+      LIMIT 1`
+
 export const ORGANIZATION_BY_ID_QUERY = (orgId: string) => `
   PREFIX dct: <http://purl.org/dc/terms/>
   PREFIX foaf: <http://xmlns.com/foaf/0.1/>

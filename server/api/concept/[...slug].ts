@@ -26,11 +26,6 @@ export default defineEventHandler(
       )
       const cleanSlug = extension ? slug.replace(extension, '') : slug
 
-      console.log(cleanSlug, 'clean')
-      console.log(cleanSlug, 'clean')
-      console.log(cleanSlug, 'clean')
-      console.log(cleanSlug, 'clean')
-
       const config = await getConceptConfig(cleanSlug)
 
       // Handle content negotiation - serialize only this concept

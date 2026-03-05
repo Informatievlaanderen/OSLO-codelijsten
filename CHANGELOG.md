@@ -34,3 +34,15 @@ ADD ALL KBO DATA
   "urlRef": "IT001/Dossierstatus",
   "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT001-Dossierstatus.ttl"
   },
+
+  1.16.1
+
+  - Add support for conceptschemes of conceptschemes
+    {
+    "urlRef": "IT141",
+    "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141.ttl"
+    },
+    {
+    "urlRef": "IT141/Gezinsrelatie",
+    "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141-Gezinsrelatietype.ttl"
+    },

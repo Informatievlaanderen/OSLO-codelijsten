@@ -1,5 +1,6 @@
 import {
   CONCEPT_SCHEME_QUERY,
+  CONCEPT_SCHEME_BY_ID_QUERY,
   topConceptQuery,
   SUPPORTED_EXTENSIONS,
   SUPPORTED_FORMATS,
@@ -83,6 +84,8 @@ const getConceptSchemeConfig = async (
 
   const config = data.conceptSchemes.find((c: any) => c.urlRef === slug)
 
+  console.log('config,', config)
+
   // throw an error if it's explicitally stated to use an extension but it's not the correct one (jsonld versus ttl for example)
   if (extension && !config?.sourceUrl.endsWith(extension)) {
     throw createError({
@@ -104,7 +107,15 @@ const getConceptSchemeConfig = async (
 const buildConceptSchemeResponse = async (
   config: ConceptSchemeConfig,
 ): Promise<ConceptScheme> => {
-  const bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [config.sourceUrl])
+  // First try a filtered query to find the exact scheme matching the urlRef
+  let bindings = await executeQuery(CONCEPT_SCHEME_BY_ID_QUERY(config.urlRef), [
+    config.sourceUrl,
+  ])
+
+  // Fallback to the generic query if filtered returns nothing
+  if (!bindings.length) {
+    bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [config.sourceUrl])
+  }
 
   if (!bindings.length) {
     throw createError({
@@ -115,6 +126,8 @@ const buildConceptSchemeResponse = async (
 
   const binding = bindings[0]
   const schemeUri = binding.get('scheme')?.value ?? ''
+
+  console.log(schemeUri, 'schemeURI')
 
   const topConceptsQuery = topConceptQuery(schemeUri)
   const topConceptBindings = await executeQuery(topConceptsQuery, [
@@ -129,6 +142,8 @@ const buildConceptSchemeResponse = async (
     notation: b.get('notation')?.value ?? '',
     source: config.sourceUrl,
   }))
+
+  console.log(topConcepts, 'topConcepts')
 
   return {
     id: config.urlRef,
