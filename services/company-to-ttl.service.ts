@@ -88,7 +88,7 @@ export class CompanyToTTLService {
   }
 
   private addRegistration(
-    parentNode: RDF.NamedNode,
+    parentNode: RDF.NamedNode | RDF.BlankNode,
     blankNodeId: string,
     identifier: string,
     startDate: string,
@@ -582,9 +582,7 @@ export class CompanyToTTLService {
     )
 
     for (const branch of company.branch) {
-      const branchUri = this.df.namedNode(
-        `${this.baseUri}/id/bijkantoor/${branch.identifier}`,
-      )
+      const branchUri = this.df.blankNode(`branch_${branch.identifier}`)
 
       this.store.addQuads([
         this.df.quad(companyUri, ns2.org('hasRegisteredSite'), branchUri),
@@ -701,7 +699,7 @@ export class CompanyToTTLService {
   public async exportBranchAsTurtle(branchIdentifier: string): Promise<string> {
     let quads: RDF.Quad[] = []
     this.discoverCompany(
-      this.df.namedNode(`${this.baseUri}/id/bijkantoor/${branchIdentifier}`),
+      this.df.namedNode(`branch_${branchIdentifier}`),
       quads,
       this.store,
     )
