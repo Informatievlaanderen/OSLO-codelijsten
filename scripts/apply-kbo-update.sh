@@ -1,0 +1,83 @@
+#!/bin/bash
+# filepath: scripts/apply-kbo-update.sh
+
+set -e  # Exit on error
+
+echo "=========================================="
+echo "Applying KBO daily update"
+echo "=========================================="
+
+# Define variables
+REPO_URL="git@github.com:Informatievlaanderen/OSLO-codelistgenerated.git"
+REPO_BRANCH="KBO"
+REPO_DIR="/tmp/OSLO-codelistgenerated"
+UPDATE_DIR="/tmp/kbo-update/update"
+FULL_DIR="/tmp/kbo-full/data"
+
+# Validate required environment variables
+for var in FTP_HOST FTP_USER FTP_PASSWORD FTP_UPDATE_PATH FTP_FULL_PATH; do
+    if [ -z "${!var}" ]; then
+        echo "Error: Required environment variable '$var' is not set."
+        exit 1
+    fi
+done
+
+# Clean up any previous runs
+echo "Cleaning up previous files..."
+rm -rf "$REPO_DIR" "$UPDATE_DIR" "$FULL_DIR"
+mkdir -p "$UPDATE_DIR" "$FULL_DIR"
+
+# Clone the KBO branch of the generated repo
+echo "Cloning OSLO-codelistgenerated ($REPO_BRANCH branch)..."
+git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
+
+# Fetch update and full data directories from FTP
+echo "Fetching KBO data from FTP..."
+lftp -c "
+  set ssl:verify-certificate no;
+  open ftp://$FTP_USER:$FTP_PASSWORD@$FTP_HOST;
+  mirror --verbose $FTP_UPDATE_PATH $UPDATE_DIR;
+  mirror --verbose $FTP_FULL_PATH $FULL_DIR;
+  bye
+"
+
+if [ ! -d "$UPDATE_DIR" ] || [ -z "$(ls -A "$UPDATE_DIR")" ]; then
+    echo "Error: Update directory is empty or missing after FTP download."
+    exit 1
+fi
+
+if [ ! -d "$FULL_DIR" ] || [ -z "$(ls -A "$FULL_DIR")" ]; then
+    echo "Error: Full data directory is empty or missing after FTP download."
+    exit 1
+fi
+
+# Patch the full dataset with inserted enterprises from the update
+echo "Applying enterprise inserts..."
+cp "$UPDATE_DIR/enterprise_insert.csv" "$FULL_DIR/enterprise.csv"
+echo "  ✓ enterprise.csv replaced with enterprise_insert.csv"
+
+# Remove TTL files for deleted enterprises/establishments/branches
+echo "Removing deleted TTL files..."
+chmod +x "$(dirname "$0")/remove-deleted-ttl-files.sh"
+"$(dirname "$0")/remove-deleted-ttl-files.sh" "$UPDATE_DIR" "$REPO_DIR/$REPO_BRANCH"
+
+# Convert inserted enterprises to TTL
+echo "Converting enterprises to TTL..."
+oslo-company-to-ttl --input "$FULL_DIR" --output "$REPO_DIR/$REPO_BRANCH"
+
+# Commit and push changes
+echo "Committing and pushing changes..."
+cd "$REPO_DIR"
+git add -A
+
+if git diff --cached --quiet; then
+    echo "No changes to commit."
+else
+    git commit -m "chore: apply KBO update from $(date +%Y-%m-%d)"
+    git push origin "$REPO_BRANCH"
+    echo "  ✓ Changes pushed to $REPO_BRANCH"
+fi
+
+echo "=========================================="
+echo "KBO update complete"
+echo "=========================================="

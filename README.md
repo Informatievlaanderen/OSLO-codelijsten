@@ -1,12 +1,12 @@
-# OVO Codes Extractie
+# KBO Codes extractie en conversie
 
-Deze repository bevat scripts voor het extraheren van OVO-codes uit de basisregisters van Vlaanderen. OVO-codes worden gebruikt om verschillende administratieve entiteiten te identificeren en te classificeren. De OVO codes worden gepubliceerd op https://data.vlaanderen.be.
+Deze repository bevat scripts voor het extraheren van KBO-codes uit de publicaties van de KBO-codes op een FTP server. De KBO-codes worden gepubliceerd door de Belgische overheid en bevatten informatie over bedrijven en organisaties in België (https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html)
 
-## Organization to TTL Converter
+## KBO to TTL Converter
 
 ### Overzicht
 
-De Organization to TTL Converter is een command-line tool die organisatiegegevens in JSON-formaat omzet naar RDF Turtle (TTL) formaat.
+De KBO to TTL Converter is een command-line tool die KBO-gegevens in CSV-formaat omzet naar RDF Turtle (TTL) formaat.
 
 ### Installatie
 
@@ -19,13 +19,13 @@ npm install
 # Build het project
 npm run build
 
-node dist/convert-org-to-ttl.js --input <input-file> --output <output-directory>
+node dist/convert-kbo-to-ttl.js --input <input-file> --output <output-directory>
 ```
 
 #### Als NPM package
 
 ```bash
-npm install -g @oslo-flanders/org-to-ttl-converter
+npm install -g @oslo-flanders/kbo-to-ttl-converter
 ```
 
 ### Gebruik
@@ -34,16 +34,16 @@ npm install -g @oslo-flanders/org-to-ttl-converter
 
 ```bash
 # Lange vorm
-oslo-org-to-ttl --input <input-file> --output <output-directory>
+oslo-kbo-to-ttl --input <input-file> --output <output-directory>
 ```
 
 **Parameters**
 
-- `--input, -i`: Pad naar het input JSON-bestand met organisatiegegevens
+- `--input, -i`: Pad naar het input CSV-bestand met KBO-gegevens
 - `--output, -o`: Pad naar de output directory waar TTL-bestanden worden opgeslagen
 
 **Voorbeelden**
 
 ```bash
-oslo-org-to-ttl -i ./data/orgs.json -o ./output/ttl
+oslo-kbo-to-ttl -i ./data/kbo/ -o ./output/ttl
 ```

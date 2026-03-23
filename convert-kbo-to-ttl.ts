@@ -40,7 +40,9 @@ async function main() {
     )
     console.error('')
     console.error('Options:')
-    console.error('  --input, -i   Path to input JSON file')
+    console.error(
+      '  --input, -i   Path to input CSV directory containing the KBO data',
+    )
     console.error('  --output, -o  Path to output directory')
     console.error('')
     console.error('Example:')

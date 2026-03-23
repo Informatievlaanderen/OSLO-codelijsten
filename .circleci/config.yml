@@ -1,21 +1,18 @@
 version: 2.1
-
 jobs:
   build:
     docker:
-      - image: cimg/node:20.11.1
+      - image: 'cimg/node:22'
     steps:
       - checkout
-
       - run:
           name: Install dependencies
           command: |
             npm ci
             npm run build
-
-  update-ovo-organizations:
+  apply-kbo-update:
     docker:
-      - image: cimg/node:20.11.1
+      - image: 'cimg/node:22'
     steps:
       - checkout
 
@@ -27,7 +24,7 @@ jobs:
           name: Install system dependencies
           command: |
             sudo apt-get update
-            sudo apt-get install -y jq git curl
+            sudo apt-get install -y lftp git
 
       - run:
           name: Configure Git
@@ -36,25 +33,24 @@ jobs:
             git config --global user.email "OSLO-support@vlaanderen.be"
 
       - run:
-          name: Install OVO converter
-          command: sudo npm install -g @oslo-flanders/org-to-ttl-converter
+          name: Install KBO converter
+          command: sudo npm install -g @oslo-flanders/kbo-to-ttl-converter
 
       - run:
-          name: Fetch and convert OVO organizations
-          command: ./scripts/fetch-and-convert-OVO.sh /tmp/output/organisations /tmp/organisaties.json
+          name: Apply KBO daily update
+          command: ./scripts/apply-kbo-update.sh
           no_output_timeout: 60m
 
 workflows:
   version: 2
-
-  update-ovo-weekly:
+  apply-kbo-update-daily:
     triggers:
       - schedule:
-          cron: '0 4 * * 2' # Run every Tuesday at 4 AM UTC (Monday night)
+          cron: 0 3 * * *
           filters:
             branches:
               only:
-                - OVO-codes
+                - main
     jobs:
-      - update-ovo-organizations:
-          context: ovo-converter
+      - apply-kbo-update:
+          context: kbo-converter
