@@ -15,7 +15,7 @@ UPDATE_DIR="/tmp/kbo-update/update"
 FULL_DIR="/tmp/kbo-full/data"
 
 # Validate required environment variables
-for var in FTP_HOST FTP_USER FTP_PASSWORD FTP_UPDATE_PATH FTP_FULL_PATH; do
+for var in FTP_HOST FTP_PORT FTP_USER FTP_PASSWORD FTP_UPDATE_PATH FTP_FULL_PATH; do
     if [ -z "${!var}" ]; then
         echo "Error: Required environment variable '$var' is not set."
         exit 1
@@ -35,7 +35,7 @@ git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 echo "Fetching KBO data from FTP..."
 lftp -c "
   set ssl:verify-certificate no;
-  open ftp://$FTP_USER:$FTP_PASSWORD@$FTP_HOST;
+  open ftp://$FTP_USER:$FTP_PASSWORD@$FTP_HOST:$FTP_PORT;
   get1 $FTP_UPDATE_PATH -o /tmp/kbo-update.zip;
   get1 $FTP_FULL_PATH -o /tmp/kbo-full.zip;
   bye
