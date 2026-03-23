@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/node:20.11.1
+      - image: cimg/node:22
     steps:
       - checkout
 
@@ -15,7 +15,7 @@ jobs:
 
   update-ovo-organizations:
     docker:
-      - image: cimg/node:20.11.1
+      - image: cimg/node:22
     steps:
       - checkout
 
