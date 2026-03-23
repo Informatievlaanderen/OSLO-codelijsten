@@ -1,7 +1,7 @@
 {
   "name": "@oslo-flanders/org-to-ttl-converter",
   "author": "Digitaal Vlaanderen <https://data.vlaanderen.be/id/organisatie/OVO002949>",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Convert organization JSON data to RDF Turtle format",
   "main": "dist/index.js",
   "bin": {
@@ -17,8 +17,7 @@
     "convert:all": "ts-node convert-company-to-json.ts --input ./KboOpenData_0274_2026_02_16_Full --output ./output",
     "build": "tsc",
     "prepublishOnly": "npm run build",
-    "start": "node dist/convert-company-to-json.js",
-    "postinstall": "chmod +x dist/convert-company-to-json.js || true"
+    "start": "node dist/convert-company-to-json.js"
   },
   "keywords": [
     "rdf",
