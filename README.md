@@ -19,7 +19,7 @@ npm install
 # Build het project
 npm run build
 
-node dist/convert-kbo-to-ttl.js --input <input-file> --output <output-directory>
+node dist/convert-kbo-to-ttl.js --input <input-directory> --output <output-directory>
 ```
 
 #### Als NPM package
@@ -34,12 +34,12 @@ npm install -g @oslo-flanders/kbo-to-ttl-converter
 
 ```bash
 # Lange vorm
-oslo-kbo-to-ttl --input <input-file> --output <output-directory>
+oslo-kbo-to-ttl --input <input-directory> --output <output-directory>
 ```
 
 **Parameters**
 
-- `--input, -i`: Pad naar het input CSV-bestand met KBO-gegevens
+- `--input, -i`: Pad naar het de directory waar de KBO CSV-bestanden zich bevinden
 - `--output, -o`: Pad naar de output directory waar TTL-bestanden worden opgeslagen
 
 **Voorbeelden**
