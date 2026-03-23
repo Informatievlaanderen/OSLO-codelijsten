@@ -36,10 +36,6 @@ jobs:
             git config --global user.email "OSLO-support@vlaanderen.be"
 
       - run:
-          name: Install OVO converter
-          command: sudo npm install -g @oslo-flanders/org-to-ttl-converter
-
-      - run:
           name: Fetch and convert OVO organizations
           command: ./scripts/fetch-and-convert-OVO.sh /tmp/output/organisations /tmp/organisaties.json
           no_output_timeout: 60m
