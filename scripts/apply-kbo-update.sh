@@ -31,23 +31,46 @@ mkdir -p "$UPDATE_DIR" "$FULL_DIR"
 echo "Cloning OSLO-codelistgenerated ($REPO_BRANCH branch)..."
 git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 
-# Fetch update and full data directories from FTP
+# Fetch update and full data zip files from FTP
 echo "Fetching KBO data from FTP..."
 lftp -c "
   set ssl:verify-certificate no;
   open ftp://$FTP_USER:$FTP_PASSWORD@$FTP_HOST;
-  mirror --verbose $FTP_UPDATE_PATH $UPDATE_DIR;
-  mirror --verbose $FTP_FULL_PATH $FULL_DIR;
+  get1 $FTP_UPDATE_PATH -o /tmp/kbo-update.zip;
+  get1 $FTP_FULL_PATH -o /tmp/kbo-full.zip;
   bye
 "
 
-if [ ! -d "$UPDATE_DIR" ] || [ -z "$(ls -A "$UPDATE_DIR")" ]; then
-    echo "Error: Update directory is empty or missing after FTP download."
+if [ ! -f "/tmp/kbo-update.zip" ]; then
+    echo "Error: Failed to download update zip from FTP."
     exit 1
 fi
 
-if [ ! -d "$FULL_DIR" ] || [ -z "$(ls -A "$FULL_DIR")" ]; then
-    echo "Error: Full data directory is empty or missing after FTP download."
+if [ ! -f "/tmp/kbo-full.zip" ]; then
+    echo "Error: Failed to download full data zip from FTP."
+    exit 1
+fi
+
+echo "Extracting zip archives..."
+unzip -q /tmp/kbo-update.zip -d "$UPDATE_DIR"
+unzip -q /tmp/kbo-full.zip -d "$FULL_DIR"
+
+# Flatten if the zip extracted into a single subdirectory
+for DIR in "$UPDATE_DIR" "$FULL_DIR"; do
+    if [ "$(ls -1 "$DIR" | wc -l)" -eq 1 ] && [ -d "$DIR"/$(ls "$DIR") ]; then
+        SUBDIR="$DIR/$(ls "$DIR")"
+        mv "$SUBDIR"/* "$DIR/"
+        rmdir "$SUBDIR"
+    fi
+done
+
+if [ ! -f "$UPDATE_DIR/enterprise_insert.csv" ]; then
+    echo "Error: enterprise_insert.csv not found in extracted update directory."
+    exit 1
+fi
+
+if [ ! -f "$FULL_DIR/enterprise.csv" ]; then
+    echo "Error: enterprise.csv not found in extracted full data directory."
     exit 1
 fi
 
