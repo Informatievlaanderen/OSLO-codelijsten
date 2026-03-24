@@ -33,14 +33,23 @@ git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 
 # Fetch update and full data zip files from SFTP
 echo "Fetching KBO data from SFTP..."
-export SSHPASS="$FTP_PASSWORD"
-SFTP_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -P $FTP_PORT"
+curl --fail --silent --show-error \
+  --insecure \
+  --connect-timeout 30 \
+  --retry 3 \
+  --retry-delay 5 \
+  -u "$FTP_USER:$FTP_PASSWORD" \
+  -o /tmp/kbo-update.zip \
+  "sftp://$FTP_HOST:$FTP_PORT$FTP_UPDATE_PATH"
 
-sshpass -e sftp -oBatchMode=no $SFTP_OPTS "$FTP_USER@$FTP_HOST" <<EOF
-get $FTP_UPDATE_PATH /tmp/kbo-update.zip
-get $FTP_FULL_PATH /tmp/kbo-full.zip
-bye
-EOF
+curl --fail --silent --show-error \
+  --insecure \
+  --connect-timeout 30 \
+  --retry 3 \
+  --retry-delay 5 \
+  -u "$FTP_USER:$FTP_PASSWORD" \
+  -o /tmp/kbo-full.zip \
+  "sftp://$FTP_HOST:$FTP_PORT$FTP_FULL_PATH"
 
 if [ ! -f "/tmp/kbo-update.zip" ]; then
     echo "Error: Failed to download update zip from FTP."
