@@ -40,7 +40,7 @@ curl --fail --silent --show-error \
   --retry-delay 5 \
   -u "$FTP_USER:$FTP_PASSWORD" \
   -o /tmp/kbo-update.zip \
-  "sftp://$FTP_HOST:$FTP_PORT$FTP_UPDATE_PATH"
+  "sftp://$FTP_HOST:22$FTP_UPDATE_PATH"
 
 curl --fail --silent --show-error \
   --insecure \
@@ -49,7 +49,7 @@ curl --fail --silent --show-error \
   --retry-delay 5 \
   -u "$FTP_USER:$FTP_PASSWORD" \
   -o /tmp/kbo-full.zip \
-  "sftp://$FTP_HOST:$FTP_PORT$FTP_FULL_PATH"
+  "sftp://$FTP_HOST:22$FTP_FULL_PATH"
 
 if [ ! -f "/tmp/kbo-update.zip" ]; then
     echo "Error: Failed to download update zip from FTP."
