@@ -46,11 +46,15 @@ workflows:
   apply-kbo-update-daily:
     triggers:
       - schedule:
-          cron: 0 3 * * *
+          cron: '0 13 * * *'
           filters:
             branches:
               only:
-                - main
+                - KBO-codes
+      - push:
+          branches:
+            only:
+              - KBO-codes
     jobs:
       - apply-kbo-update:
           context: kbo-converter
