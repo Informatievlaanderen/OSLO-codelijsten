@@ -22,8 +22,6 @@ for var in FTP_HOST FTP_PORT FTP_USER FTP_PASSWORD FTP_UPDATE_PATH FTP_FULL_PATH
     fi
 done
 
-echo "ftp://$FTP_USER:***@$FTP_HOST:$FTP_PORT"
-
 # Clean up any previous runs
 echo "Cleaning up previous files..."
 rm -rf "$REPO_DIR" "$UPDATE_DIR" "$FULL_DIR"
@@ -36,7 +34,10 @@ git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 # Fetch update and full data zip files from FTP
 echo "Fetching KBO data from FTP..."
 lftp -c "
-  set ssl:verify-certificate no;
+  set net:timeout 30;
+  set net:max-retries 3;
+  set net:reconnect-interval-base 5;
+  set ftp:passive-mode yes;
   open ftp://$FTP_USER:$FTP_PASSWORD@$FTP_HOST:$FTP_PORT;
   get1 $FTP_UPDATE_PATH -o /tmp/kbo-update.zip;
   get1 $FTP_FULL_PATH -o /tmp/kbo-full.zip;
