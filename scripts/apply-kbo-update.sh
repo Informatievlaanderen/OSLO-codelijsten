@@ -22,6 +22,8 @@ for var in FTP_HOST FTP_PORT FTP_USER FTP_PASSWORD FTP_UPDATE_PATH FTP_FULL_PATH
     fi
 done
 
+echo "ftp://$FTP_USER:***@$FTP_HOST:$FTP_PORT"
+
 # Clean up any previous runs
 echo "Cleaning up previous files..."
 rm -rf "$REPO_DIR" "$UPDATE_DIR" "$FULL_DIR"
