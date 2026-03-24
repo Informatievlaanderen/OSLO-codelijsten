@@ -51,10 +51,14 @@ workflows:
             branches:
               only:
                 - KBO-codes
-      - push:
-          branches:
-            only:
-              - KBO-codes
     jobs:
       - apply-kbo-update:
+          context: kbo-converter
+  apply-kbo-update-on-push:
+    jobs:
+      - apply-kbo-update:
+          filters:
+            branches:
+              only:
+                - KBO-codes
           context: kbo-converter
