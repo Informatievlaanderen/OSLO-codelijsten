@@ -31,17 +31,16 @@ mkdir -p "$UPDATE_DIR" "$FULL_DIR"
 echo "Cloning OSLO-codelistgenerated ($REPO_BRANCH branch)..."
 git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 
-# Fetch update and full data zip files from FTP
-echo "Fetching KBO data from FTP..."
-lftp -u "$FTP_USER,$FTP_PASSWORD" -p "$FTP_PORT" sftp://"$FTP_HOST" -c "
-  set net:timeout 30;
-  set net:max-retries 3;
-  set net:reconnect-interval-base 5;
-  set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null';
-  get1 $FTP_UPDATE_PATH -o /tmp/kbo-update.zip;
-  get1 $FTP_FULL_PATH -o /tmp/kbo-full.zip;
-  bye
-"
+# Fetch update and full data zip files from SFTP
+echo "Fetching KBO data from SFTP..."
+export SSHPASS="$FTP_PASSWORD"
+SFTP_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -P $FTP_PORT"
+
+sshpass -e sftp -oBatchMode=no $SFTP_OPTS "$FTP_USER@$FTP_HOST" <<EOF
+get $FTP_UPDATE_PATH /tmp/kbo-update.zip
+get $FTP_FULL_PATH /tmp/kbo-full.zip
+bye
+EOF
 
 if [ ! -f "/tmp/kbo-update.zip" ]; then
     echo "Error: Failed to download update zip from FTP."
