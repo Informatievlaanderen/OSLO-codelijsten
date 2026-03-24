@@ -37,8 +37,8 @@ lftp -c "
   set net:timeout 30;
   set net:max-retries 3;
   set net:reconnect-interval-base 5;
-  set ftp:passive-mode yes;
-  open ftp://$FTP_USER:$FTP_PASSWORD@$FTP_HOST:$FTP_PORT;
+  set sftp:passive-mode yes;
+  open sftp://$FTP_USER:$FTP_PASSWORD@$FTP_HOST:$FTP_PORT;
   get1 $FTP_UPDATE_PATH -o /tmp/kbo-update.zip;
   get1 $FTP_FULL_PATH -o /tmp/kbo-full.zip;
   bye
