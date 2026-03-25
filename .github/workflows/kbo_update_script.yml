@@ -25,8 +25,8 @@ jobs:
           pass: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           run: |
-            sftp -o StrictHostKeyChecking=no -P 22 ftp.DylanVanAssche@ftp.DylanVanAssche@ftps.economie.fgov.be <<EOF
-            get /home/ftp.DylanVanAssche//home/ftp.DylanVanAssche/KboOpenData_0311_2026_03_25_Update.zip /tmp/kbo-update.zip
+            sftp -P 22 ftp.DylanVanAssche@ftps.economie.fgov.be <<EOF
+            get /home/ftp.DylanVanAssche/home/ftp.DylanVanAssche/KboOpenData_0311_2026_03_25_Update.zip /tmp/kbo-update.zip
             bye
             EOF
 
