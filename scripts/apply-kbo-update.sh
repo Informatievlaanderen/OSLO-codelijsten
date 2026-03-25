@@ -31,27 +31,13 @@ mkdir -p "$UPDATE_DIR" "$FULL_DIR"
 echo "Cloning OSLO-codelistgenerated ($REPO_BRANCH branch)..."
 git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 
-# Fetch update and full data zip files from FTPS
-echo "Fetching KBO data from FTPS..."
-curl --fail --silent --show-error \
-  --ssl-reqd \
-  --insecure \
-  --connect-timeout 30 \
-  --retry 3 \
-  --retry-delay 5 \
-  -u "$FTP_USER:$FTP_PASSWORD" \
-  -o /tmp/kbo-update.zip \
-  "ftps://${FTP_HOST}:${FTP_PORT}/${FTP_UPDATE_PATH#/}"
-
-curl --fail --silent --show-error \
-  --ssl-reqd \
-  --insecure \
-  --connect-timeout 30 \
-  --retry 3 \
-  --retry-delay 5 \
-  -u "$FTP_USER:$FTP_PASSWORD" \
-  -o /tmp/kbo-full.zip \
-  "ftps://${FTP_HOST}:${FTP_PORT}/${FTP_FULL_PATH#/}"
+# Fetch update and full data zip files from SFTP
+echo "Fetching KBO data from SFTP..."
+sshpass -p "$FTP_PASSWORD" sftp -o StrictHostKeyChecking=no -P "$FTP_PORT" "$FTP_USER@$FTP_HOST" <<EOF
+get /home/$FTP_USER/$FTP_UPDATE_PATH /tmp/kbo-update.zip
+get /home/$FTP_USER/$FTP_FULL_PATH /tmp/kbo-full.zip
+bye
+EOF
 
 if [ ! -f "/tmp/kbo-update.zip" ]; then
     echo "Error: Failed to download update zip from FTP."
