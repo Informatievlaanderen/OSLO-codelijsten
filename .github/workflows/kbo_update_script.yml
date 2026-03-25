@@ -18,8 +18,18 @@ jobs:
           ref: KBO-codes
 
       - name: Test SFTP connectivity
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
         run: |
-          timeout 10 bash -c "echo > /dev/tcp/${{ secrets.FTP_HOST }}/22" && echo "Port 22 reachable" || echo "Port 22 blocked"
+          echo "--- Port check ---"
+          timeout 10 bash -c "echo > /dev/tcp/$FTP_HOST/$FTP_PORT" && echo "Port $FTP_PORT reachable" || echo "Port $FTP_PORT blocked"
+
+          echo "--- SSH banner check ---"
+          timeout 10 ssh-keyscan -p "$FTP_PORT" "$FTP_HOST" 2>&1 || echo "SSH handshake failed"
+
+          echo "--- Runner IP ---"
+          curl -s ifconfig.me
 
       - name: Download from SFTP
         env:
