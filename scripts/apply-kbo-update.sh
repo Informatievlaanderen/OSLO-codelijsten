@@ -31,11 +31,11 @@ mkdir -p "$UPDATE_DIR" "$FULL_DIR"
 echo "Cloning OSLO-codelistgenerated ($REPO_BRANCH branch)..."
 git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 
-# Fetch update and full data zip files from SFTP
-echo "Fetching KBO data from SFTP..."
-sshpass -p "$FTP_PASSWORD" sftp -o StrictHostKeyChecking=no -P "$FTP_PORT" "$FTP_USER@$FTP_HOST" <<EOF
-get /home/$FTP_USER/$FTP_UPDATE_PATH /tmp/kbo-update.zip
-get /home/$FTP_USER/$FTP_FULL_PATH /tmp/kbo-full.zip
+# Fetch update and full data zip files from sshpass
+echo "Fetching KBO data from sshpass..."
+sshpass
+sshpass -p "$FTP_PASSWORD" sftp -P 22 ftp.DylanVanAssche@ftps.economie.fgov.be <<EOF
+get /home/ftp.DylanVanAssche/KboOpenData_0311_2026_03_25_Update.zip /tmp/kbo-update.zip
 bye
 EOF
 
