@@ -10,6 +10,7 @@ on:
 jobs:
   apply-kbo-update:
     runs-on: ubuntu-latest
+    environment: KBO # Github secrets environment
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,7 +30,7 @@ jobs:
           FTP_UPDATE_PATH: ${{ secrets.FTP_UPDATE_PATH }}
           FTP_FULL_PATH: ${{ secrets.FTP_FULL_PATH }}
         run: |
-          sudo apt-get install -y sshpass
+          echo $FTP_PORT
           sshpass -p "$FTP_PASSWORD" sftp -o StrictHostKeyChecking=no -P "$FTP_PORT" "$FTP_USER@$FTP_HOST" <<EOF
           get /home/$FTP_USER/$FTP_UPDATE_PATH /tmp/kbo-update.zip
           get /home/$FTP_USER/$FTP_FULL_PATH /tmp/kbo-full.zip
