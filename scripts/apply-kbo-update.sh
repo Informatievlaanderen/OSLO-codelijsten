@@ -38,8 +38,6 @@ get /home/ftp.DylanVanAssche/KboOpenData_0311_2026_03_25_Update.zip /tmp/kbo-upd
 bye
 EOF
 
-ls /tmp
-
 if [ ! -f "/tmp/kbo-update.zip" ]; then
     echo "Error: Failed to download update zip from FTP."
     exit 1
