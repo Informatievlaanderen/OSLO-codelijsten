@@ -1,1 +1,49 @@
+# .github/workflows/kbo-update.yml
+name: Apply KBO Update
 
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  push:
+    branches:
+      - kbo-codes
+jobs:
+  apply-kbo-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: kbo-codes
+
+      - name: Test SFTP connectivity
+        run: |
+          timeout 10 bash -c "echo > /dev/tcp/${{ secrets.FTP_HOST }}/22" && echo "Port 22 reachable" || echo "Port 22 blocked"
+
+      - name: Download from SFTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_UPDATE_PATH: ${{ secrets.FTP_UPDATE_PATH }}
+          FTP_FULL_PATH: ${{ secrets.FTP_FULL_PATH }}
+        run: |
+          sudo apt-get install -y sshpass
+          sshpass -p "$FTP_PASSWORD" sftp -o StrictHostKeyChecking=no -P "$FTP_PORT" "$FTP_USER@$FTP_HOST" <<EOF
+          get /home/$FTP_USER/$FTP_UPDATE_PATH /tmp/kbo-update.zip
+          get /home/$FTP_USER/$FTP_FULL_PATH /tmp/kbo-full.zip
+          bye
+          EOF
+
+      - name: Run update script
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_UPDATE_PATH: ${{ secrets.FTP_UPDATE_PATH }}
+          FTP_FULL_PATH: ${{ secrets.FTP_FULL_PATH }}
+        run: |
+          chmod +x scripts/apply-kbo-update.sh
+          ./scripts/apply-kbo-update.sh
