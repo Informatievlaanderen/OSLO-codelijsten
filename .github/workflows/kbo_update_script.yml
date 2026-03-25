@@ -1,4 +1,3 @@
-# .github/workflows/kbo-update.yml
 name: Apply KBO Update
 
 on:
@@ -7,44 +6,30 @@ on:
   push:
     branches:
       - KBO-codes
+
 jobs:
   apply-kbo-update:
     runs-on: ubuntu-latest
-    environment: KBO # Github secrets environment
+    environment: KBO
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: KBO-codes
 
-      - name: Test SFTP connectivity
-        env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          FTP_PORT: ${{ secrets.FTP_PORT }}
-        run: |
-          echo "--- Port check ---"
-          timeout 10 bash -c "echo > /dev/tcp/$FTP_HOST/$FTP_PORT" && echo "Port $FTP_PORT reachable" || echo "Port $FTP_PORT blocked"
-
-          echo "--- SSH banner check ---"
-          timeout 10 ssh-keyscan -p "$FTP_PORT" "$FTP_HOST" 2>&1 || echo "SSH handshake failed"
-
-          echo "--- Runner IP ---"
-          curl -s ifconfig.me
-
       - name: Download from SFTP
-        env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          FTP_PORT: ${{ secrets.FTP_PORT }}
-          FTP_USER: ${{ secrets.FTP_USER }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_UPDATE_PATH: ${{ secrets.FTP_UPDATE_PATH }}
-          FTP_FULL_PATH: ${{ secrets.FTP_FULL_PATH }}
-        run: |
-          echo $FTP_PORT
-          sshpass -p "$FTP_PASSWORD" sftp -P 22 ftp.DylanVanAssche@ftps.economie.fgov.be <<EOF
-          get /home/ftp.DylanVanAssche/KboOpenData_0311_2026_03_25_Update.zip /tmp/kbo-update.zip
-          bye
-          EOF
+        uses: matheusvanzan/sshpass-action@v2
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          user: ${{ secrets.FTP_USER }}
+          pass: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          run: |
+            sftp -o StrictHostKeyChecking=no -P ${{ secrets.FTP_PORT }} ${{ secrets.FTP_USER }}@${{ secrets.FTP_HOST }} <<EOF
+            get /home/${{ secrets.FTP_USER }}/${{ secrets.FTP_UPDATE_PATH }} /tmp/kbo-update.zip
+            get /home/${{ secrets.FTP_USER }}/${{ secrets.FTP_FULL_PATH }} /tmp/kbo-full.zip
+            bye
+            EOF
 
       - name: Run update script
         env:
