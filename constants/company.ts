@@ -26,12 +26,12 @@ export const literalFields = (
     { value: address.zipcode, predicate: ns2.locn('postCode') },
     {
       value: address.municipalityNl,
-      predicate: ns2.adres('Gemeentenaam'),
+      predicate: ns2.adres('gemeentenaam'),
       lang: 'nl',
     },
     {
       value: address.municipalityFr,
-      predicate: ns2.adres('Gemeentenaam'),
+      predicate: ns2.adres('gemeentenaam'),
       lang: 'fr',
     },
     { value: address.countryNl, predicate: ns2.adres('land'), lang: 'nl' },
