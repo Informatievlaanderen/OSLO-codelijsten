@@ -1,19 +1,24 @@
+import axios from 'axios'
 import {
   SUPPORTED_FORMATS,
   SUPPORTED_EXTENSIONS,
-  KBO_ORGANIZATION_BY_ID_QUERY,
+  VKBO_BASE,
 } from '~/constants/constants'
-import { executeQuery } from '~/server/services/rdfquery.service'
-import { serializeAllTriples } from '~/services/serialization-service'
 import type {
   KboOrganizationData,
   KboContactPoint,
-  KboRegistration,
-  KboSite,
+  KboIdentificator,
+  KBOBranchData,
+  KboActiviteit,
+  KboOprichting,
+  KboStopzetting,
 } from '~/types/KBO'
+import { clean, cleanDate, buildNaceUri } from '../utils/kbo-utils'
 
 export default defineEventHandler(
-  async (event): Promise<KboOrganizationData | string | null> => {
+  async (
+    event: any,
+  ): Promise<KboOrganizationData | KBOBranchData | string | null> => {
     try {
       const slug = getRouterParam(event, 'slug')
 
@@ -24,21 +29,18 @@ export default defineEventHandler(
         })
       }
 
-      console.log(`[${new Date().toISOString()}] Fetching KBO enterprise: ${slug}`)
+      console.log(`[${new Date().toISOString()}] Fetching enterprise: ${slug}`)
 
       // Detect supported file extension (.ttl, .jsonld, .nt)
       const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
         slug.endsWith(ext),
       )
-
       const cleanSlug = extension ? slug.replace(extension, '') : slug
 
-      const runtimeConfig = useRuntimeConfig()
-      const KBO_TTL_URL = runtimeConfig.KBO_TTL_URL ?? process.env.KBO_TTL_URL
+      // Build VKBO API URL
+      const vkboUrl = `${VKBO_BASE}?f=application/json&filter-lang=cql-text&filter=${encodeURIComponent(`Ondernemingsnr eq '${cleanSlug}'`)}`
 
-      const sourceUrl = `${KBO_TTL_URL}/organisations/${cleanSlug}.ttl`
-
-      // Handle content negotiation - serialize in requested format
+      // Handle content negotiation for RDF formats
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
         ? SUPPORTED_FORMATS[
@@ -52,151 +54,160 @@ export default defineEventHandler(
         )
 
       if (requestedFormat) {
-        const serialized = await serializeAllTriples(sourceUrl, requestedFormat)
-        setHeader(event, 'Content-Type', requestedFormat)
-        return serialized
+        throw createError({
+          statusCode: 406,
+          statusMessage: 'RDF serialization from VKBO source not yet supported',
+        })
       }
+      // // Fetch from VKBO OGC API
+      const { data } = await axios.get(vkboUrl)
 
-      // Fetch KBO data as JSON
-      const bindings = await executeQuery(KBO_ORGANIZATION_BY_ID_QUERY(cleanSlug), [
-        sourceUrl,
-      ])
-
-      if (!bindings.length) {
+      if (!data?.features?.length) {
         throw createError({
           statusCode: 404,
-          statusMessage: `KBO enterprise not found: ${cleanSlug}`,
+          statusMessage: `Enterprise not found: ${cleanSlug}`,
         })
       }
 
-      // Collect unique legalNames
-      const legalNames = new Set<string>()
-      const contactTypes = new Set<string>()
-      const sitesMap = new Map<string, KboSite>()
-      let uri: string | undefined
-      let rechtspersoonlijkheid: string | undefined
-      let rechtstoestand: string | undefined
-      let rechtsvorm: string | undefined
-      let created: string | undefined
-      let thoroughfare: string | undefined
-      let postCode: string | undefined
-      let municipality: string | undefined
-      let country: string | undefined
-      let contactEmail: string | undefined
-      let contactTelephone: string | undefined
-      let registrationNotation: string | undefined
-      let registrationCreator: string | undefined
-      let registrationSchemaAgency: string | undefined
-      let registrationIssued: string | undefined
+      const props = data.features[0].properties
 
-      for (const binding of bindings) {
-        uri = uri ?? binding.get('organization')?.value
-        rechtspersoonlijkheid =
-          rechtspersoonlijkheid ?? binding.get('rechtspersoonlijkheid')?.value
-        rechtstoestand = rechtstoestand ?? binding.get('rechtstoestand')?.value
-        rechtsvorm = rechtsvorm ?? binding.get('rechtsvorm')?.value
-        created = created ?? binding.get('issued')?.value
+      const isVestiging = !!clean(props.Ondernemingsnr_maatsch_zetel)
 
-        const legalName = binding.get('legalName')?.value
-        if (legalName) legalNames.add(legalName)
-
-        const contactType = binding.get('contactType')?.value
-        if (contactType) contactTypes.add(contactType)
-
-        contactEmail = contactEmail ?? binding.get('contactEmail')?.value
-        contactTelephone =
-          contactTelephone ?? binding.get('contactTelephone')?.value
-
-        thoroughfare = thoroughfare ?? binding.get('addressThoroughfare')?.value
-        postCode = postCode ?? binding.get('addressPostCode')?.value
-        municipality = municipality ?? binding.get('addressMunicipality')?.value
-        country = country ?? binding.get('addressCountry')?.value
-
-        registrationNotation =
-          registrationNotation ?? binding.get('registrationNotation')?.value
-        registrationCreator =
-          registrationCreator ?? binding.get('registrationCreator')?.value
-        registrationSchemaAgency =
-          registrationSchemaAgency ??
-          binding.get('registrationSchemaAgency')?.value
-        registrationIssued =
-          registrationIssued ?? binding.get('registrationIssued')?.value
-
-        // Collect registered sites
-        const siteUri = binding.get('site')?.value
-        if (siteUri && !sitesMap.has(siteUri)) {
-          sitesMap.set(siteUri, {
-            uri: siteUri,
-            created: binding.get('siteCreated')?.value,
-            registration: binding.get('siteRegNotation')?.value
-              ? {
-                  notation: binding.get('siteRegNotation')?.value,
-                  creator: binding.get('siteRegCreator')?.value,
-                  schemaAgency: binding.get('siteRegSchemaAgency')?.value,
-                  issued: binding.get('siteRegIssued')?.value,
-                }
-              : undefined,
-          })
-        }
+      // --- Identificator ---
+      const identificator: KboIdentificator = {
+        identificator: cleanSlug,
+        toegekendOp: cleanDate(props.Datum_inschrijving),
       }
 
+      // --- Oprichting (Veranderingsgebeurtenis) ---
+      const oprichting: KboOprichting | undefined = cleanDate(props.Startdatum)
+        ? { datum: cleanDate(props.Startdatum)! }
+        : undefined
+
+      // --- Stopzetting (Veranderingsgebeurtenis, remove 1900 placeholder) ---
+      const stopzettingDatum = cleanDate(props.Datum_stopzetting)
+      const stopzetting: KboStopzetting | undefined = stopzettingDatum
+        ? {
+            datum: stopzettingDatum,
+            redenStopzetting: clean(props.Reden_stopzetting),
+          }
+        : undefined
+
+      // --- Names ---
+      const wettelijkeNaam = clean(props.Maatschappelijke_naam)
+      const voorkeursnaam = clean(props.Commerciele_naam)
+      const alternatieveNaam: string[] = []
+      if (clean(props.Afgekorte_naam))
+        alternatieveNaam.push(clean(props.Afgekorte_naam)!)
+      if (clean(props.Zoeknaam)) alternatieveNaam.push(clean(props.Zoeknaam)!)
+
+      // --- Organisatie.type ---
+      const organisatieType = clean(props.Type_onderneming)
+
+      // --- GeregistreerdeOrganisatie fields ---
+      const rechtsvorm = clean(props.Rechtsvorm)
+      const rechtstoestand = clean(props.Rechtstoestand)
+
+      // --- NACE activity (BTW fallback to RSZ) ---
+      const naceCode =
+        clean(props.NACE_hoofdact_BTW) ?? clean(props.NACE_hoofdact_RSZ)
+      const naceVersion =
+        clean(props.NACE_versie_BTW) ?? clean(props.NACE_Versie_RSZ)
+      const naceLabel =
+        clean(props.Omschrijving_hoofdact_BTW) ??
+        clean(props.Omschrijving_hoofdact_RSZ)
+      const activityUri = buildNaceUri(naceCode, naceVersion)
+      const activiteit: KboActiviteit | undefined = activityUri
+        ? { uri: activityUri, label: naceLabel }
+        : undefined
+
+      // --- Address with AR → KBO fallback ---
+      const street = clean(props.AR_straat) ?? clean(props.KBO_Straat)
+      const houseNr = clean(props.AR_huisnr) ?? clean(props.KBO_Huisnr)
+      const bus = clean(props.AR_busnr) ?? clean(props.KBO_Busnr)
+      const postcode = clean(props.AR_postcode) ?? clean(props.KBO_Postcode)
+      const municipality = clean(props.KBO_Gemeente)
+
+      // --- Contact point ---
       const contactPoints: KboContactPoint[] = []
-      if (
-        thoroughfare ||
-        postCode ||
-        municipality ||
-        country ||
-        contactEmail ||
-        contactTelephone ||
-        contactTypes.size
-      ) {
+      const email = clean(props.Email)
+      const telephone = clean(props.Telefoonnummer)
+      if (email || telephone || street) {
         contactPoints.push({
           id: 'contact-0',
-          type: contactTypes.size ? Array.from(contactTypes) : undefined,
-          email: contactEmail,
-          telephone: contactTelephone,
+          email,
+          telephone,
           address:
-            thoroughfare || postCode || municipality || country
-              ? { thoroughfare, postCode, municipality, country }
+            street || postcode || municipality
+              ? {
+                  thoroughfare: [street, houseNr, bus]
+                    .filter(Boolean)
+                    .join(' '),
+                  postCode: postcode,
+                  municipality: municipality,
+                  country: 'België',
+                }
               : undefined,
         })
       }
 
-      const registration: KboRegistration | undefined =
-        registrationNotation ||
-        registrationCreator ||
-        registrationSchemaAgency ||
-        registrationIssued
-          ? {
-              notation: registrationNotation,
-              creator: registrationCreator,
-              schemaAgency: registrationSchemaAgency,
-              issued: registrationIssued,
-            }
-          : undefined
-
-      const kboData: KboOrganizationData = {
-        id: cleanSlug,
-        uri,
-        legalName: legalNames.size ? Array.from(legalNames) : undefined,
-        rechtspersoonlijkheid,
-        rechtstoestand,
-        rechtsvorm,
-        created,
-        contactPoints: contactPoints.length ? contactPoints : undefined,
-        registration,
-        registeredSites: sitesMap.size
-          ? Array.from(sitesMap.values())
-          : undefined,
-        source: sourceUrl,
+      // --- Vestiging ---
+      if (isVestiging) {
+        const branch: KBOBranchData = {
+          id: cleanSlug,
+          uri: `https://data.vlaanderen.be/id/vestiging/${cleanSlug}`,
+          types: ['Vestiging'],
+          wettelijkeNaam,
+          voorkeursnaam,
+          alternatieveNaam: alternatieveNaam.length
+            ? alternatieveNaam
+            : undefined,
+          identificator,
+          oprichting,
+          stopzetting,
+          organisatieType,
+          rechtsvorm,
+          rechtstoestand,
+          activiteit,
+          contactPoints: contactPoints.length ? contactPoints : undefined,
+          parentOrganisatie: clean(props.Ondernemingsnr_maatsch_zetel),
+          source: vkboUrl,
+        }
+        return branch
       }
 
-      return kboData
-    } catch (error) {
-      console.error('Error fetching KBO:', error)
+      // --- Organisatie ---
+      const enterprise: KboOrganizationData = {
+        id: cleanSlug,
+        uri: `https://data.vlaanderen.be/id/organisatie/${cleanSlug}`,
+        types: [
+          'Organisatie',
+          'GeregistreerdeOrganisatie',
+          'FormeleOrganisatie',
+        ],
+        wettelijkeNaam,
+        voorkeursnaam,
+        alternatieveNaam: alternatieveNaam.length
+          ? alternatieveNaam
+          : undefined,
+        identificator,
+        oprichting,
+        stopzetting,
+        organisatieType,
+        rechtsvorm,
+        rechtstoestand,
+        activiteit,
+        contactPoints: contactPoints.length ? contactPoints : undefined,
+        source: vkboUrl,
+      }
+
+      return enterprise
+    } catch (error: any) {
+      if (error.statusCode) throw error
+      console.error('Error fetching enterprise:', error)
       throw createError({
         statusCode: 500,
-        statusMessage: 'Error fetching KBO data',
+        statusMessage: 'Error fetching enterprise',
       })
     }
   },

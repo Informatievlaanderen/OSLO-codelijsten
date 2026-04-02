@@ -16,12 +16,24 @@
 
   <vl-layout>
     <vl-region>
-      <vl-grid mod-v-center mod-stacked>
+      <!-- Loading State -->
+      <vl-grid v-if="isLoading" mod-v-center mod-stacked>
+        <vl-column width="12" class="vl-u-align-center">
+          <p>Vestiging inladen...</p>
+        </vl-column>
+      </vl-grid>
+
+      <!-- Content -->
+      <vl-grid v-else mod-v-center mod-stacked>
         <!-- Header Section -->
         <vl-column width="12">
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
-              {{ `Vestiging: ${slug}` }}
+              {{
+                data?.wettelijkeNaam
+                  ? data.wettelijkeNaam
+                  : `Vestiging: ${slug}`
+              }}
             </vl-title>
             <vl-link @click="copyToClipboard(data?.uri ?? '')" class="uri-link">
               <vl-icon icon="file-copy" mod-before></vl-icon>
@@ -51,60 +63,155 @@
         <vl-column width="12">
           <vl-data-table>
             <tbody>
-              <tr v-if="data?.uri">
-                <td><strong>URI</strong></td>
-                <td>
-                  <vl-link :href="data.uri" external>
-                    {{ data.uri }}
-                  </vl-link>
-                </td>
-              </tr>
-              <tr v-if="data?.type">
+              <tr v-if="data?.types?.length">
                 <td><strong>Type</strong></td>
+                <td>{{ data.types.join(', ') }}</td>
+              </tr>
+              <tr v-if="data?.wettelijkeNaam">
+                <td><strong>Wettelijke naam</strong></td>
+                <td>{{ data.wettelijkeNaam }}</td>
+              </tr>
+              <tr v-if="data?.voorkeursnaam">
+                <td><strong>Voorkeursnaam</strong></td>
+                <td>{{ data.voorkeursnaam }}</td>
+              </tr>
+              <tr v-if="data?.alternatieveNaam?.length">
+                <td><strong>Alternatieve naam</strong></td>
                 <td>
-                  <vl-link :href="data.type" external>
-                    {{ data.type }}
-                  </vl-link>
+                  <div v-for="name in data.alternatieveNaam" :key="name">
+                    {{ name }}
+                  </div>
                 </td>
               </tr>
-              <tr v-if="data?.created">
-                <td><strong>Aangemaakt op</strong></td>
-                <td>{{ data.created }}</td>
+              <tr v-if="data?.organisatieType">
+                <td><strong>Type entiteit</strong></td>
+                <td>{{ data.organisatieType }}</td>
+              </tr>
+              <tr v-if="data?.rechtstoestand">
+                <td><strong>Rechtstoestand</strong></td>
+                <td>{{ data.rechtstoestand }}</td>
+              </tr>
+              <tr v-if="data?.rechtsvorm">
+                <td><strong>Rechtsvorm</strong></td>
+                <td>{{ data.rechtsvorm }}</td>
+              </tr>
+              <tr v-if="data?.parentOrganisatie">
+                <td><strong>Organisatie</strong></td>
+                <td>
+                  <vl-link
+                    :href="`/onderneming/${data.parentOrganisatie}`"
+                  >
+                    {{ data.parentOrganisatie }}
+                  </vl-link>
+                </td>
               </tr>
             </tbody>
           </vl-data-table>
         </vl-column>
 
-        <!-- Registration -->
-        <template v-if="data?.registration">
+        <!-- Identificator -->
+        <template v-if="data?.identificator">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Registratie</vl-title>
+            <vl-title tag-name="h2" mod-h3>Identificator</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
               <tbody>
-                <tr v-if="data.registration.notation">
+                <tr>
                   <td><strong>Identificator</strong></td>
-                  <td>{{ data.registration.notation }}</td>
+                  <td>{{ data.identificator.identificator }}</td>
                 </tr>
-                <tr v-if="data.registration.creator">
-                  <td><strong>Bron</strong></td>
-                  <td>
-                    <vl-link :href="data.registration.creator" external>
-                      {{ data.registration.creator }}
-                    </vl-link>
-                  </td>
-                </tr>
-                <tr v-if="data.registration.schemaAgency">
-                  <td><strong>Toegekend door</strong></td>
-                  <td>{{ data.registration.schemaAgency }}</td>
-                </tr>
-                <tr v-if="data.registration.issued">
+                <tr v-if="data.identificator.toegekendOp">
                   <td><strong>Toegekend op</strong></td>
-                  <td>{{ data.registration.issued }}</td>
+                  <td>{{ data.identificator.toegekendOp }}</td>
                 </tr>
               </tbody>
             </vl-data-table>
+          </vl-column>
+        </template>
+
+        <!-- Oprichting & Stopzetting -->
+        <template v-if="data?.oprichting || data?.stopzetting">
+          <vl-column width="12">
+            <vl-title tag-name="h2" mod-h3>Veranderingsgebeurtenissen</vl-title>
+          </vl-column>
+          <vl-column width="12">
+            <vl-data-table>
+              <tbody>
+                <tr v-if="data?.oprichting">
+                  <td><strong>Oprichting</strong></td>
+                  <td>{{ data.oprichting.datum }}</td>
+                </tr>
+                <tr v-if="data?.stopzetting">
+                  <td><strong>Stopzetting</strong></td>
+                  <td>
+                    {{ data.stopzetting.datum }}
+                    <span v-if="data.stopzetting.redenStopzetting">
+                      — {{ data.stopzetting.redenStopzetting }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </vl-data-table>
+          </vl-column>
+        </template>
+
+        <!-- Activiteit -->
+        <template v-if="data?.activiteit">
+          <vl-column width="12">
+            <vl-title tag-name="h2" mod-h3>Activiteit</vl-title>
+          </vl-column>
+          <vl-column width="12">
+            <vl-data-table>
+              <tbody>
+                <tr>
+                  <td><strong>NACE</strong></td>
+                  <td>
+                    <vl-link :href="data.activiteit.uri" external>
+                      {{ data.activiteit.label ?? data.activiteit.uri }}
+                    </vl-link>
+                  </td>
+                </tr>
+              </tbody>
+            </vl-data-table>
+          </vl-column>
+        </template>
+
+        <!-- Contact Points -->
+        <template v-if="data?.contactPoints?.length">
+          <vl-column width="12">
+            <vl-title tag-name="h2" mod-h3>Contactgegevens</vl-title>
+          </vl-column>
+          <vl-column
+            v-for="contact in data.contactPoints"
+            :key="contact.id"
+            width="6"
+            width-s="12"
+          >
+            <vl-info-tile>
+              <vl-title tag-name="h4" slot="title">Contactpunt</vl-title>
+              <div slot="content">
+                <p v-if="contact.email">
+                  <vl-icon icon="email" mod-before></vl-icon>
+                  <vl-link :href="`mailto:${contact.email}`">
+                    {{ contact.email }}
+                  </vl-link>
+                </p>
+                <p v-if="contact.telephone">
+                  <vl-icon icon="phone" mod-before></vl-icon>
+                  <vl-link :href="`tel:${contact.telephone}`">
+                    {{ contact.telephone }}
+                  </vl-link>
+                </p>
+                <address v-if="contact.address">
+                  <vl-icon icon="location-map" mod-before></vl-icon>
+                  {{ contact.address.thoroughfare }}
+                  {{ contact.address.postCode }}
+                  {{ contact.address.municipality }}
+                  {{ contact.address.country }}
+                </address>
+              </div>
+            </vl-info-tile>
           </vl-column>
         </template>
       </vl-grid>
@@ -120,11 +227,47 @@ import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
 
 const showToaster = ref(false)
+const isLoading = ref(true)
 
 const route = useRoute()
 const slug = computed(() => {
   const params = route.params.slug
   return Array.isArray(params) ? params.join('/') : params
+})
+
+const data = ref<KBOBranchData | null>(null)
+
+const fetchBranch = async () => {
+  try {
+    data.value = await $fetch(`/doc/api/branch/${slug.value}`)
+  } catch (err) {
+    console.error('Error loading branch:', err)
+    data.value = null
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchBranch()
+})
+
+watch(
+  () => slug.value,
+  () => {
+    isLoading.value = true
+    fetchBranch()
+  },
+)
+
+// Redirect to 404 if no data
+watchEffect(() => {
+  if (!isLoading.value && !data?.value) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Vestiging niet gevonden',
+    })
+  }
 })
 
 const copyToClipboard = async (text: string) => {
@@ -139,27 +282,16 @@ const copyToClipboard = async (text: string) => {
   }
 }
 
-const { data } = await useAsyncData<KBOBranchData | null>(
-  `branch-${slug.value}`,
-  async () => {
-    try {
-      return await $fetch(`/doc/api/branch/${slug.value}`)
-    } catch (err) {
-      console.error('Error loading branch:', err)
-      return null
-    }
-  },
-)
-
-// Redirect to 404 if no data
-if (!data?.value) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: 'Vestiging niet gevonden',
-  })
-}
-
 useSeoHead({
-  title: `Vestiging: ${slug.value}`,
+  title: data.value?.wettelijkeNaam ?? `Vestiging: ${slug.value}`,
 })
 </script>
+
+<style scoped>
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+</style>

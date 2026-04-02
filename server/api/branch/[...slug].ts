@@ -5,7 +5,7 @@ import {
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import { serializeAllTriples } from '~/services/serialization-service'
-import type { KBOBranchData, KBOBranchRegistration } from '~/types/KBO'
+import type { KBOBranchData, KboIdentificator } from '~/types/KBO'
 
 export default defineEventHandler(
   async (event): Promise<KBOBranchData | string | null> => {
@@ -66,25 +66,20 @@ export default defineEventHandler(
 
       const binding = bindings[0]
 
-      const registration: KBOBranchRegistration | undefined =
-        binding.get('regNotation')?.value ||
-        binding.get('regCreator')?.value ||
-        binding.get('regSchemaAgency')?.value ||
-        binding.get('regIssued')?.value
-          ? {
-              notation: binding.get('regNotation')?.value,
-              creator: binding.get('regCreator')?.value,
-              schemaAgency: binding.get('regSchemaAgency')?.value,
-              issued: binding.get('regIssued')?.value,
-            }
-          : undefined
+      const identificator: KboIdentificator = {
+        identificator:
+          binding.get('regNotation')?.value ?? cleanSlug,
+        toegekendOp: binding.get('regIssued')?.value,
+      }
 
       const branchData: KBOBranchData = {
         id: cleanSlug,
-        uri: binding.get('site')?.value,
-        type: binding.get('type')?.value,
-        created: binding.get('created')?.value,
-        registration,
+        uri: binding.get('site')?.value ?? '',
+        types: ['Vestiging'],
+        identificator,
+        oprichting: binding.get('created')?.value
+          ? { datum: binding.get('created')!.value }
+          : undefined,
         source: sourceUrl,
       }
 

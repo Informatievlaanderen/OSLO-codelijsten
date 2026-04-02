@@ -22,8 +22,8 @@
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
               {{
-                data?.legalName?.length
-                  ? data.legalName[0]
+                data?.wettelijkeNaam
+                  ? data.wettelijkeNaam
                   : `Onderneming: ${slug}`
               }}
             </vl-title>
@@ -55,73 +55,104 @@
         <vl-column width="12">
           <vl-data-table>
             <tbody>
-              <tr v-if="data?.legalName?.length">
-                <td><strong>Juridische naam</strong></td>
+              <tr v-if="data?.types?.length">
+                <td><strong>Type</strong></td>
+                <td>{{ data.types.join(', ') }}</td>
+              </tr>
+              <tr v-if="data?.wettelijkeNaam">
+                <td><strong>Wettelijke naam</strong></td>
+                <td>{{ data.wettelijkeNaam }}</td>
+              </tr>
+              <tr v-if="data?.voorkeursnaam">
+                <td><strong>Voorkeursnaam</strong></td>
+                <td>{{ data.voorkeursnaam }}</td>
+              </tr>
+              <tr v-if="data?.alternatieveNaam?.length">
+                <td><strong>Alternatieve naam</strong></td>
                 <td>
-                  <div v-for="name in data.legalName" :key="name">
+                  <div v-for="name in data.alternatieveNaam" :key="name">
                     {{ name }}
                   </div>
                 </td>
               </tr>
-              <tr v-if="data?.rechtspersoonlijkheid">
-                <td><strong>Rechtspersoonlijkheid</strong></td>
-                <td>
-                  <vl-link :href="data.rechtspersoonlijkheid" external>
-                    {{ data.rechtspersoonlijkheid }}
-                  </vl-link>
-                </td>
+              <tr v-if="data?.organisatieType">
+                <td><strong>Type entiteit</strong></td>
+                <td>{{ data.organisatieType }}</td>
               </tr>
               <tr v-if="data?.rechtstoestand">
                 <td><strong>Rechtstoestand</strong></td>
-                <td>
-                  <vl-link :href="data.rechtstoestand" external>
-                    {{ data.rechtstoestand }}
-                  </vl-link>
-                </td>
+                <td>{{ data.rechtstoestand }}</td>
               </tr>
               <tr v-if="data?.rechtsvorm">
                 <td><strong>Rechtsvorm</strong></td>
-                <td>
-                  <vl-link :href="data.rechtsvorm" external>
-                    {{ data.rechtsvorm }}
-                  </vl-link>
-                </td>
-              </tr>
-              <tr v-if="data?.created">
-                <td><strong>Aangemaakt</strong></td>
-                <td>{{ data.created }}</td>
+                <td>{{ data.rechtsvorm }}</td>
               </tr>
             </tbody>
           </vl-data-table>
         </vl-column>
 
-        <!-- Registration -->
-        <template v-if="data?.registration">
+        <!-- Identificator -->
+        <template v-if="data?.identificator">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Registratie</vl-title>
+            <vl-title tag-name="h2" mod-h3>Identificator</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
               <tbody>
-                <tr v-if="data.registration.notation">
+                <tr>
                   <td><strong>Identificator</strong></td>
-                  <td>{{ data.registration.notation }}</td>
+                  <td>{{ data.identificator.identificator }}</td>
                 </tr>
-                <tr v-if="data.registration.creator">
-                  <td><strong>Bron</strong></td>
+                <tr v-if="data.identificator.toegekendOp">
+                  <td><strong>Toegekend op</strong></td>
+                  <td>{{ data.identificator.toegekendOp }}</td>
+                </tr>
+              </tbody>
+            </vl-data-table>
+          </vl-column>
+        </template>
+
+        <!-- Oprichting & Stopzetting -->
+        <template v-if="data?.oprichting || data?.stopzetting">
+          <vl-column width="12">
+            <vl-title tag-name="h2" mod-h3>Veranderingsgebeurtenissen</vl-title>
+          </vl-column>
+          <vl-column width="12">
+            <vl-data-table>
+              <tbody>
+                <tr v-if="data?.oprichting">
+                  <td><strong>Oprichting</strong></td>
+                  <td>{{ data.oprichting.datum }}</td>
+                </tr>
+                <tr v-if="data?.stopzetting">
+                  <td><strong>Stopzetting</strong></td>
                   <td>
-                    <vl-link :href="data.registration.creator" external>
-                      {{ data.registration.creator }}
-                    </vl-link>
+                    {{ data.stopzetting.datum }}
+                    <span v-if="data.stopzetting.redenStopzetting">
+                      — {{ data.stopzetting.redenStopzetting }}
+                    </span>
                   </td>
                 </tr>
-                <tr v-if="data.registration.schemaAgency">
-                  <td><strong>Toegekend door</strong></td>
-                  <td>{{ data.registration.schemaAgency }}</td>
-                </tr>
-                <tr v-if="data.registration.issued">
-                  <td><strong>Toegekend op</strong></td>
-                  <td>{{ data.registration.issued }}</td>
+              </tbody>
+            </vl-data-table>
+          </vl-column>
+        </template>
+
+        <!-- Activiteit -->
+        <template v-if="data?.activiteit">
+          <vl-column width="12">
+            <vl-title tag-name="h2" mod-h3>Activiteit</vl-title>
+          </vl-column>
+          <vl-column width="12">
+            <vl-data-table>
+              <tbody>
+                <tr>
+                  <td><strong>NACE</strong></td>
+                  <td>
+                    <vl-link :href="data.activiteit.uri" external>
+                      {{ data.activiteit.label ?? data.activiteit.uri }}
+                    </vl-link>
+                  </td>
                 </tr>
               </tbody>
             </vl-data-table>
@@ -142,13 +173,6 @@
             <vl-info-tile>
               <vl-title tag-name="h4" slot="title">Contactpunt</vl-title>
               <div slot="content">
-                <p v-if="contact.type?.length">
-                  <strong>Type: </strong>
-                  <span v-for="(t, i) in contact.type" :key="t">
-                    <vl-link :href="t" external>{{ t }}</vl-link>
-                    <span v-if="i < contact.type.length - 1">, </span>
-                  </span>
-                </p>
                 <p v-if="contact.email">
                   <vl-icon icon="email" mod-before></vl-icon>
                   <vl-link :href="`mailto:${contact.email}`">
@@ -173,36 +197,6 @@
           </vl-column>
         </template>
 
-        <!-- Registered Sites -->
-        <template v-if="data?.registeredSites?.length">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Vestigingen</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <thead>
-                <tr>
-                  <th>URI</th>
-                  <th>Aangemaakt op</th>
-                  <th>Notatie</th>
-                  <th>Toegekend door</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="site in data.registeredSites" :key="site.uri">
-                  <td>
-                    <vl-link :href="site.uri" external>
-                      {{ site.uri }}
-                    </vl-link>
-                  </td>
-                  <td>{{ site.created ?? '-' }}</td>
-                  <td>{{ site.registration?.notation ?? '-' }}</td>
-                  <td>{{ site.registration?.schemaAgency ?? '-' }}</td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -256,6 +250,6 @@ if (!data?.value) {
 }
 
 useSeoHead({
-  title: data.value?.legalName?.[0] ?? `enterprise: ${slug.value}`,
+  title: data.value?.wettelijkeNaam ?? `enterprise: ${slug.value}`,
 })
 </script>

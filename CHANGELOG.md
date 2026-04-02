@@ -54,3 +54,7 @@ ADD ALL KBO DATA
       1.16.3
 
     - Fix for links to concept or conceptschemes
+
+      1.16.4
+
+    feat: Use VKBO instead of KBO directly for enterprises

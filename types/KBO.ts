@@ -1,6 +1,24 @@
+export interface KboIdentificator {
+  identificator: string
+  toegekendOp?: string
+}
+
+export interface KboOprichting {
+  datum: string
+}
+
+export interface KboStopzetting {
+  datum: string
+  redenStopzetting?: string
+}
+
+export interface KboActiviteit {
+  uri: string
+  label?: string
+}
+
 export interface KboContactPoint {
   id: string
-  type?: string[]
   email?: string
   telephone?: string
   address?: {
@@ -11,45 +29,39 @@ export interface KboContactPoint {
   }
 }
 
-export interface KboRegistration {
-  notation?: string
-  creator?: string
-  schemaAgency?: string
-  issued?: string
-}
-
-export interface KboSite {
-  uri: string
-  created?: string
-  registration?: KboRegistration
-}
-
 export interface KboOrganizationData {
   id: string
-  uri?: string
-  legalName?: string[]
-  rechtspersoonlijkheid?: string
-  rechtstoestand?: string
+  uri: string
+  types: string[]
+  wettelijkeNaam?: string
+  voorkeursnaam?: string
+  alternatieveNaam?: string[]
+  identificator: KboIdentificator
+  oprichting?: KboOprichting
+  stopzetting?: KboStopzetting
+  organisatieType?: string
   rechtsvorm?: string
-  created?: string
+  rechtstoestand?: string
+  activiteit?: KboActiviteit
   contactPoints?: KboContactPoint[]
-  registration?: KboRegistration
-  registeredSites?: KboSite[]
   source: string
-}
-
-export interface KBOBranchRegistration {
-  notation?: string
-  creator?: string
-  schemaAgency?: string
-  issued?: string
 }
 
 export interface KBOBranchData {
   id: string
-  uri?: string
-  type?: string
-  created?: string
-  registration?: KBOBranchRegistration
+  uri: string
+  types: string[]
+  wettelijkeNaam?: string
+  voorkeursnaam?: string
+  alternatieveNaam?: string[]
+  identificator: KboIdentificator
+  oprichting?: KboOprichting
+  stopzetting?: KboStopzetting
+  organisatieType?: string
+  rechtsvorm?: string
+  rechtstoestand?: string
+  activiteit?: KboActiviteit
+  contactPoints?: KboContactPoint[]
+  parentOrganisatie?: string
   source: string
 }
