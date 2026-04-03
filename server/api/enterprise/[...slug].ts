@@ -14,6 +14,8 @@ import type {
   KboStopzetting,
 } from '~/types/KBO'
 import { clean, cleanDate, buildNaceUri } from '../utils/kbo-utils'
+import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
+import { serializeQuadsToString } from '~/services/serialization-service'
 
 export default defineEventHandler(
   async (
@@ -53,12 +55,6 @@ export default defineEventHandler(
           acceptHeader.includes(fmt),
         )
 
-      if (requestedFormat) {
-        throw createError({
-          statusCode: 406,
-          statusMessage: 'RDF serialization from VKBO source not yet supported',
-        })
-      }
       // // Fetch from VKBO OGC API
       const { data } = await axios.get(vkboUrl)
 
@@ -173,13 +169,21 @@ export default defineEventHandler(
           parentOrganisatie: clean(props.Ondernemingsnr_maatsch_zetel),
           source: vkboUrl,
         }
+
+        if (requestedFormat) {
+          const quads = kboDataToQuads(branch)
+          const serialized = await serializeQuadsToString(quads, requestedFormat)
+          setHeader(event, 'Content-Type', requestedFormat)
+          return serialized
+        }
+
         return branch
       }
 
       // --- Organisatie ---
       const enterprise: KboOrganizationData = {
         id: cleanSlug,
-        uri: `https://data.vlaanderen.be/id/organisatie/${cleanSlug}`,
+        uri: `https://data.vlaanderen.be/id/onderneming/${cleanSlug}`,
         types: [
           'Organisatie',
           'GeregistreerdeOrganisatie',
@@ -199,6 +203,13 @@ export default defineEventHandler(
         activiteit,
         contactPoints: contactPoints.length ? contactPoints : undefined,
         source: vkboUrl,
+      }
+
+      if (requestedFormat) {
+        const quads = kboDataToQuads(enterprise)
+        const serialized = await serializeQuadsToString(quads, requestedFormat)
+        setHeader(event, 'Content-Type', requestedFormat)
+        return serialized
       }
 
       return enterprise

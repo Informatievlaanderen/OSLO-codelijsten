@@ -8,6 +8,30 @@ import { filterPrefixes, unwrapJsonLdArray } from '../utils/serialization.utils'
 const queryEngine = new QueryEngine()
 
 /**
+ * Serializes an array of in-memory RDF quads in the requested format.
+ */
+export const serializeQuadsToString = async (
+  quads: RDF.Quad[],
+  contentType: string,
+): Promise<string> => {
+  const allPrefixes = await getPrefixes()
+  const usedPrefixes = filterPrefixes(allPrefixes, quads)
+
+  const quadReadable = Readable.from(quads)
+  const textStream = rdfSerializer.serialize(quadReadable, {
+    contentType,
+    prefixes: usedPrefixes,
+  })
+
+  const chunks: string[] = []
+  for await (const chunk of textStream) {
+    chunks.push(typeof chunk === 'string' ? chunk : chunk.toString())
+  }
+
+  return unwrapJsonLdArray(chunks.join(''), contentType)
+}
+
+/**
  * Serializes all triples from the given source URL in the requested format.
  * Used for sources that already contain exactly the data needed (e.g. per-entity TTL files).
  */

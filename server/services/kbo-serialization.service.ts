@@ -1,0 +1,148 @@
+import { DataFactory } from 'rdf-data-factory'
+import type * as RDF from '@rdfjs/types'
+import type { KboOrganizationData, KBOBranchData } from '~/types/KBO'
+
+const df = new DataFactory()
+
+// --- Namespace helpers ---
+const ns = (base: string) => (local: string) => df.namedNode(`${base}${local}`)
+
+const rdf = ns('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+const rdfs = ns('http://www.w3.org/2000/01/rdf-schema#')
+const skos = ns('http://www.w3.org/2004/02/skos/core#')
+const dcterms = ns('http://purl.org/dc/terms/')
+const adms = ns('http://www.w3.org/ns/adms#')
+const org = ns('http://www.w3.org/ns/org#')
+const reorg = ns('http://www.w3.org/ns/regorg#')
+const schema = ns('https://schema.org/')
+const locn = ns('http://www.w3.org/ns/locn#')
+const adres = ns('https://data.vlaanderen.be/ns/adres#')
+const organisatie = ns('https://data.vlaanderen.be/ns/organisatie#')
+const xsd = ns('http://www.w3.org/2001/XMLSchema#')
+
+const TYPE_MAP: Record<string, RDF.NamedNode> = {
+  Organisatie: org('Organization'),
+  GeregistreerdeOrganisatie: reorg('RegisteredOrganization'),
+  FormeleOrganisatie: org('FormalOrganization'),
+  Vestiging: org('Site'),
+}
+
+function addLiteral(
+  quads: RDF.Quad[],
+  subject: RDF.NamedNode | RDF.BlankNode,
+  predicate: RDF.NamedNode,
+  value: string | undefined,
+  datatype?: RDF.NamedNode,
+): void {
+  if (!value) return
+  quads.push(df.quad(subject, predicate, datatype ? df.literal(value, datatype) : df.literal(value)))
+}
+
+function addNamedNode(
+  quads: RDF.Quad[],
+  subject: RDF.NamedNode | RDF.BlankNode,
+  predicate: RDF.NamedNode,
+  uri: string | undefined,
+): void {
+  if (!uri) return
+  quads.push(df.quad(subject, predicate, df.namedNode(uri)))
+}
+
+/**
+ * Converts a KboOrganizationData or KBOBranchData object into an array of RDF quads
+ * following the OSLO organisation / KBO vocabulary.
+ */
+export function kboDataToQuads(
+  data: KboOrganizationData | KBOBranchData,
+): RDF.Quad[] {
+  const quads: RDF.Quad[] = []
+  const subject = df.namedNode(data.uri)
+
+  // --- rdf:type ---
+  for (const t of data.types) {
+    const mapped = TYPE_MAP[t]
+    if (mapped) {
+      quads.push(df.quad(subject, rdf('type'), mapped))
+    }
+  }
+
+  // --- Names ---
+  addLiteral(quads, subject, reorg('legalName'), data.wettelijkeNaam)
+  addLiteral(quads, subject, skos('prefLabel'), data.voorkeursnaam)
+  if (data.alternatieveNaam) {
+    for (const alt of data.alternatieveNaam) {
+      addLiteral(quads, subject, skos('altLabel'), alt)
+    }
+  }
+
+  // --- Registration / Identificator ---
+  const regNode = df.blankNode(`reg-${data.id}`)
+  quads.push(df.quad(subject, reorg('registration'), regNode))
+  addLiteral(quads, regNode, skos('notation'), data.identificator.identificator)
+  addLiteral(
+    quads,
+    regNode,
+    dcterms('issued'),
+    data.identificator.toegekendOp,
+    xsd('date'),
+  )
+
+  // --- Organisatie-specific fields ---
+  addLiteral(quads, subject, organisatie('rechtsvorm'), data.rechtsvorm)
+  addLiteral(quads, subject, organisatie('rechtstoestand'), data.rechtstoestand)
+  if (data.organisatieType) {
+    addLiteral(quads, subject, dcterms('type'), data.organisatieType)
+  }
+
+  // --- Dates ---
+  if (data.oprichting) {
+    addLiteral(quads, subject, dcterms('created'), data.oprichting.datum, xsd('date'))
+  }
+  if (data.stopzetting) {
+    addLiteral(quads, subject, organisatie('stopzetting'), data.stopzetting.datum, xsd('date'))
+  }
+
+  // --- Activity (NACE) ---
+  if (data.activiteit) {
+    addNamedNode(quads, subject, reorg('orgActivity'), data.activiteit.uri)
+    if (data.activiteit.label) {
+      addLiteral(
+        quads,
+        df.namedNode(data.activiteit.uri),
+        skos('prefLabel'),
+        data.activiteit.label,
+      )
+    }
+  }
+
+  // --- Contact points ---
+  if (data.contactPoints) {
+    for (const cp of data.contactPoints) {
+      const cpNode = df.blankNode(`cp-${cp.id}`)
+      quads.push(df.quad(subject, schema('contactPoint'), cpNode))
+      addLiteral(quads, cpNode, schema('email'), cp.email)
+      addLiteral(quads, cpNode, schema('telephone'), cp.telephone)
+
+      if (cp.address) {
+        const addrNode = df.blankNode(`addr-${cp.id}`)
+        quads.push(df.quad(cpNode, locn('address'), addrNode))
+        addLiteral(quads, addrNode, locn('thoroughfare'), cp.address.thoroughfare)
+        addLiteral(quads, addrNode, locn('postCode'), cp.address.postCode)
+        addLiteral(quads, addrNode, adres('Gemeentenaam'), cp.address.municipality)
+        addLiteral(quads, addrNode, adres('land'), cp.address.country)
+      }
+    }
+  }
+
+  // --- Branch-specific: parent organisation ---
+  if ('parentOrganisatie' in data && data.parentOrganisatie) {
+    addNamedNode(
+      quads,
+      subject,
+      org('siteOf'),
+      `https://data.vlaanderen.be/id/onderneming/${data.parentOrganisatie}`,
+    )
+  }
+
+  return quads
+}

@@ -58,3 +58,6 @@ ADD ALL KBO DATA
       1.16.4
 
     feat: Use VKBO instead of KBO directly for enterprises
+
+  1.16.5
+  feat: add content-negotiation for enterprises
