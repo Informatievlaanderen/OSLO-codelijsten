@@ -63,10 +63,6 @@
         <vl-column width="12">
           <vl-data-table>
             <tbody>
-              <tr v-if="data?.types?.length">
-                <td><strong>Type</strong></td>
-                <td>{{ data.types.join(', ') }}</td>
-              </tr>
               <tr v-if="data?.wettelijkeNaam">
                 <td><strong>Wettelijke naam</strong></td>
                 <td>{{ data.wettelijkeNaam }}</td>
@@ -83,26 +79,20 @@
                   </div>
                 </td>
               </tr>
-              <tr v-if="data?.organisatieType">
-                <td><strong>Type entiteit</strong></td>
-                <td>{{ data.organisatieType }}</td>
-              </tr>
               <tr v-if="data?.rechtstoestand">
                 <td><strong>Rechtstoestand</strong></td>
-                <td>{{ data.rechtstoestand }}</td>
+                <td>
+                  <vl-link :href="data.rechtstoestand.uri">{{
+                    data.rechtstoestand.label
+                  }}</vl-link>
+                </td>
               </tr>
               <tr v-if="data?.rechtsvorm">
                 <td><strong>Rechtsvorm</strong></td>
-                <td>{{ data.rechtsvorm }}</td>
-              </tr>
-              <tr v-if="data?.parentOrganisatie">
-                <td><strong>Organisatie</strong></td>
                 <td>
-                  <vl-link
-                    :href="`/onderneming/${data.parentOrganisatie}`"
-                  >
-                    {{ data.parentOrganisatie }}
-                  </vl-link>
+                  <vl-link :href="data.rechtsvorm.uri">{{
+                    data.rechtsvorm.label
+                  }}</vl-link>
                 </td>
               </tr>
             </tbody>

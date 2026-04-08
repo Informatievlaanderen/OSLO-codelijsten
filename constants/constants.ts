@@ -6,6 +6,12 @@ export const BASEPATH = '/standaarden'
 export const CODELIST_ROOT = 'https://data.vlaanderen.be/id/concept/Domein/'
 export const VKBO_BASE =
   'https://geo.api.vlaanderen.be/VKBO/ogc/features/v1/collections/Vkbo/items'
+export const JURIDICAL_FORM_TTL =
+  'https://data.vlaanderen.be/doc/conceptscheme/JuridicalForm.ttl'
+export const JURIDICAL_SITUATION_TTL =
+  'https://data.vlaanderen.be/doc/conceptscheme/JuridicalSituation.ttl'
+export const ORGANISATIE_TYPE_TTL =
+  'https://data.vlaanderen.be/doc/conceptscheme/TypeOfEnterprise.ttl'
 
 export const CONCEPT_SCHEME_QUERY = `
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>

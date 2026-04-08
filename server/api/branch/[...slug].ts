@@ -1,11 +1,26 @@
+import axios from 'axios'
 import {
   SUPPORTED_FORMATS,
   SUPPORTED_EXTENSIONS,
-  KBO_BRANCH_BY_ID_QUERY,
+  VKBO_BASE,
 } from '~/constants/constants'
-import { executeQuery } from '~/server/services/rdfquery.service'
-import { serializeAllTriples } from '~/services/serialization-service'
-import type { KBOBranchData, KboIdentificator } from '~/types/KBO'
+import type {
+  KboContactPoint,
+  KboIdentificator,
+  KBOBranchData,
+  KboActiviteit,
+  KboOprichting,
+  KboStopzetting,
+} from '~/types/KBO'
+import {
+  clean,
+  cleanDate,
+  buildNaceUri,
+  buildJuridicalSituationUri,
+  buildJuridicalFormUri,
+} from '../utils/kbo-utils'
+import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
+import { serializeQuadsToString } from '~/services/serialization-service'
 
 export default defineEventHandler(
   async (event): Promise<KBOBranchData | string | null> => {
@@ -19,21 +34,27 @@ export default defineEventHandler(
         })
       }
 
-      console.log(`[${new Date().toISOString()}] Fetching KBO branch: ${slug}`)
+      console.log(`[${new Date().toISOString()}] Fetching branch: ${slug}`)
 
       // Detect supported file extension (.ttl, .jsonld, .nt)
       const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
         slug.endsWith(ext),
       )
-
       const cleanSlug = extension ? slug.replace(extension, '') : slug
 
-      const runtimeConfig = useRuntimeConfig()
-      const KBO_TTL_URL = runtimeConfig.KBO_TTL_URL ?? process.env.KBO_TTL_URL
+      // Vestiging starts with 2 or higher - this endpoint is for branches only
+      const firstDigit = parseInt(cleanSlug.charAt(0), 10)
+      if (isNaN(firstDigit) || firstDigit < 2) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: `This is not a vestiging (branch), this endpoint requires a branch ID starting with 2 or higher: ${cleanSlug}`,
+        })
+      }
 
-      const sourceUrl = `${KBO_TTL_URL}/branches/${cleanSlug}.ttl`
+      // Build VKBO API URL
+      const vkboUrl = `${VKBO_BASE}?f=application/json&filter-lang=cql-text&filter=${encodeURIComponent(`Ondernemingsnr eq '${cleanSlug}'`)}`
 
-      // Handle content negotiation - serialize in requested format
+      // Handle content negotiation for RDF formats
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
         ? SUPPORTED_FORMATS[
@@ -46,49 +67,129 @@ export default defineEventHandler(
           acceptHeader.includes(fmt),
         )
 
+      // Fetch from VKBO OGC API
+      const { data } = await axios.get(vkboUrl)
+
+      if (!data?.features?.length) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: `Branch not found: ${cleanSlug}`,
+        })
+      }
+
+      const props = data.features[0].properties
+
+      // --- Identificator ---
+      const identificator: KboIdentificator = {
+        identificator: cleanSlug,
+        toegekendOp: cleanDate(props.Datum_inschrijving),
+      }
+
+      // --- Oprichting (Veranderingsgebeurtenis) ---
+      const oprichting: KboOprichting | undefined = cleanDate(props.Startdatum)
+        ? { datum: cleanDate(props.Startdatum)! }
+        : undefined
+
+      // --- Stopzetting (Veranderingsgebeurtenis, remove 1900 placeholder) ---
+      const stopzettingDatum = cleanDate(props.Datum_stopzetting)
+      const stopzetting: KboStopzetting | undefined = stopzettingDatum
+        ? {
+            datum: stopzettingDatum,
+            redenStopzetting: clean(props.Reden_stopzetting),
+          }
+        : undefined
+
+      // --- Names ---
+      const wettelijkeNaam = clean(props.Maatschappelijke_naam)
+      const voorkeursnaam = clean(props.Commerciele_naam)
+      const alternatieveNaam: string[] = []
+      if (clean(props.Afgekorte_naam))
+        alternatieveNaam.push(clean(props.Afgekorte_naam)!)
+      if (clean(props.Zoeknaam)) alternatieveNaam.push(clean(props.Zoeknaam)!)
+
+      // --- GeregistreerdeOrganisatie fields ---
+      const rechtsvorm = await buildJuridicalFormUri(props.Rechtsvorm)
+      const rechtstoestandCode = clean(props.Rechtstoestand)
+      const rechtstoestandUri =
+        await buildJuridicalSituationUri(rechtstoestandCode)
+
+      // --- NACE activity (BTW fallback to RSZ) ---
+      const naceCode =
+        clean(props.NACE_hoofdact_BTW) ?? clean(props.NACE_hoofdact_RSZ)
+      const naceVersion =
+        clean(props.NACE_versie_BTW) ?? clean(props.NACE_Versie_RSZ)
+      const naceLabel =
+        clean(props.Omschrijving_hoofdact_BTW) ??
+        clean(props.Omschrijving_hoofdact_RSZ)
+      const activityUri = buildNaceUri(naceCode, naceVersion)
+      const activiteit: KboActiviteit | undefined = activityUri
+        ? { uri: activityUri, label: naceLabel }
+        : undefined
+
+      // --- Address with AR → KBO fallback ---
+      const street = clean(props.AR_straat) ?? clean(props.KBO_Straat)
+      const houseNr = clean(props.AR_huisnr) ?? clean(props.KBO_Huisnr)
+      const bus = clean(props.AR_busnr) ?? clean(props.KBO_Busnr)
+      const postcode = clean(props.AR_postcode) ?? clean(props.KBO_Postcode)
+      const municipality = clean(props.KBO_Gemeente)
+
+      // --- Contact point ---
+      const contactPoints: KboContactPoint[] = []
+      const email = clean(props.Email)
+      const telephone = clean(props.Telefoonnummer)
+      if (email || telephone || street) {
+        contactPoints.push({
+          id: 'contact-0',
+          email,
+          telephone,
+          address:
+            street || postcode || municipality
+              ? {
+                  thoroughfare: [street, houseNr, bus]
+                    .filter(Boolean)
+                    .join(' '),
+                  postCode: postcode,
+                  municipality: municipality,
+                  country: 'België',
+                }
+              : undefined,
+        })
+      }
+
+      // --- Build Branch Data ---
+      const branch: KBOBranchData = {
+        id: cleanSlug,
+        uri: `https://data.vlaanderen.be/id/vestiging/${cleanSlug}`,
+        wettelijkeNaam,
+        voorkeursnaam,
+        alternatieveNaam: alternatieveNaam.length
+          ? alternatieveNaam
+          : undefined,
+        identificator,
+        oprichting,
+        stopzetting,
+        rechtsvorm,
+        rechtstoestand: rechtstoestandUri,
+        activiteit,
+        contactPoints: contactPoints.length ? contactPoints : undefined,
+        parentOrganisatie: clean(props.Ondernemingsnr_maatsch_zetel),
+        source: vkboUrl,
+      }
+
       if (requestedFormat) {
-        const serialized = await serializeAllTriples(sourceUrl, requestedFormat)
+        const quads = kboDataToQuads(branch)
+        const serialized = await serializeQuadsToString(quads, requestedFormat)
         setHeader(event, 'Content-Type', requestedFormat)
         return serialized
       }
 
-      // Fetch branch data as JSON
-      const bindings = await executeQuery(KBO_BRANCH_BY_ID_QUERY(cleanSlug), [
-        sourceUrl,
-      ])
-
-      if (!bindings.length) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: `KBO branch not found: ${cleanSlug}`,
-        })
-      }
-
-      const binding = bindings[0]
-
-      const identificator: KboIdentificator = {
-        identificator:
-          binding.get('regNotation')?.value ?? cleanSlug,
-        toegekendOp: binding.get('regIssued')?.value,
-      }
-
-      const branchData: KBOBranchData = {
-        id: cleanSlug,
-        uri: binding.get('site')?.value ?? '',
-        types: ['Vestiging'],
-        identificator,
-        oprichting: binding.get('created')?.value
-          ? { datum: binding.get('created')!.value }
-          : undefined,
-        source: sourceUrl,
-      }
-
-      return branchData
-    } catch (error) {
-      console.error('Error fetching KBO branch:', error)
+      return branch
+    } catch (error: any) {
+      if (error.statusCode) throw error
+      console.error('Error fetching branch:', error)
       throw createError({
         statusCode: 500,
-        statusMessage: 'Error fetching KBO branch data',
+        statusMessage: 'Error fetching branch',
       })
     }
   },
