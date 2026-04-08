@@ -66,6 +66,7 @@ export default defineEventHandler(
       }
 
       const props = data.features[0].properties
+      const geometry = data.features[0].geometry
 
       const isVestiging = !!clean(props.Ondernemingsnr_maatsch_zetel)
 
@@ -73,6 +74,7 @@ export default defineEventHandler(
       const identificator: KboIdentificator = {
         identificator: cleanSlug,
         toegekendOp: cleanDate(props.Datum_inschrijving),
+        toegekendDoor: 'https://data.vlaanderen.be/id/organisatie/OVO027341',
       }
 
       // --- Oprichting (Veranderingsgebeurtenis) ---
@@ -128,6 +130,8 @@ export default defineEventHandler(
       const contactPoints: KboContactPoint[] = []
       const email = clean(props.Email)
       const telephone = clean(props.Telefoonnummer)
+      const geometryX = geometry.coordinates[0]
+      const geometryY = geometry.coordinates[1]
       if (email || telephone || street) {
         contactPoints.push({
           id: 'contact-0',
@@ -144,6 +148,12 @@ export default defineEventHandler(
                   country: 'België',
                 }
               : undefined,
+          place: {
+            geometry: {
+              wkt: `POINT (${geometryX} ${geometryY})`,
+              gml: `<gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/31370"><gml:coordinates>${geometryX}, ${geometryY}</gml:coordinates></gml:Point>`,
+            },
+          },
         })
       }
 
@@ -172,7 +182,10 @@ export default defineEventHandler(
 
         if (requestedFormat) {
           const quads = kboDataToQuads(branch)
-          const serialized = await serializeQuadsToString(quads, requestedFormat)
+          const serialized = await serializeQuadsToString(
+            quads,
+            requestedFormat,
+          )
           setHeader(event, 'Content-Type', requestedFormat)
           return serialized
         }
