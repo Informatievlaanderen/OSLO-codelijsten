@@ -78,11 +78,13 @@ export default defineEventHandler(
       }
 
       const props = data.features[0].properties
+      const geometry = data.features[0].geometry
 
       // --- Identificator ---
       const identificator: KboIdentificator = {
         identificator: cleanSlug,
         toegekendOp: cleanDate(props.Datum_inschrijving),
+        toegekendDoor: 'https://data.vlaanderen.be/id/organisatie/OVO027341',
       }
 
       // --- Oprichting (Veranderingsgebeurtenis) ---
@@ -137,6 +139,8 @@ export default defineEventHandler(
       const contactPoints: KboContactPoint[] = []
       const email = clean(props.Email)
       const telephone = clean(props.Telefoonnummer)
+      const geometryX = geometry.coordinates[0]
+      const geometryY = geometry.coordinates[1]
       if (email || telephone || street) {
         contactPoints.push({
           id: 'contact-0',
@@ -153,12 +157,19 @@ export default defineEventHandler(
                   country: 'België',
                 }
               : undefined,
+          place: {
+            geometry: {
+              wkt: `POINT (${geometryX} ${geometryY})`,
+              gml: `<gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/31370"><gml:coordinates>${geometryX}, ${geometryY}</gml:coordinates></gml:Point>`,
+            },
+          },
         })
       }
 
       // --- Build Branch Data ---
       const branch: KBOBranchData = {
         id: cleanSlug,
+        types: ['vestiging'],
         uri: `https://data.vlaanderen.be/id/vestiging/${cleanSlug}`,
         wettelijkeNaam,
         voorkeursnaam,

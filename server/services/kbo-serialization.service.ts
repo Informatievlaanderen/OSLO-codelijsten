@@ -104,10 +104,12 @@ export function kboDataToQuads(
 
   // --- Organisatie-specific fields ---
   addNamedNode(quads, subject, organisatie('rechtsvorm'), data.rechtsvorm?.uri)
-  addNamedNode(quads, subject, organisatie('rechtstoestand'), data.rechtstoestand?.uri)
-  if (data.organisatieType) {
-    addNamedNode(quads, subject, dcterms('type'), data.organisatieType.uri)
-  }
+  addNamedNode(
+    quads,
+    subject,
+    organisatie('rechtstoestand'),
+    data.rechtstoestand?.uri,
+  )
 
   // --- Veranderinggebeurtenissen ---
   if (data.oprichting) {
@@ -125,7 +127,9 @@ export function kboDataToQuads(
   }
 
   if (data.stopzetting) {
-    const stopzettingNode = df.blankNode(`stopzetting-${data.oprichting.datum}`)
+    const stopzettingNode = df.blankNode(
+      `stopzetting-${data.oprichting?.datum}`,
+    )
     quads.push(df.quad(subject, org('changedBy'), stopzettingNode))
     quads.push(df.quad(stopzettingNode, rdf('type'), org('ChangeEvent')))
     quads.push(

@@ -16,15 +16,8 @@
 
   <vl-layout>
     <vl-region>
-      <!-- Loading State -->
-      <vl-grid v-if="isLoading" mod-v-center mod-stacked>
-        <vl-column width="12" class="vl-u-align-center">
-          <p>Vestiging inladen...</p>
-        </vl-column>
-      </vl-grid>
-
       <!-- Content -->
-      <vl-grid v-else mod-v-center mod-stacked>
+      <vl-grid mod-v-center mod-stacked>
         <!-- Header Section -->
         <vl-column width="12">
           <div class="h1-sublink">
@@ -225,7 +218,6 @@ import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
 
 const showToaster = ref(false)
-const isLoading = ref(true)
 
 const route = useRoute()
 const slug = computed(() => {
@@ -233,40 +225,25 @@ const slug = computed(() => {
   return Array.isArray(params) ? params.join('/') : params
 })
 
-const data = ref<KBOBranchData | null>(null)
-
-const fetchBranch = async () => {
-  try {
-    data.value = await $fetch(`/doc/api/branch/${slug.value}`)
-  } catch (err) {
-    console.error('Error loading branch:', err)
-    data.value = null
-  } finally {
-    isLoading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchBranch()
-})
-
-watch(
-  () => slug.value,
-  () => {
-    isLoading.value = true
-    fetchBranch()
+const { data } = await useAsyncData<KBOBranchData | null>(
+  `branch-${slug.value}`,
+  async () => {
+    try {
+      return await $fetch(`/doc/api/branch/${slug.value}`)
+    } catch (err) {
+      console.error('Error loading branch:', err)
+      return null
+    }
   },
 )
 
 // Redirect to 404 if no data
-watchEffect(() => {
-  if (!isLoading.value && !data?.value) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Vestiging niet gevonden',
-    })
-  }
-})
+if (!data?.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Onderneming niet gevonden',
+  })
+}
 
 const copyToClipboard = async (text: string) => {
   try {
@@ -284,12 +261,3 @@ useSeoHead({
   title: data.value?.wettelijkeNaam ?? `Vestiging: ${slug.value}`,
 })
 </script>
-
-<style scoped>
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-}
-</style>

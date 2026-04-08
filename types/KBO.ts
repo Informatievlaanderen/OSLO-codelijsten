@@ -1,5 +1,6 @@
 export interface KboIdentificator {
   identificator: string
+  toegekendDoor: 'https://data.vlaanderen.be/id/organisatie/OVO027341'
   toegekendOp?: string
 }
 
@@ -22,6 +23,13 @@ export interface KboConcept {
   label: string
 }
 
+export interface KboPlace {
+  geometry: {
+    wkt: string
+    gml: string
+  }
+}
+
 export interface KboContactPoint {
   id: string
   email?: string
@@ -32,11 +40,13 @@ export interface KboContactPoint {
     municipality?: string
     country?: string
   }
+  place: KboPlace
 }
 
 export interface KboOrganizationData {
   id: string
   uri: string
+  types: string[]
   organisatieType?: KboConcept
   wettelijkeNaam?: string
   voorkeursnaam?: string
@@ -54,6 +64,7 @@ export interface KboOrganizationData {
 export interface KBOBranchData {
   id: string
   uri: string
+  types: string[]
   wettelijkeNaam?: string
   voorkeursnaam?: string
   alternatieveNaam?: string[]

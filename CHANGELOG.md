@@ -66,3 +66,6 @@ ADD ALL KBO DATA
   feat: add link to conceptscheme for JuridicalSituation, JuridicalForm and EnterpriseType
   fix: split up concepts for vestiging and enterprise
   fix: readded parentOrganisatie at vestiging
+  fix: remove attempt at lazyloading on vestiging page
+  fix: add types for geometry to TypeScript interfaces
+  fix: readded types for .ttl representation of enterprises and vestigingen

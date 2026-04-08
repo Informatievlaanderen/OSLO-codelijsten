@@ -176,6 +176,11 @@ export default defineEventHandler(
       const enterprise: KboOrganizationData = {
         id: cleanSlug,
         uri: `https://data.vlaanderen.be/id/onderneming/${cleanSlug}`,
+        types: [
+          'Organisatie',
+          'GeregistreerdeOrganisatie',
+          'FormeleOrganisatie',
+        ],
         wettelijkeNaam,
         voorkeursnaam,
         alternatieveNaam: alternatieveNaam.length
