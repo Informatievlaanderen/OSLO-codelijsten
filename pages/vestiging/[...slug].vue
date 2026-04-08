@@ -95,6 +95,14 @@
                   }}</vl-link>
                 </td>
               </tr>
+              <tr v-if="data?.parentOrganisatie">
+                <td><strong>Organisatie</strong></td>
+                <td>
+                  <vl-link :href="`/onderneming/${data.parentOrganisatie}`">
+                    {{ data.parentOrganisatie }}
+                  </vl-link>
+                </td>
+              </tr>
             </tbody>
           </vl-data-table>
         </vl-column>

@@ -65,3 +65,4 @@ ADD ALL KBO DATA
   1.16.6
   feat: add link to conceptscheme for JuridicalSituation, JuridicalForm and EnterpriseType
   fix: split up concepts for vestiging and enterprise
+  fix: readded parentOrganisatie at vestiging
