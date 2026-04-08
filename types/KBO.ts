@@ -17,6 +17,11 @@ export interface KboActiviteit {
   label?: string
 }
 
+export interface KboConcept {
+  uri: string
+  label: string
+}
+
 export interface KboContactPoint {
   id: string
   email?: string
@@ -32,16 +37,15 @@ export interface KboContactPoint {
 export interface KboOrganizationData {
   id: string
   uri: string
-  types: string[]
+  organisatieType?: KboConcept
   wettelijkeNaam?: string
   voorkeursnaam?: string
   alternatieveNaam?: string[]
   identificator: KboIdentificator
   oprichting?: KboOprichting
   stopzetting?: KboStopzetting
-  organisatieType?: string
-  rechtsvorm?: string
-  rechtstoestand?: string
+  rechtsvorm?: KboConcept
+  rechtstoestand?: KboConcept
   activiteit?: KboActiviteit
   contactPoints?: KboContactPoint[]
   source: string
@@ -50,16 +54,14 @@ export interface KboOrganizationData {
 export interface KBOBranchData {
   id: string
   uri: string
-  types: string[]
   wettelijkeNaam?: string
   voorkeursnaam?: string
   alternatieveNaam?: string[]
   identificator: KboIdentificator
   oprichting?: KboOprichting
   stopzetting?: KboStopzetting
-  organisatieType?: string
-  rechtsvorm?: string
-  rechtstoestand?: string
+  rechtsvorm?: KboConcept
+  rechtstoestand?: KboConcept
   activiteit?: KboActiviteit
   contactPoints?: KboContactPoint[]
   parentOrganisatie?: string

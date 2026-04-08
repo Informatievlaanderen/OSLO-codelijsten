@@ -8,19 +8,23 @@ import type {
   KboOrganizationData,
   KboContactPoint,
   KboIdentificator,
-  KBOBranchData,
   KboActiviteit,
   KboOprichting,
   KboStopzetting,
 } from '~/types/KBO'
-import { clean, cleanDate, buildNaceUri } from '../utils/kbo-utils'
+import {
+  clean,
+  cleanDate,
+  buildNaceUri,
+  buildJuridicalSituationUri,
+  buildJuridicalFormUri,
+  buildOrganisationTypeUri,
+} from '../utils/kbo-utils'
 import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
 import { serializeQuadsToString } from '~/services/serialization-service'
 
 export default defineEventHandler(
-  async (
-    event: any,
-  ): Promise<KboOrganizationData | KBOBranchData | string | null> => {
+  async (event: any): Promise<KboOrganizationData | string | null> => {
     try {
       const slug = getRouterParam(event, 'slug')
 
@@ -38,6 +42,15 @@ export default defineEventHandler(
         slug.endsWith(ext),
       )
       const cleanSlug = extension ? slug.replace(extension, '') : slug
+
+      // Vestiging starts with 2 or higher - this endpoint is for enterprises only
+      const firstDigit = parseInt(cleanSlug.charAt(0), 10)
+      if (!isNaN(firstDigit) && firstDigit >= 2) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: `This is a vestiging (branch), not an enterprise: ${cleanSlug}`,
+        })
+      }
 
       // Build VKBO API URL
       const vkboUrl = `${VKBO_BASE}?f=application/json&filter-lang=cql-text&filter=${encodeURIComponent(`Ondernemingsnr eq '${cleanSlug}'`)}`
@@ -67,8 +80,6 @@ export default defineEventHandler(
 
       const props = data.features[0].properties
       const geometry = data.features[0].geometry
-
-      const isVestiging = !!clean(props.Ondernemingsnr_maatsch_zetel)
 
       // --- Identificator ---
       const identificator: KboIdentificator = {
@@ -100,11 +111,15 @@ export default defineEventHandler(
       if (clean(props.Zoeknaam)) alternatieveNaam.push(clean(props.Zoeknaam)!)
 
       // --- Organisatie.type ---
-      const organisatieType = clean(props.Type_onderneming)
+      const organisatieType = await buildOrganisationTypeUri(
+        props.Type_onderneming,
+      )
 
       // --- GeregistreerdeOrganisatie fields ---
-      const rechtsvorm = clean(props.Rechtsvorm)
-      const rechtstoestand = clean(props.Rechtstoestand)
+      const rechtsvorm = await buildJuridicalFormUri(props.Rechtsvorm)
+      const rechtstoestandCode = clean(props.Rechtstoestand)
+      const rechtstoestandUri =
+        await buildJuridicalSituationUri(rechtstoestandCode)
 
       // --- NACE activity (BTW fallback to RSZ) ---
       const naceCode =
@@ -157,51 +172,10 @@ export default defineEventHandler(
         })
       }
 
-      // --- Vestiging ---
-      if (isVestiging) {
-        const branch: KBOBranchData = {
-          id: cleanSlug,
-          uri: `https://data.vlaanderen.be/id/vestiging/${cleanSlug}`,
-          types: ['Vestiging'],
-          wettelijkeNaam,
-          voorkeursnaam,
-          alternatieveNaam: alternatieveNaam.length
-            ? alternatieveNaam
-            : undefined,
-          identificator,
-          oprichting,
-          stopzetting,
-          organisatieType,
-          rechtsvorm,
-          rechtstoestand,
-          activiteit,
-          contactPoints: contactPoints.length ? contactPoints : undefined,
-          parentOrganisatie: clean(props.Ondernemingsnr_maatsch_zetel),
-          source: vkboUrl,
-        }
-
-        if (requestedFormat) {
-          const quads = kboDataToQuads(branch)
-          const serialized = await serializeQuadsToString(
-            quads,
-            requestedFormat,
-          )
-          setHeader(event, 'Content-Type', requestedFormat)
-          return serialized
-        }
-
-        return branch
-      }
-
       // --- Organisatie ---
       const enterprise: KboOrganizationData = {
         id: cleanSlug,
         uri: `https://data.vlaanderen.be/id/onderneming/${cleanSlug}`,
-        types: [
-          'Organisatie',
-          'GeregistreerdeOrganisatie',
-          'FormeleOrganisatie',
-        ],
         wettelijkeNaam,
         voorkeursnaam,
         alternatieveNaam: alternatieveNaam.length
@@ -212,7 +186,7 @@ export default defineEventHandler(
         stopzetting,
         organisatieType,
         rechtsvorm,
-        rechtstoestand,
+        rechtstoestand: rechtstoestandUri,
         activiteit,
         contactPoints: contactPoints.length ? contactPoints : undefined,
         source: vkboUrl,

@@ -103,10 +103,10 @@ export function kboDataToQuads(
   )
 
   // --- Organisatie-specific fields ---
-  addLiteral(quads, subject, organisatie('rechtsvorm'), data.rechtsvorm)
-  addLiteral(quads, subject, organisatie('rechtstoestand'), data.rechtstoestand)
+  addNamedNode(quads, subject, organisatie('rechtsvorm'), data.rechtsvorm?.uri)
+  addNamedNode(quads, subject, organisatie('rechtstoestand'), data.rechtstoestand?.uri)
   if (data.organisatieType) {
-    addLiteral(quads, subject, dcterms('type'), data.organisatieType)
+    addNamedNode(quads, subject, dcterms('type'), data.organisatieType.uri)
   }
 
   // --- Veranderinggebeurtenissen ---
