@@ -21,6 +21,7 @@ const organisatie = ns('https://data.vlaanderen.be/ns/organisatie#')
 const xsd = ns('http://www.w3.org/2001/XMLSchema#')
 const geosparql = ns('http://www.opengis.net/ont/geosparql#')
 const opengis = ns('http://www.opengis.net/ont/geosparql#')
+const m8g = ns('http://data.europa.eu/m8g/')
 
 const TYPE_MAP: Record<string, RDF.NamedNode> = {
   Organisatie: org('Organization'),
@@ -108,21 +109,32 @@ export function kboDataToQuads(
     addLiteral(quads, subject, dcterms('type'), data.organisatieType)
   }
 
-  // --- Dates ---
+  // --- Veranderinggebeurtenissen ---
   if (data.oprichting) {
+    const oprichtingNode = df.blankNode(`oprichting-${data.oprichting.datum}`)
+    quads.push(df.quad(subject, org('changedBy'), oprichtingNode))
+    quads.push(df.quad(oprichtingNode, rdf('type'), org('ChangeEvent')))
+    quads.push(df.quad(oprichtingNode, rdf('type'), m8g('FoundationEvent')))
     addLiteral(
       quads,
-      subject,
-      dcterms('created'),
+      oprichtingNode,
+      dcterms('date'),
       data.oprichting.datum,
       xsd('date'),
     )
   }
+
   if (data.stopzetting) {
+    const stopzettingNode = df.blankNode(`stopzetting-${data.oprichting.datum}`)
+    quads.push(df.quad(subject, org('changedBy'), stopzettingNode))
+    quads.push(df.quad(stopzettingNode, rdf('type'), org('ChangeEvent')))
+    quads.push(
+      df.quad(stopzettingNode, rdf('type'), organisatie('Stopzetting')),
+    )
     addLiteral(
       quads,
-      subject,
-      organisatie('stopzetting'),
+      stopzettingNode,
+      dcterms('date'),
       data.stopzetting.datum,
       xsd('date'),
     )
