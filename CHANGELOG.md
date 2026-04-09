@@ -47,25 +47,28 @@ ADD ALL KBO DATA
     "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141-Gezinsrelatietype.ttl"
     },
 
-    1.16.2
+        1.16.2
 
-    - Fix for root conceptscheme showing the information of a child conceptscheme
+        - Fix for root conceptscheme showing the information of a child conceptscheme
 
-      1.16.3
+          1.16.3
 
-    - Fix for links to concept or conceptschemes
+        - Fix for links to concept or conceptschemes
 
-      1.16.4
+          1.16.4
 
-    feat: Use VKBO instead of KBO directly for enterprises
+        feat: Use VKBO instead of KBO directly for enterprises
 
-  1.16.5
-  feat: add content-negotiation for enterprises
+    1.16.5
+    feat: add content-negotiation for enterprises
 
-  1.16.6
-  feat: add link to conceptscheme for JuridicalSituation, JuridicalForm and EnterpriseType
-  fix: split up concepts for vestiging and enterprise
-  fix: readded parentOrganisatie at vestiging
-  fix: remove attempt at lazyloading on vestiging page
-  fix: add types for geometry to TypeScript interfaces
-  fix: readded types for .ttl representation of enterprises and vestigingen
+    1.16.6
+    feat: add link to conceptscheme for JuridicalSituation, JuridicalForm and EnterpriseType
+    fix: split up concepts for vestiging and enterprise
+    fix: readded parentOrganisatie at vestiging
+    fix: remove attempt at lazyloading on vestiging page
+    fix: add types for geometry to TypeScript interfaces
+    fix: readded types for .ttl representation of enterprises and vestigingen
+
+    1.16.7
+    fix: add missing /id in uri to onderneming on vestiging page
