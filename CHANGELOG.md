@@ -72,3 +72,6 @@ ADD ALL KBO DATA
 
     1.16.7
     fix: add missing /id in uri to onderneming on vestiging page
+
+    1.16.8
+    feat: Add a OSM map to the vestiging page and onderneming page

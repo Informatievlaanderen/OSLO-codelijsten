@@ -17,7 +17,7 @@
   <vl-layout>
     <vl-region>
       <!-- Content -->
-      <vl-grid mod-v-center mod-stacked>
+      <vl-grid mod-stacked>
         <!-- Header Section -->
         <vl-column width="12">
           <div class="h1-sublink">
@@ -204,6 +204,9 @@
               </div>
             </vl-info-tile>
           </vl-column>
+          <vl-column v-if="contactGeoJsonUrl">
+            <contact-map :url="contactGeoJsonUrl" :center="center" />
+          </vl-column>
         </template>
       </vl-grid>
     </vl-region>
@@ -223,6 +226,24 @@ const route = useRoute()
 const slug = computed(() => {
   const params = route.params.slug
   return Array.isArray(params) ? params.join('/') : params
+})
+
+const contactGeoJsonUrl = computed(() => {
+  const geometry = data.value?.contactPoints?.find((cp) => cp.place?.geometry)
+    ?.place.geometry
+  if (geometry?.x && geometry.y) {
+    // Dirty workaround but the map component expects the URL to end with geojson, hence the dummy query param format=geojson at te end
+    // Hoping this gets fixed at some point in the component library
+    return `/doc/api/geojson?x=${geometry.x}&y=${geometry.y}&format=geojson`
+  }
+})
+const center = computed((): number[] => {
+  const geometry = data.value?.contactPoints?.find((cp) => cp.place?.geometry)
+    ?.place.geometry
+  if (geometry) {
+    return [Number(geometry.x), Number(geometry.y)]
+  }
+  return [4.3113025, 51.0238049]
 })
 
 const { data } = await useAsyncData<KBOBranchData | null>(

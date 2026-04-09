@@ -27,6 +27,8 @@ export interface KboPlace {
   geometry: {
     wkt: string
     gml: string
+    x: number
+    y: string
   }
 }
 
