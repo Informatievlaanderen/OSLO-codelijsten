@@ -175,6 +175,7 @@ export function kboDataToQuads(
           addrNode,
           locn('thoroughfare'),
           cp.address.thoroughfare,
+          rdf('langString'),
         )
         addLiteral(quads, addrNode, locn('postCode'), cp.address.postCode)
         addLiteral(
@@ -182,15 +183,22 @@ export function kboDataToQuads(
           addrNode,
           adres('gemeentenaam'),
           cp.address.municipality,
+          rdf('langString'),
         )
-        addLiteral(quads, addrNode, adres('land'), cp.address.country)
+        addLiteral(
+          quads,
+          addrNode,
+          adres('land'),
+          cp.address.country,
+          rdf('langString'),
+        )
       }
 
       if (cp.place) {
         const placeNode = df.blankNode(`place-${cp.id}`)
         const geometryNode = df.blankNode(`geometry-${cp.id}`)
         quads.push(df.quad(cpNode, dcterms('spatial'), placeNode))
-        quads.push(df.quad(placeNode, rdf('type'), dcterms('Place')))
+        quads.push(df.quad(placeNode, rdf('type'), dcterms('Location')))
         quads.push(df.quad(placeNode, locn('geometry'), geometryNode))
         quads.push(df.quad(geometryNode, rdf('type'), locn('Geometry')))
         addLiteral(
