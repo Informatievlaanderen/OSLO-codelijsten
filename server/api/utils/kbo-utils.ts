@@ -99,6 +99,7 @@ export async function buildJuridicalSituationUri(
   const c = clean(label)
   if (!c) return undefined
   const map = await getJuridicalSituationMap()
+  console.log(map, 'map')
   const uri = map.get(c.toLowerCase())
   if (!uri) return undefined
   return { uri, label: c }
@@ -110,6 +111,7 @@ export async function buildJuridicalFormUri(
   const c = clean(label)
   if (!c) return undefined
   const map = await getJuridicalFormMap()
+  console.log(map, 'map')
   const uri = map.get(c.toLowerCase())
   if (!uri) return undefined
   return { uri, label: c }
@@ -121,6 +123,7 @@ export async function buildOrganisationTypeUri(
   const c = clean(label)
   if (!c) return undefined
   const map = await getOrganisationTypeMap()
+  console.log(map, 'map')
   const uri = map.get(c.toLowerCase())
   if (!uri) return undefined
   return { uri, label: c }

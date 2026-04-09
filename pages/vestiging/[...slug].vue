@@ -91,7 +91,7 @@
               <tr v-if="data?.parentOrganisatie">
                 <td><strong>Organisatie</strong></td>
                 <td>
-                  <vl-link :href="`/id/onderneming/${data.parentOrganisatie}`">
+                  <vl-link :href="`/doc/onderneming/${data.parentOrganisatie}`">
                     {{ data.parentOrganisatie }}
                   </vl-link>
                 </td>
