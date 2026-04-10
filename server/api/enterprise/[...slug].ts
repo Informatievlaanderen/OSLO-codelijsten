@@ -104,7 +104,7 @@ export default defineEventHandler(
 
       // --- Names ---
       const wettelijkeNaam = clean(props.Maatschappelijke_naam)
-      const voorkeursnaam = clean(props.Commerciele_naam)
+      const voorkeursnaam = clean(props.Commerciele_naam) ?? wettelijkeNaam
       const alternatieveNaam: string[] = []
       if (clean(props.Afgekorte_naam))
         alternatieveNaam.push(clean(props.Afgekorte_naam)!)

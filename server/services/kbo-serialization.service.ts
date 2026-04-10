@@ -76,17 +76,30 @@ export function kboDataToQuads(
   }
 
   // --- Names ---
-  addLiteral(quads, subject, reorg('legalName'), data.wettelijkeNaam)
-  addLiteral(quads, subject, skos('prefLabel'), data.voorkeursnaam)
+  addLiteral(
+    quads,
+    subject,
+    reorg('legalName'),
+    data.wettelijkeNaam,
+    rdf('langString'),
+  )
+  addLiteral(
+    quads,
+    subject,
+    skos('prefLabel'),
+    data.voorkeursnaam,
+    rdf('langString'),
+  )
   if (data.alternatieveNaam) {
     for (const alt of data.alternatieveNaam) {
-      addLiteral(quads, subject, skos('altLabel'), alt)
+      addLiteral(quads, subject, skos('altLabel'), alt, rdf('langString'))
     }
   }
 
   // --- Registration / Identificator ---
   const regNode = df.blankNode(`reg-${data.id}`)
   quads.push(df.quad(subject, reorg('registration'), regNode))
+  quads.push(df.quad(regNode, rdf('type'), adms('Identifier')))
   addLiteral(quads, regNode, skos('notation'), data.identificator.identificator)
   addLiteral(
     quads,
