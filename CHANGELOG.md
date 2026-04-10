@@ -79,3 +79,6 @@ ADD ALL KBO DATA
     1.16.9
 
     fix: fixes to the .ttl of onderneming
+
+    1.16.10
+    fix: fixes to the .ttl of onderneming
