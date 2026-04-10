@@ -75,3 +75,7 @@ ADD ALL KBO DATA
 
     1.16.8
     feat: Add a OSM map to the vestiging page and onderneming page
+
+    1.16.9
+
+    fix: fixes to the .ttl of onderneming
