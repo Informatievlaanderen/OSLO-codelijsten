@@ -114,6 +114,9 @@ export function kboDataToQuads(
     dcterms('creator'),
     data.identificator.toegekendDoor,
   )
+  quads.push(
+    df.quad(data.identificator.toegekendDoor, rdf('type'), dcterms('Agent')),
+  )
 
   // --- Organisatie-specific fields ---
   addNamedNode(quads, subject, organisatie('rechtsvorm'), data.rechtsvorm?.uri)
@@ -126,7 +129,7 @@ export function kboDataToQuads(
 
   // --- Veranderinggebeurtenissen ---
   if (data.oprichting) {
-    const oprichtingNode = df.blankNode(`oprichting-${data.oprichting.datum}`)
+    const oprichtingNode = df.blankNode(`oprichting-${data.oprichting.datum.toISOString()}`)
     quads.push(df.quad(subject, org('changedBy'), oprichtingNode))
     quads.push(df.quad(oprichtingNode, rdf('type'), org('ChangeEvent')))
     quads.push(df.quad(oprichtingNode, rdf('type'), m8g('FoundationEvent')))
@@ -134,14 +137,14 @@ export function kboDataToQuads(
       quads,
       oprichtingNode,
       dcterms('date'),
-      data.oprichting.datum,
+      data.oprichting.datum.toISOString(),
       xsd('date'),
     )
   }
 
   if (data.stopzetting) {
     const stopzettingNode = df.blankNode(
-      `stopzetting-${data.oprichting?.datum}`,
+      `stopzetting-${data.oprichting?.datum.toISOString()}`,
     )
     quads.push(df.quad(subject, org('changedBy'), stopzettingNode))
     quads.push(df.quad(stopzettingNode, rdf('type'), org('ChangeEvent')))
@@ -152,7 +155,7 @@ export function kboDataToQuads(
       quads,
       stopzettingNode,
       dcterms('date'),
-      data.stopzetting.datum,
+      data.stopzetting.datum.toISOString(),
       xsd('date'),
     )
   }
