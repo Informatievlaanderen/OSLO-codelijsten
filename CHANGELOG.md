@@ -82,3 +82,6 @@ ADD ALL KBO DATA
 
     1.16.10
     fix: fixes to the .ttl of onderneming
+
+    1.16.11
+    fix: use `toISODateString()` instead of `toLocaleDateString()` for the .ttl representation of enterprises and vestigingen to avoid locale issues
