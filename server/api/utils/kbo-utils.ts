@@ -12,7 +12,7 @@ export function clean(val: string | undefined | null): string | undefined {
 export function cleanDate(val: string | undefined | null): string | undefined {
   const c = clean(val)
   if (!c || c.startsWith('1900-01-01')) return undefined
-  return new Date(c).toISOString()
+  return new Date(c).toISOString().split('T')[0]
 }
 
 export function buildNaceUri(
