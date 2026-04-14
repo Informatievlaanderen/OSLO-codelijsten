@@ -244,6 +244,7 @@ const contactGeoJsonUrl = computed(() => {
   if (geometry?.x && geometry.y) {
     // Dirty workaround but the map component expects the URL to end with geojson, hence the dummy query param format=geojson at te end
     // Hoping this gets fixed at some point in the component library
+    // https://vlaamseoverheid.atlassian.net/browse/UXCOMP-4395
     return `/doc/api/geojson?x=${geometry.x}&y=${geometry.y}&format=geojson`
   }
 })
