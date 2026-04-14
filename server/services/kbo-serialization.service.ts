@@ -35,7 +35,7 @@ function addLiteral(
   subject: RDF.NamedNode | RDF.BlankNode,
   predicate: RDF.NamedNode,
   value: string | undefined,
-  datatype?: RDF.NamedNode,
+  datatype?: RDF.NamedNode | string,
 ): void {
   if (!value) return
   quads.push(
@@ -81,18 +81,18 @@ export function kboDataToQuads(
     subject,
     reorg('legalName'),
     data.wettelijkeNaam,
-    rdf('langString'),
+    'nl',
   )
   addLiteral(
     quads,
     subject,
     skos('prefLabel'),
     data.voorkeursnaam,
-    rdf('langString'),
+    'nl',
   )
   if (data.alternatieveNaam) {
     for (const alt of data.alternatieveNaam) {
-      addLiteral(quads, subject, skos('altLabel'), alt, rdf('langString'))
+      addLiteral(quads, subject, skos('altLabel'), alt, 'nl')
     }
   }
 
@@ -197,7 +197,7 @@ export function kboDataToQuads(
           addrNode,
           locn('thoroughfare'),
           cp.address.thoroughfare,
-          rdf('langString'),
+          'nl',
         )
         addLiteral(quads, addrNode, locn('postCode'), cp.address.postCode)
         addLiteral(
@@ -205,14 +205,14 @@ export function kboDataToQuads(
           addrNode,
           adres('gemeentenaam'),
           cp.address.municipality,
-          rdf('langString'),
+          'nl',
         )
         addLiteral(
           quads,
           addrNode,
           adres('land'),
           cp.address.country,
-          rdf('langString'),
+          'nl',
         )
       }
 
