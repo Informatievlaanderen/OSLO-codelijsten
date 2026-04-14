@@ -23,7 +23,7 @@ export function buildNaceUri(
   const v = clean(version)
   if (!c || !v) return undefined
   const vocabPath = v === '2025' ? 'nace2025' : 'nace2008'
-  return `https://vocab.belgif.be/auth/${vocabPath}/${c}`
+  return `http://vocab.belgif.be/auth/${vocabPath}/${c}`
 }
 
 let juridicalFormCache: Map<string, string> | null = null
