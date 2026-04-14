@@ -85,3 +85,8 @@ ADD ALL KBO DATA
 
     1.16.11
     fix: use `toISODateString()` instead of `toLocaleDateString()` for the .ttl representation of enterprises and vestigingen to avoid locale issues
+
+    1.16.12
+    fix: add missing `@type` to .ttl representation of vestiging
+    fix: add missing `@type` to .ttl representation of enterprise
+    fix: Don't use miliseconds in the ISO date format for the .ttl/jsonld representation of enterprises and vestigingen

@@ -166,11 +166,13 @@ export function kboDataToQuads(
 
   // --- Activity (NACE) ---
   if (data.activiteit) {
+    const activityNode = df.namedNode(data.activiteit.uri)
     addNamedNode(quads, subject, reorg('orgActivity'), data.activiteit.uri)
+    quads.push(df.quad(activityNode, rdf('type'), skos('Concept')))
     if (data.activiteit.label) {
       addLiteral(
         quads,
-        df.namedNode(data.activiteit.uri),
+        activityNode,
         skos('prefLabel'),
         data.activiteit.label,
       )
