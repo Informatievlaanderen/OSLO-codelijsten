@@ -93,3 +93,9 @@ ADD ALL KBO DATA
 
     1.16.13
     fix: Added language to the .jsonld representation of enterprises and vestigingen
+
+    1.16.14
+    feat: added a link to the .ttl and .jsonld sections of each enterprise / branch
+    fix: added https://www.w3.org/ns/regorg#orgType to the .ttl representation of enterprise / branch
+    feat: add dereferencable uris to the labels of the enterprise / branch view
+    fix: follow https://data.test-vlaanderen.be/doc/implementatiemodel/organisatie/ontwerpdocument/VKBO/ completely for the visual representation of the data

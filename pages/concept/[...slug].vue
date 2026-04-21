@@ -36,19 +36,11 @@
           </div>
         </vl-column>
         <vl-column width="12">
-          <vl-action-group mod-collapse-s>
+          <action-buttons :source="data?.source ?? ''">
             <a :href="`/doc/conceptscheme/${conceptScheme}`"
               ><vl-button type="button">Terug naar conceptschema</vl-button></a
             >
-            <vl-button
-              @click="() => openSource(data?.source ?? '')"
-              mod-secondary
-              mod-small
-            >
-              <vl-icon icon="download-harddisk" mod-before></vl-icon>
-              Bekijk brondata
-            </vl-button>
-          </vl-action-group>
+          </action-buttons>
         </vl-column>
         <concept-info v-if="data" :concept="data" />
 

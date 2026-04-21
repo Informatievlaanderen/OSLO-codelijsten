@@ -23,6 +23,21 @@ export interface KboConcept {
   label: string
 }
 
+export interface KboFieldUris {
+  type: string
+  wettelijkeNaam: string
+  voorkeursnaam: string
+  alternatieveNaam: string
+  rechtsvorm: string
+  rechtstoestand: string
+  activiteit: string
+  identificator: string
+  toegekendOp: string
+  oprichting: string
+  stopzetting: string
+  parentOrganisatie: string
+}
+
 export interface KboPlace {
   geometry: {
     wkt: string
@@ -49,6 +64,7 @@ export interface KboOrganizationData {
   id: string
   uri: string
   types: string[]
+  fieldUris: KboFieldUris
   organisatieType?: KboConcept
   wettelijkeNaam?: string
   voorkeursnaam?: string
@@ -67,6 +83,7 @@ export interface KBOBranchData {
   id: string
   uri: string
   types: string[]
+  fieldUris: KboFieldUris
   wettelijkeNaam?: string
   voorkeursnaam?: string
   alternatieveNaam?: string[]

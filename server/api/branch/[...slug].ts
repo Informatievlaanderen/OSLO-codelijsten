@@ -19,6 +19,7 @@ import {
   buildJuridicalSituationUri,
   buildJuridicalFormUri,
 } from '../utils/kbo-utils'
+import { KBO_FIELD_URIS } from '~/server/utils/kbo-predicate-uris'
 import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
 import { serializeQuadsToString } from '~/services/serialization-service'
 
@@ -173,6 +174,7 @@ export default defineEventHandler(
         id: cleanSlug,
         types: ['vestiging'],
         uri: `https://data.vlaanderen.be/id/vestiging/${cleanSlug}`,
+        fieldUris: KBO_FIELD_URIS,
         wettelijkeNaam,
         voorkeursnaam,
         alternatieveNaam: alternatieveNaam.length

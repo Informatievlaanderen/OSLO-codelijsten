@@ -35,28 +35,19 @@
         </vl-column>
 
         <!-- Action Buttons -->
-        <vl-column width="12">
-          <vl-action-group mod-collapse-s>
-            <vl-button
-              @click="() => openSource(data?.source ?? '')"
-              mod-secondary
-              mod-small
-            >
-              <vl-icon icon="download-harddisk" mod-before></vl-icon>
-              Bekijk brondata
-            </vl-button>
-          </vl-action-group>
+        <vl-column width="6">
+          <action-buttons :source="data?.source ?? ''" />
         </vl-column>
-
         <!-- Basic Information -->
-        <vl-column width="12">
-          <vl-title tag-name="h2" mod-h3>Informatie</vl-title>
-        </vl-column>
         <vl-column width="12">
           <vl-data-table>
             <tbody>
               <tr v-if="data?.organisatieType">
-                <td><strong>Type entiteit</strong></td>
+                <td>
+                  <vl-link :href="data.fieldUris.type" external>
+                    Type entiteit
+                  </vl-link>
+                </td>
                 <td>
                   <vl-link :href="data.organisatieType.uri">{{
                     data.organisatieType.label
@@ -64,15 +55,27 @@
                 </td>
               </tr>
               <tr v-if="data?.wettelijkeNaam">
-                <td><strong>Wettelijke naam</strong></td>
+                <td>
+                  <vl-link :href="data.fieldUris.wettelijkeNaam" external>
+                    Wettelijke naam
+                  </vl-link>
+                </td>
                 <td>{{ data.wettelijkeNaam }}</td>
               </tr>
               <tr v-if="data?.voorkeursnaam">
-                <td><strong>Voorkeursnaam</strong></td>
+                <td>
+                  <vl-link :href="data.fieldUris.voorkeursnaam" external>
+                    Voorkeursnaam
+                  </vl-link>
+                </td>
                 <td>{{ data.voorkeursnaam }}</td>
               </tr>
               <tr v-if="data?.alternatieveNaam?.length">
-                <td><strong>Alternatieve naam</strong></td>
+                <td>
+                  <vl-link :href="data.fieldUris.alternatieveNaam" external>
+                    Alternatieve naam
+                  </vl-link>
+                </td>
                 <td>
                   <div v-for="name in data.alternatieveNaam" :key="name">
                     {{ name }}
@@ -80,7 +83,11 @@
                 </td>
               </tr>
               <tr v-if="data?.rechtstoestand">
-                <td><strong>Rechtstoestand</strong></td>
+                <td>
+                  <vl-link :href="data.fieldUris.rechtstoestand" external>
+                    Rechtstoestand
+                  </vl-link>
+                </td>
                 <td>
                   <vl-link :href="data.rechtstoestand.uri">{{
                     data.rechtstoestand.label
@@ -88,11 +95,27 @@
                 </td>
               </tr>
               <tr v-if="data?.rechtsvorm">
-                <td><strong>Rechtsvorm</strong></td>
+                <td>
+                  <vl-link :href="data.fieldUris.rechtsvorm" external>
+                    Rechtsvorm
+                  </vl-link>
+                </td>
                 <td>
                   <vl-link :href="data.rechtsvorm.uri">{{
                     data.rechtsvorm.label
                   }}</vl-link>
+                </td>
+              </tr>
+              <tr v-if="data?.activiteit">
+                <td>
+                  <vl-link :href="data.fieldUris.activiteit" external>
+                    Activiteit
+                  </vl-link>
+                </td>
+                <td>
+                  <vl-link :href="data.activiteit.uri" external>
+                    {{ data.activiteit.label ?? data.activiteit.uri }}
+                  </vl-link>
                 </td>
               </tr>
             </tbody>
@@ -108,11 +131,19 @@
             <vl-data-table>
               <tbody>
                 <tr>
-                  <td><strong>Identificator</strong></td>
+                  <td>
+                    <vl-link :href="data.fieldUris.identificator" external>
+                      Identificator
+                    </vl-link>
+                  </td>
                   <td>{{ data.identificator.identificator }}</td>
                 </tr>
                 <tr v-if="data.identificator.toegekendOp">
-                  <td><strong>Toegekend op</strong></td>
+                  <td>
+                    <vl-link :href="data.fieldUris.toegekendOp" external>
+                      Toegekend op
+                    </vl-link>
+                  </td>
                   <td>{{ data.identificator.toegekendOp }}</td>
                 </tr>
               </tbody>
@@ -129,11 +160,19 @@
             <vl-data-table>
               <tbody>
                 <tr v-if="data?.oprichting">
-                  <td><strong>Oprichting</strong></td>
+                  <td>
+                    <vl-link :href="data.fieldUris.oprichting" external>
+                      Oprichting
+                    </vl-link>
+                  </td>
                   <td>{{ data.oprichting.datum }}</td>
                 </tr>
                 <tr v-if="data?.stopzetting">
-                  <td><strong>Stopzetting</strong></td>
+                  <td>
+                    <vl-link :href="data.fieldUris.stopzetting" external>
+                      Stopzetting
+                    </vl-link>
+                  </td>
                   <td>
                     {{ data.stopzetting.datum }}
                     <span v-if="data.stopzetting.redenStopzetting">
@@ -146,31 +185,10 @@
           </vl-column>
         </template>
 
-        <!-- Activiteit -->
-        <template v-if="data?.activiteit">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Activiteit</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr>
-                  <td><strong>NACE</strong></td>
-                  <td>
-                    <vl-link :href="data.activiteit.uri" external>
-                      {{ data.activiteit.label ?? data.activiteit.uri }}
-                    </vl-link>
-                  </td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
-
         <!-- Contact Points -->
         <template v-if="data?.contactPoints?.length">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Contactgegevens</vl-title>
+            <vl-title tag-name="h2" mod-h3>Contactpunt</vl-title>
           </vl-column>
           <vl-column
             v-for="contact in data.contactPoints"
@@ -216,7 +234,6 @@
 
 <script setup lang="ts">
 import type { KboOrganizationData } from '~/types/KBO'
-import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
 
 const showToaster = ref(false)

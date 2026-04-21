@@ -20,6 +20,7 @@ import {
   buildJuridicalFormUri,
   buildOrganisationTypeUri,
 } from '../utils/kbo-utils'
+import { KBO_FIELD_URIS } from '~/server/utils/kbo-predicate-uris'
 import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
 import { serializeQuadsToString } from '~/services/serialization-service'
 
@@ -183,6 +184,7 @@ export default defineEventHandler(
           'GeregistreerdeOrganisatie',
           'FormeleOrganisatie',
         ],
+        fieldUris: KBO_FIELD_URIS,
         wettelijkeNaam,
         voorkeursnaam,
         alternatieveNaam: alternatieveNaam.length

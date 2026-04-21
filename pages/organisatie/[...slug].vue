@@ -32,16 +32,7 @@
 
         <!-- Action Buttons -->
         <vl-column width="12">
-          <vl-action-group mod-collapse-s>
-            <vl-button
-              @click="() => openSource(data?.source ?? '')"
-              mod-secondary
-              mod-small
-            >
-              <vl-icon icon="download-harddisk" mod-before></vl-icon>
-              Bekijk brondata
-            </vl-button>
-          </vl-action-group>
+          <action-buttons :source="data?.source ?? ''" />
         </vl-column>
 
         <!-- Basic Information -->
