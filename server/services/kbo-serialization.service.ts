@@ -123,6 +123,9 @@ export function kboDataToQuads(
   )
 
   // --- Organisatie-specific fields ---
+  if ('organisatieType' in data) {
+    addNamedNode(quads, subject, reorg('orgType'), data.organisatieType?.uri)
+  }
   addNamedNode(quads, subject, organisatie('rechtsvorm'), data.rechtsvorm?.uri)
   addNamedNode(
     quads,
