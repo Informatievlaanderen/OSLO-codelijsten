@@ -36,7 +36,6 @@ ADD ALL KBO DATA
   },
 
   1.16.1
-
   - Add support for conceptschemes of conceptschemes
     {
     "urlRef": "IT141",
@@ -99,3 +98,6 @@ ADD ALL KBO DATA
     fix: added https://www.w3.org/ns/regorg#orgType to the .ttl representation of enterprise / branch
     feat: add dereferencable uris to the labels of the enterprise / branch view
     fix: follow https://data.test-vlaanderen.be/doc/implementatiemodel/organisatie/ontwerpdocument/VKBO/ completely for the visual representation of the data
+
+  1.16.15
+  fix: add /doc to the .jsonld and .ttl buttons for enterprise and branch

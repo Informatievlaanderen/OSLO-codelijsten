@@ -6,7 +6,7 @@
       Bekijk brondata
     </vl-button>
     <vl-button
-      @click="() => openSource(`${$route.path}.ttl`)"
+      @click="() => openSource(`/doc${$route.path}.ttl`)"
       mod-secondary
       mod-small
     >
@@ -14,7 +14,7 @@
       .ttl
     </vl-button>
     <vl-button
-      @click="() => openSource(`${$route.path}.jsonld`)"
+      @click="() => openSource(`/doc${$route.path}.jsonld`)"
       mod-secondary
       mod-small
     >
