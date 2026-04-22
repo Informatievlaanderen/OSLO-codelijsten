@@ -23,7 +23,7 @@
     "@govflanders/vl-ui-design-system-vue3": "^7.1.1",
     "@govflanders/vl-widget-polyfill": "^1.4.1",
     "@oslo-flanders/core": "^1.0.15",
-    "axios": "^1.14.0",
+    "axios": "^1.15.0",
     "core-js": "^3.15.1",
     "ol": "^10.8.0",
     "rdf-serialize": "^5.1.0",
