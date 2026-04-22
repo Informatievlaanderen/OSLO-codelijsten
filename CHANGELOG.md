@@ -105,3 +105,5 @@ ADD ALL KBO DATA
     1.16.16
     fix: small copy improvement for adres
     fix: ignore empty contact points
+    fix: remove <strong> tag from OVO page
+    feat: add URIs to the labels of the OVO code page
