@@ -9,8 +9,8 @@
       width="6"
       width-s="12"
     >
-      <vl-info-tile>
-        <vl-title tag-name="h4" slot="title">{{ 'Contactpunt' }}</vl-title>
+      <!-- if keys are less than 0, it means that there is a contact point with just an ID. That can be ignored -->
+      <vl-info-tile v-if="Object.keys(contact).length > 1">
         <div slot="content">
           <p v-if="contact.name">
             <strong>{{ contact.name }}</strong>
