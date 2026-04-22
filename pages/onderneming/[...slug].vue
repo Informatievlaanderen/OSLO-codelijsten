@@ -197,7 +197,6 @@
             width-s="12"
           >
             <vl-info-tile>
-              <vl-title tag-name="h4" slot="title">Contactpunt</vl-title>
               <div slot="content">
                 <p v-if="contact.email">
                   <vl-icon icon="email" mod-before></vl-icon>
