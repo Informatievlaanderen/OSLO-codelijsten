@@ -190,36 +190,38 @@
           <vl-column width="12">
             <vl-title tag-name="h2" mod-h3>Contactpunt</vl-title>
           </vl-column>
-          <vl-column
-            v-for="contact in data.contactPoints"
-            :key="contact.id"
-            width="6"
-            width-s="12"
-          >
-            <vl-info-tile>
-              <div slot="content">
-                <p v-if="contact.email">
-                  <vl-icon icon="email" mod-before></vl-icon>
-                  <vl-link :href="`mailto:${contact.email}`">
-                    {{ contact.email }}
-                  </vl-link>
-                </p>
-                <p v-if="contact.telephone">
-                  <vl-icon icon="phone" mod-before></vl-icon>
-                  <vl-link :href="`tel:${contact.telephone}`">
-                    {{ contact.telephone }}
-                  </vl-link>
-                </p>
-                <address v-if="contact.address">
-                  <vl-icon icon="location-map" mod-before></vl-icon>
-                  {{ contact.address.thoroughfare }}
-                  {{ contact.address.postCode }}
-                  {{ contact.address.municipality }}
-                  {{ contact.address.country }}
-                </address>
-              </div>
-            </vl-info-tile>
-          </vl-column>
+          <template v-for="contact in data.contactPoints" :key="contact.id">
+            <!-- if keys are less than 0, it means that there is a contact point with just an ID. That can be ignored -->
+            <vl-column
+              v-if="Object.keys(contact).length > 1"
+              width="6"
+              width-s="12"
+            >
+              <vl-info-tile>
+                <div slot="content">
+                  <p v-if="contact.email">
+                    <vl-icon icon="email" mod-before></vl-icon>
+                    <vl-link :href="`mailto:${contact.email}`">
+                      {{ contact.email }}
+                    </vl-link>
+                  </p>
+                  <p v-if="contact.telephone">
+                    <vl-icon icon="phone" mod-before></vl-icon>
+                    <vl-link :href="`tel:${contact.telephone}`">
+                      {{ contact.telephone }}
+                    </vl-link>
+                  </p>
+                  <address v-if="contact.address">
+                    <vl-icon icon="location-map" mod-before></vl-icon>
+                    {{ contact.address.thoroughfare }}
+                    {{ contact.address.postCode }}
+                    {{ contact.address.municipality }}
+                    {{ contact.address.country }}
+                  </address>
+                </div>
+              </vl-info-tile>
+            </vl-column>
+          </template>
           <vl-column v-if="contactGeoJsonUrl">
             <contact-map :url="contactGeoJsonUrl" :center="center" />
           </vl-column>
