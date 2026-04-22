@@ -46,17 +46,17 @@ ADD ALL KBO DATA
     "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141-Gezinsrelatietype.ttl"
     },
 
-          1.16.2
+            1.16.2
 
-          - Fix for root conceptscheme showing the information of a child conceptscheme
+            - Fix for root conceptscheme showing the information of a child conceptscheme
 
-            1.16.3
+              1.16.3
 
-          - Fix for links to concept or conceptschemes
+            - Fix for links to concept or conceptschemes
 
-            1.16.4
+              1.16.4
 
-          feat: Use VKBO instead of KBO directly for enterprises
+            feat: Use VKBO instead of KBO directly for enterprises
 
     1.16.5
     feat: add content-negotiation for enterprises
@@ -99,5 +99,8 @@ ADD ALL KBO DATA
     feat: add dereferencable uris to the labels of the enterprise / branch view
     fix: follow https://data.test-vlaanderen.be/doc/implementatiemodel/organisatie/ontwerpdocument/VKBO/ completely for the visual representation of the data
 
-  1.16.15
-  fix: add /doc to the .jsonld and .ttl buttons for enterprise and branch
+    1.16.15
+    fix: add /doc to the .jsonld and .ttl buttons for enterprise and branch
+
+    1.16.16
+    fix: small copy improvement for adres
