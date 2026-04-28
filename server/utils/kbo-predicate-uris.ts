@@ -6,7 +6,7 @@ export const KBO_FIELD_URIS = {
   rechtsvorm: 'https://data.vlaanderen.be/ns/organisatie#rechtsvorm',
   rechtstoestand: 'https://data.vlaanderen.be/ns/organisatie#rechtstoestand',
   activiteit: 'http://www.w3.org/ns/regorg#orgActivity',
-  identificator: 'http://www.w3.org/ns/regorg#registration',
+  identificator: 'http://www.w3.org/2004/02/skos/core#notation',
   toegekendOp: 'http://purl.org/dc/terms/issued',
   oprichting: 'http://purl.org/dc/terms/date',
   stopzetting: 'http://purl.org/dc/terms/date',

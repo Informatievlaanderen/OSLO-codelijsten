@@ -44,9 +44,7 @@
             <tbody>
               <tr v-if="data?.organisatieType">
                 <td>
-                  <vl-link :href="data.fieldUris.type" external>
-                    Type entiteit
-                  </vl-link>
+                  <vl-link :href="data.fieldUris.type" external> Type </vl-link>
                 </td>
                 <td>
                   <vl-link :href="data.organisatieType.uri">{{
@@ -159,18 +157,24 @@
           <vl-column width="12">
             <vl-data-table>
               <tbody>
+                <th v-if="data?.oprichting">
+                  <vl-title tag-name="h4" mod-h4>Oprichting</vl-title>
+                </th>
                 <tr v-if="data?.oprichting">
                   <td>
                     <vl-link :href="data.fieldUris.oprichting" external>
-                      Oprichting
+                      Datum
                     </vl-link>
                   </td>
                   <td>{{ data.oprichting.datum }}</td>
                 </tr>
+                <th v-if="data?.stopzetting">
+                  <vl-title tag-name="h4" mod-h4>Stopzetting</vl-title>
+                </th>
                 <tr v-if="data?.stopzetting">
                   <td>
                     <vl-link :href="data.fieldUris.stopzetting" external>
-                      Stopzetting
+                      Datum
                     </vl-link>
                   </td>
                   <td>
@@ -188,7 +192,7 @@
         <!-- Contact Points -->
         <template v-if="data?.contactPoints?.length">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Contactpunt</vl-title>
+            <vl-title tag-name="h2" mod-h3>Contactinfo</vl-title>
           </vl-column>
           <template v-for="contact in data.contactPoints" :key="contact.id">
             <!-- if keys are less than 0, it means that there is a contact point with just an ID. That can be ignored -->

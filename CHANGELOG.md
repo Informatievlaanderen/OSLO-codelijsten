@@ -107,3 +107,7 @@ ADD ALL KBO DATA
     fix: ignore empty contact points
     fix: remove <strong> tag from OVO page
     feat: add URIs to the labels of the OVO code page
+
+    1.16.17
+    fix: Correct uri for `Identificator.identificator` in the html representation
+    fix: Correct labels for `type`, `contactinfo`, `stopzetting` and `oprichting`
