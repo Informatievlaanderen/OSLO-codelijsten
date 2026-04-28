@@ -57,7 +57,7 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
 
     return schemes.filter((s) => s !== null) as ConceptScheme[]
   } catch (error) {
-    console.error('Error fetching concept schemes:')
+    console.error('Error fetching concept schemes:', error)
     return []
   }
 })

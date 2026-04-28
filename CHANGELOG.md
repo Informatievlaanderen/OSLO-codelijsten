@@ -111,3 +111,6 @@ ADD ALL KBO DATA
     1.16.17
     fix: Correct uri for `Identificator.identificator` in the html representation
     fix: Correct labels for `type`, `contactinfo`, `stopzetting` and `oprichting`
+
+    1.16.18
+    fix: add logging to `error fetching concept schemes` error
