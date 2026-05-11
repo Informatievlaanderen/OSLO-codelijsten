@@ -114,3 +114,6 @@ ADD ALL KBO DATA
 
     1.16.18
     fix: add logging to `error fetching concept schemes` error
+
+    1.16.19
+    feat: added GRB as layer to the map and map controls

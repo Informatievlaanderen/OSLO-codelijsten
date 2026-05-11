@@ -54,7 +54,7 @@ export default defineEventHandler(
       }
 
       // Build VKBO API URL
-      const vkboUrl = `${VKBO_BASE}?f=application/json&filter-lang=cql-text&crs=EPSG:3812&filter=${encodeURIComponent(`Ondernemingsnr eq '${cleanSlug}'`)}`
+      const vkboUrl = `${VKBO_BASE}?f=application/json&filter-lang=cql-text&filter=${encodeURIComponent(`Ondernemingsnr eq '${cleanSlug}'`)}`
 
       // Handle content negotiation for RDF formats
       const acceptHeader = getHeader(event, 'accept') ?? ''
@@ -169,7 +169,7 @@ export default defineEventHandler(
               x: geometryX,
               y: geometryY,
               wkt: `POINT (${geometryX} ${geometryY})`,
-              gml: `<gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/3812"><gml:coordinates>${geometryX}, ${geometryY}</gml:coordinates></gml:Point>`,
+              gml: `<gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/31370"><gml:coordinates>${geometryX}, ${geometryY}</gml:coordinates></gml:Point>`,
             },
           },
         })
