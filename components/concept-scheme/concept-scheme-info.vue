@@ -6,7 +6,7 @@
         <vl-properties-list>
           <vl-properties-label>
             <vl-link
-              href="https://www.w3.org/2009/08/skos-reference/skos.html#prefLabel"
+              href="http://www.w3.org/2004/02/skos/core#prefLabel"
               external
             >
               Label
@@ -18,7 +18,7 @@
 
           <vl-properties-label>
             <vl-link
-              href="https://www.w3.org/2009/08/skos-reference/skos.html#definition"
+              href="http://www.w3.org/2004/02/skos/core#definition"
               external
             >
               Definitie
@@ -32,7 +32,7 @@
       <vl-properties-column>
         <vl-properties-list>
           <vl-properties-label>
-            <vl-link href="https://www.w3.org/ns/adms#status" external>
+            <vl-link href="http://www.w3.org/ns/adms#status" external>
               Status
             </vl-link>
           </vl-properties-label>
