@@ -119,5 +119,5 @@ ADD ALL KBO DATA
     1.16.19
     feat: added GRB as layer to the map and map controls
 
-    1.16.20
+    1.16.21
     feat: add support for external codelists when navigating to a conceptscheme that's not part of data.vlaanderen.be
