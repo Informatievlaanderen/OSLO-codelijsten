@@ -14,8 +14,14 @@ export const openSource = (source: string) => {
 export const extractConcept = (uri: string): string => {
   try {
     const url = new URL(uri)
-    let origin = url.origin // Returns: https://data.vlaanderen.be
-    return uri.replace(origin, '').replace(/\/(id|doc)\//, '')
+
+    // if it's a Vlaanderen url, it will most likely be one of our conceptschemes and thus needs to be an internal path
+    // Can't return the full url to keep test environments working
+    if (!url.origin.includes('vlaanderen')) {
+      return uri
+    }
+
+    return `/doc/${uri.replace(url.origin, '').replace(/\/(id|doc)\//, '')}`
   } catch {
     return ''
   }

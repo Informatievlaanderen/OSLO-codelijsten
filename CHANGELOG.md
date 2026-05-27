@@ -36,6 +36,7 @@ ADD ALL KBO DATA
   },
 
   1.16.1
+
   - Add support for conceptschemes of conceptschemes
     {
     "urlRef": "IT141",
@@ -46,17 +47,17 @@ ADD ALL KBO DATA
     "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141-Gezinsrelatietype.ttl"
     },
 
-            1.16.2
+              1.16.2
 
-            - Fix for root conceptscheme showing the information of a child conceptscheme
+              - Fix for root conceptscheme showing the information of a child conceptscheme
 
-              1.16.3
+                1.16.3
 
-            - Fix for links to concept or conceptschemes
+              - Fix for links to concept or conceptschemes
 
-              1.16.4
+                1.16.4
 
-            feat: Use VKBO instead of KBO directly for enterprises
+              feat: Use VKBO instead of KBO directly for enterprises
 
     1.16.5
     feat: add content-negotiation for enterprises
@@ -117,3 +118,6 @@ ADD ALL KBO DATA
 
     1.16.19
     feat: added GRB as layer to the map and map controls
+
+    1.16.20
+    feat: add support for external codelists when navigating to a conceptscheme that's not part of data.vlaanderen.be
