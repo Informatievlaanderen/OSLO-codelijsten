@@ -1,95 +1,75 @@
 import {
   CONCEPT_SCHEME_QUERY,
   CONCEPT_SCHEME_BY_ID_QUERY,
+  ITEMS_PER_PAGE,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import type { ConceptScheme, ConceptSchemeConfig } from '~/types/conceptScheme'
 
-const CONCURRENCY = 10
+export default defineEventHandler(async (event) => {
+  const query = getQuery(event)
+  const page = Math.max(1, parseInt((query.page as string) ?? '1', 10))
+  const search = ((query.search as string) ?? '').toLowerCase().trim()
 
-const runConcurrently = async <T>(
-  tasks: Array<() => Promise<T>>,
-  limit: number,
-): Promise<T[]> => {
-  const results: T[] = new Array(tasks.length)
-  let next = 0
-  async function worker() {
-    while (next < tasks.length) {
-      const i = next++
-      results[i] = await tasks[i]()
-    }
-  }
-  await Promise.all(
-    Array.from({ length: Math.min(limit, tasks.length) }, worker),
-  )
-  return results
-}
+  try {
+    const runtimeConfig = useRuntimeConfig()
+    const DATASET_CONFIG_URL: string =
+      process.env.DATASET_CONFIG_URL ?? runtimeConfig.DATASET_CONFIG_URL
+    const response = await $fetch<any>(DATASET_CONFIG_URL)
 
-export default defineCachedEventHandler(
-  async (): Promise<ConceptScheme[]> => {
-    try {
-      const runtimeConfig = useRuntimeConfig()
-      // Env variable access during build time
-      const DATASET_CONFIG_URL: string =
-        process.env.DATASET_CONFIG_URL ?? runtimeConfig.DATASET_CONFIG_URL
-      const response = await $fetch<any>(DATASET_CONFIG_URL)
+    console.log(
+      `[${new Date().toISOString()}] Fetched concept scheme config from:`,
+      DATASET_CONFIG_URL,
+    )
+    const data =
+      typeof response === 'string' ? JSON.parse(response) : response
+    const configs: ConceptSchemeConfig[] = data.conceptSchemes
 
-      console.log(
-        `[${new Date().toISOString()}] Fetched concept scheme config from:`,
-        DATASET_CONFIG_URL,
-      )
-      const data =
-        typeof response === 'string' ? JSON.parse(response) : response
-      const configs: ConceptSchemeConfig[] = data.conceptSchemes
+    const filtered = search
+      ? configs.filter((c) => c.urlRef.toLowerCase().includes(search))
+      : configs
 
-      const tasks = configs.map(
-        (config) => async (): Promise<ConceptScheme | null> => {
-          try {
-            // First try filtered query to find the exact scheme matching the urlRef
-            let bindings = await executeQuery(
-              CONCEPT_SCHEME_BY_ID_QUERY(config.urlRef),
-              [config.sourceUrl],
-            )
+    const total = filtered.length
+    const start = (page - 1) * ITEMS_PER_PAGE
+    const pageConfigs = filtered.slice(start, start + ITEMS_PER_PAGE)
 
-            // Fallback to generic query if filtered returns nothing
-            if (!bindings.length) {
-              bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [
-                config.sourceUrl,
-              ])
-            }
+    const items = await Promise.all(
+      pageConfigs.map(async (config): Promise<ConceptScheme> => {
+        try {
+          let bindings = await executeQuery(
+            CONCEPT_SCHEME_BY_ID_QUERY(config.urlRef),
+            [config.sourceUrl],
+          )
 
-            if (!bindings.length) return null
-
-            const binding = bindings[0]
-
-            return {
-              id: config.urlRef,
-              uri: binding.get('scheme')?.value ?? '',
-              label: binding.get('label')?.value ?? config.urlRef,
-              definition: binding.get('definition')?.value ?? '',
-              status: binding.get('status')?.value ?? '',
-              dataset: binding.get('dataset')?.value ?? '',
-              topConcepts: [],
-              source: config.sourceUrl,
-            } as ConceptScheme
-          } catch (err) {
-            // Im not displaying the error to avoid cluttering the logs. It printed out the full RDF query error and HTML of the source
-            console.error(`Error loading scheme ${config.urlRef}`)
-            return null
+          if (!bindings.length) {
+            bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [config.sourceUrl])
           }
-        },
-      )
 
-      const schemes = await runConcurrently(tasks, CONCURRENCY)
-      return schemes.filter((s) => s !== null) as ConceptScheme[]
-    } catch (error) {
-      console.error('Error fetching concept schemes:', error)
-      return []
-    }
-  },
-  {
-    maxAge: 60 * 60, // cache results for 1 hour
-    name: 'conceptschemes',
-    getKey: () => 'all',
-  },
-)
+          if (!bindings.length) {
+            return { id: config.urlRef, uri: '', label: config.urlRef, source: config.sourceUrl, topConcepts: [] }
+          }
+
+          const binding = bindings[0]
+          return {
+            id: config.urlRef,
+            uri: binding.get('scheme')?.value ?? '',
+            label: binding.get('label')?.value ?? config.urlRef,
+            definition: binding.get('definition')?.value ?? '',
+            status: binding.get('status')?.value ?? '',
+            dataset: binding.get('dataset')?.value ?? '',
+            source: config.sourceUrl,
+            topConcepts: [],
+          }
+        } catch {
+          console.error(`Error fetching scheme ${config.urlRef}`)
+          return { id: config.urlRef, uri: '', label: config.urlRef, source: config.sourceUrl, topConcepts: [] }
+        }
+      }),
+    )
+
+    return { total, items }
+  } catch (error) {
+    console.error('Error fetching concept schemes:', error)
+    return { total: 0, items: [] }
+  }
+})

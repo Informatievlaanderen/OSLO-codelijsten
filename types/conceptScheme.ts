@@ -11,7 +11,6 @@ export interface ConceptScheme {
   concepts?: Concept[]
   source: string
 }
-
 export interface ConceptSchemeConfig {
   urlRef: string
   sourceUrl: string
