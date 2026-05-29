@@ -36,6 +36,7 @@ ADD ALL KBO DATA
   },
 
   1.16.1
+
   - Add support for conceptschemes of conceptschemes
     {
     "urlRef": "IT141",
@@ -117,3 +118,6 @@ ADD ALL KBO DATA
 
     1.16.19
     feat: added GRB as layer to the map and map controls
+
+  1.16.20
+  fix: run conceptscheme API in batches for better performance
