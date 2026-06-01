@@ -124,3 +124,6 @@ ADD ALL KBO DATA
 
     1.17.0
     feat: add support for codelists with a large amount of concepts by implementing pagination on the conceptscheme API
+  
+    1.17.1
+    feat: add support for external codelists when navigating to a conceptscheme that's not part of data.vlaanderen.be

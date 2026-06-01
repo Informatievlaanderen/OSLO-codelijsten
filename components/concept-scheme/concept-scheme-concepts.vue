@@ -24,7 +24,7 @@
             <td>{{ concept.label }}</td>
             <td>{{ concept.definition ?? 'Niet beschikbaar' }}</td>
             <td v-if="conceptScheme">
-              <vl-link :href="`/doc/${extractConcept(concept.uri)}`">
+              <vl-link :href="`${extractConcept(concept.uri)}`">
                 Bekijk details
               </vl-link>
             </td>
