@@ -13,6 +13,19 @@ export interface KboStopzetting {
   redenStopzetting?: string
 }
 
+export interface KboDoorhaling {
+  id: string
+  reden: { uri: string, label: string }
+  type: { uri: string, label: string }
+  tijd?: KboPeriode
+  wijzingsdatum?: string
+}
+
+export interface KboPeriode {
+  van: string
+  tot?: string
+}
+
 export interface KboActiviteit {
   uri: string
   label?: string
@@ -72,6 +85,9 @@ export interface KboOrganizationData {
   identificator: KboIdentificator
   oprichting?: KboOprichting
   stopzetting?: KboStopzetting
+  doorhaling?: KboDoorhaling[]
+  jaarrekening?: string
+  personeelsklasse?: string
   rechtsvorm?: KboConcept
   rechtstoestand?: KboConcept
   activiteit?: KboActiviteit
@@ -90,6 +106,7 @@ export interface KBOBranchData {
   identificator: KboIdentificator
   oprichting?: KboOprichting
   stopzetting?: KboStopzetting
+  doorhaling?: KboDoorhaling[]
   rechtsvorm?: KboConcept
   rechtstoestand?: KboConcept
   activiteit?: KboActiviteit

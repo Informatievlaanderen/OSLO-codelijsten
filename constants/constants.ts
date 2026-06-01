@@ -12,6 +12,10 @@ export const JURIDICAL_SITUATION_TTL =
   'https://data.vlaanderen.be/doc/conceptscheme/JuridicalSituation.ttl'
 export const ORGANISATIE_TYPE_TTL =
   'https://data.vlaanderen.be/doc/conceptscheme/TypeOfEnterprise.ttl'
+export const DOORHALINGS_TYPE_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/Doorhalingstype/v1.ttl'
+export const DOORHALINGS_REDEN_TTL =
+  'https://data.vlaanderen.be/doc/conceptscheme/RedenDoorhaling/v1.ttl'
 
 export const CONCEPT_SCHEME_QUERY = `
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>

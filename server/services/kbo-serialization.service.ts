@@ -14,6 +14,8 @@ const dcterms = ns('http://purl.org/dc/terms/')
 const adms = ns('http://www.w3.org/ns/adms#')
 const org = ns('http://www.w3.org/ns/org#')
 const reorg = ns('http://www.w3.org/ns/regorg#')
+const prov = ns('http://www.w3.org/ns/prov#')
+const time = ns('http://www.w3.org/2006/time#')
 const schema = ns('https://schema.org/')
 const locn = ns('http://www.w3.org/ns/locn#')
 const adres = ns('https://data.vlaanderen.be/ns/adres#')
@@ -22,6 +24,7 @@ const xsd = ns('http://www.w3.org/2001/XMLSchema#')
 const geosparql = ns('http://www.opengis.net/ont/geosparql#')
 const opengis = ns('http://www.opengis.net/ont/geosparql#')
 const m8g = ns('http://data.europa.eu/m8g/')
+const onderneming = ns('https://implementatie.data.vlaanderen.be/ns/vkbo/onderneming#')
 
 const TYPE_MAP: Record<string, RDF.NamedNode> = {
   Organisatie: org('Organization'),
@@ -165,6 +168,39 @@ export function kboDataToQuads(
       data.stopzetting.datum,
       xsd('date'),
     )
+  }
+
+  // --- Doorhaling Onderneming & Adres ---
+  if (data.doorhaling?.length) {
+    for (const doorhaling of data.doorhaling) {
+      const doorhalingNode = df.blankNode(doorhaling.id)
+      quads.push(df.quad(subject, prov('wasInvalidatedBy'), doorhalingNode))
+      quads.push(df.quad(doorhalingNode, rdf('type'), onderneming('Doorhaling')))
+      addLiteral(quads, doorhalingNode, dcterms('date'), doorhaling.wijzingsdatum, xsd('date'))
+      addNamedNode(quads, doorhalingNode, dcterms('provenance'), doorhaling.reden.uri)
+      addNamedNode(quads, doorhalingNode, dcterms('type'), doorhaling.type.uri)
+
+      if (doorhaling.tijd) {
+        const periodeNode = df.blankNode(`periode-${doorhaling.id}`)
+        quads.push(df.quad(doorhalingNode, prov('time'), periodeNode))
+        quads.push(df.quad(periodeNode, rdf('type'), time('ProperInterval')))
+        quads.push(df.quad(periodeNode, rdf('type'), time('TemporalEntity')))
+        if (doorhaling.tijd.van) {
+          const vanNode = df.blankNode(`periode-van-${doorhaling.id}`)
+          quads.push(df.quad(periodeNode, time('hasBeginning'), vanNode))
+          quads.push(df.quad(vanNode, rdf('type'), time('Instant')))
+          quads.push(df.quad(vanNode, rdf('type'), time('TemporalEntity')))
+          addLiteral(quads, vanNode, time('inXSDDate'), doorhaling.tijd.van, xsd('date'))
+        }
+        if (doorhaling.tijd.tot) {
+          const totNode = df.blankNode(`periode-tot-${doorhaling.id}`)
+          quads.push(df.quad(periodeNode, time('hasEnd'), totNode))
+          quads.push(df.quad(totNode, rdf('type'), time('Instant')))
+          quads.push(df.quad(totNode, rdf('type'), time('TemporalEntity')))
+          addLiteral(quads, totNode, time('inXSDDate'), doorhaling.tijd.tot, xsd('date'))
+        }
+      }
+    }
   }
 
   // --- Activity (NACE) ---
