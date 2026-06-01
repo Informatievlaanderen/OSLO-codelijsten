@@ -65,11 +65,11 @@
             </tbody>
           </vl-data-table>
 
-          <vl-pager v-if="filteredSchemes.length" mod-align="center">
+          <vl-pager v-if="total" mod-align="center">
             <vl-pager-bounds
               :from="paginationFrom?.toString()"
               :to="paginationTo?.toString()"
-              :total="filteredSchemes?.length?.toString()"
+              :total="total.toString()"
               prefix="van"
             />
             <vl-pager-item
@@ -101,84 +101,58 @@ import { ITEMS_PER_PAGE } from '~/constants/constants'
 
 const paginationIndex = ref(1)
 const searchQuery = ref('')
-const isLoading = ref(true)
+const isLoading = ref(false)
+const total = ref(0)
+const currentPageItems = ref<ConceptScheme[]>([])
 
-// Fetch schemes progressively
-const schemes = ref<ConceptScheme[]>([])
-
-const fetchSchemesProgressively = async () => {
+async function fetchPage() {
+  isLoading.value = true
   try {
-    const response = await $fetch<ConceptScheme[]>('/doc/api/conceptscheme')
-    schemes.value = response ?? []
+    const response = await $fetch<{ total: number; items: ConceptScheme[] }>(
+      '/doc/api/conceptscheme',
+      { query: { page: paginationIndex.value, search: searchQuery.value } },
+    )
+    total.value = response.total ?? 0
+    currentPageItems.value = response.items ?? []
   } catch (err) {
     console.error('Error loading concept schemes:', err)
-    schemes.value = []
+    total.value = 0
+    currentPageItems.value = []
   } finally {
     isLoading.value = false
   }
 }
 
-// Start loading immediately
-onMounted(() => {
-  fetchSchemesProgressively()
-})
-
-// Filter schemes based on search query
-const filteredSchemes = computed(() => {
-  if (!searchQuery.value.trim()) {
-    return schemes.value ?? []
-  }
-
-  const query = searchQuery.value.toLowerCase().trim()
-
-  return (schemes.value ?? []).filter((scheme) => {
-    const labelMatch = scheme.label?.toLowerCase().includes(query)
-    const uriMatch = scheme.uri?.toLowerCase().includes(query)
-    const idMatch = scheme.id?.toLowerCase().includes(query)
-    const definitionMatch = scheme.definition?.toLowerCase().includes(query)
-
-    return labelMatch || uriMatch || idMatch || definitionMatch
-  })
-})
-
-// Reset to first page when search query changes
+// Reset to page 1 when search changes
 watch(searchQuery, () => {
   paginationIndex.value = 1
 })
 
-const pagedDatasets = (): ConceptScheme[] => {
-  return (
-    filteredSchemes.value?.slice(
-      (paginationIndex.value - 1) * ITEMS_PER_PAGE,
-      paginationIndex.value * ITEMS_PER_PAGE,
-    ) ?? []
-  )
-}
+// Fetch from server whenever page or search changes
+watch([paginationIndex, searchQuery], fetchPage, { immediate: true })
+
+const pagedDatasets = (): ConceptScheme[] => currentPageItems.value
 
 const paginationFrom = computed(() => {
-  if (filteredSchemes.value.length === 0) return 0
+  if (total.value === 0) return 0
   return (paginationIndex.value - 1) * ITEMS_PER_PAGE + 1
 })
 
 const paginationTo = computed(() => {
   const to = paginationIndex.value * ITEMS_PER_PAGE
-  return Math.min(to, filteredSchemes.value.length)
+  return Math.min(to, total.value)
 })
 
 const hasNextPage = computed(() => {
-  return paginationIndex.value * ITEMS_PER_PAGE < filteredSchemes.value.length
+  return paginationIndex.value * ITEMS_PER_PAGE < total.value
 })
 
 const setPreviousPage = () => {
-  if (paginationIndex.value > 1) {
-    paginationIndex.value--
-  }
+  if (paginationIndex.value > 1) paginationIndex.value--
 }
 
 const setNextPage = () => {
-  if (hasNextPage.value) {
-    paginationIndex.value++
-  }
+  if (hasNextPage.value) paginationIndex.value++
 }
 
 useSeoHead({

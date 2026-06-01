@@ -1,11 +1,18 @@
-import { CONCEPT_SCHEME_QUERY, CONCEPT_SCHEME_BY_ID_QUERY } from '~/constants/constants'
+import {
+  CONCEPT_SCHEME_QUERY,
+  CONCEPT_SCHEME_BY_ID_QUERY,
+  ITEMS_PER_PAGE,
+} from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import type { ConceptScheme, ConceptSchemeConfig } from '~/types/conceptScheme'
 
-export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
+export default defineEventHandler(async (event) => {
+  const query = getQuery(event)
+  const page = Math.max(1, parseInt((query.page as string) ?? '1', 10))
+  const search = ((query.search as string) ?? '').toLowerCase().trim()
+
   try {
     const runtimeConfig = useRuntimeConfig()
-    // Env variable access during build time
     const DATASET_CONFIG_URL: string =
       process.env.DATASET_CONFIG_URL ?? runtimeConfig.DATASET_CONFIG_URL
     const response = await $fetch<any>(DATASET_CONFIG_URL)
@@ -14,29 +21,35 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
       `[${new Date().toISOString()}] Fetched concept scheme config from:`,
       DATASET_CONFIG_URL,
     )
-    const data = typeof response === 'string' ? JSON.parse(response) : response
+    const data =
+      typeof response === 'string' ? JSON.parse(response) : response
     const configs: ConceptSchemeConfig[] = data.conceptSchemes
 
-    // Fetch all concept schemes
-    const schemes = await Promise.all(
-      configs.map(async (config) => {
-        try {
-          // First try filtered query to find the exact scheme matching the urlRef
-          let bindings = await executeQuery(CONCEPT_SCHEME_BY_ID_QUERY(config.urlRef), [
-            config.sourceUrl,
-          ])
+    const filtered = search
+      ? configs.filter((c) => c.urlRef.toLowerCase().includes(search))
+      : configs
 
-          // Fallback to generic query if filtered returns nothing
+    const total = filtered.length
+    const start = (page - 1) * ITEMS_PER_PAGE
+    const pageConfigs = filtered.slice(start, start + ITEMS_PER_PAGE)
+
+    const items = await Promise.all(
+      pageConfigs.map(async (config): Promise<ConceptScheme> => {
+        try {
+          let bindings = await executeQuery(
+            CONCEPT_SCHEME_BY_ID_QUERY(config.urlRef),
+            [config.sourceUrl],
+          )
+
           if (!bindings.length) {
-            bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [
-              config.sourceUrl,
-            ])
+            bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [config.sourceUrl])
           }
 
-          if (!bindings.length) return null
+          if (!bindings.length) {
+            return { id: config.urlRef, uri: '', label: config.urlRef, source: config.sourceUrl, topConcepts: [] }
+          }
 
           const binding = bindings[0]
-
           return {
             id: config.urlRef,
             uri: binding.get('scheme')?.value ?? '',
@@ -44,20 +57,19 @@ export default defineEventHandler(async (): Promise<ConceptScheme[]> => {
             definition: binding.get('definition')?.value ?? '',
             status: binding.get('status')?.value ?? '',
             dataset: binding.get('dataset')?.value ?? '',
-            topConcepts: [],
             source: config.sourceUrl,
-          } as ConceptScheme
-        } catch (err) {
-          // Im not displaying the error to avoid cluttering the logs. It printed out the full RDF query error and HTML of the source
-          console.error(`Error loading scheme ${config.urlRef}`)
-          return null
+            topConcepts: [],
+          }
+        } catch {
+          console.error(`Error fetching scheme ${config.urlRef}`)
+          return { id: config.urlRef, uri: '', label: config.urlRef, source: config.sourceUrl, topConcepts: [] }
         }
       }),
     )
 
-    return schemes.filter((s) => s !== null) as ConceptScheme[]
+    return { total, items }
   } catch (error) {
     console.error('Error fetching concept schemes:', error)
-    return []
+    return { total: 0, items: [] }
   }
 })
