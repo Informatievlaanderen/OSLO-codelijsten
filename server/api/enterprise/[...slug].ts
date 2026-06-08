@@ -130,7 +130,7 @@ export default defineEventHandler(
       // --- Doorhaling Onderneming & Adres ---
       const doorhaling: KboDoorhaling[] = []
 
-      const redenDoorhalingOnderming = await buildDoorhalingsRedenUri(
+      const redenDoorhalingOnderneming = await buildDoorhalingsRedenUri(
         props.Reden_ambtsh_doorhaling,
       )
       const beginDatumDoorhalingOnderneming = cleanDate(
@@ -146,10 +146,10 @@ export default defineEventHandler(
               tot: eindDatumDoorhalingOnderneming,
             }
           : undefined
-      if (redenDoorhalingOnderming) {
+      if (redenDoorhalingOnderneming) {
         doorhaling.push({
           id: 'doorhaling-0',
-          reden: redenDoorhalingOnderming,
+          reden: redenDoorhalingOnderneming,
           tijd: doorhalingOndernemingTijd,
           type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling onderneming') as unknown as KboConcept,
           wijzingsdatum: cleanDate(props.Wijzdat_ambtsh_doorhaling),
