@@ -184,6 +184,47 @@
                     </span>
                   </td>
                 </tr>
+                <template v-for="doorhaling in data?.doorhaling">
+                  <th>
+                    <vl-title tag-name="h4" mod-h4>Doorhaling</vl-title>
+                  </th>
+                  <tr v-if="doorhaling.type">
+                    <td>
+                      <vl-link :href="data.fieldUris.typeDoorhaling" external>
+                        Type
+                      </vl-link>
+                    </td>
+                    <td>
+                      <vl-link :href="doorhaling.type.uri" external>
+                        {{ doorhaling.type.label ?? doorhaling.type.uri }}
+                      </vl-link>
+                    </td>
+                  </tr>
+                  <tr v-if="doorhaling.reden">
+                    <td>
+                      <vl-link :href="data.fieldUris.redenDoorhaling" external>
+                        Reden
+                      </vl-link>
+                    </td>
+                    <td>
+                      <vl-link :href="doorhaling.reden.uri" external>
+                        {{ doorhaling.reden.label ?? doorhaling.reden.uri }}
+                      </vl-link>
+                    </td>
+                  </tr>
+                  <tr v-if="doorhaling.tijd?.van">
+                    <td>
+                      <vl-link :href="data.fieldUris.doorhalingTijd" external>
+                        Tijd
+                      </vl-link>
+                    </td>
+                    <td>
+                      {{ doorhaling.tijd.van }} -
+                      <template v-if="doorhaling.tijd.tot">{{ doorhaling.tijd.tot }}</template>
+                      <template v-else>heden</template>
+                    </td>
+                  </tr>
+                </template>
               </tbody>
             </vl-data-table>
           </vl-column>

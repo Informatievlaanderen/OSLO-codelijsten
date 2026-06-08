@@ -1,8 +1,11 @@
 import {
+  DOORHALINGS_REDEN_TTL,
+  DOORHALINGS_TYPE_TTL,
   JURIDICAL_FORM_TTL,
   JURIDICAL_SITUATION_TTL,
   ORGANISATIE_TYPE_TTL,
 } from '~/constants/constants'
+import type { KboConcept } from '~/types/KBO'
 
 export function clean(val: string | undefined | null): string | undefined {
   if (!val || !val.trim()) return undefined
@@ -12,6 +15,7 @@ export function clean(val: string | undefined | null): string | undefined {
 export function cleanDate(val: string | undefined | null): string | undefined {
   const c = clean(val)
   if (!c || c.startsWith('1900-01-01')) return undefined
+  if (!c || c.startsWith('9999-12-31')) return undefined
   return new Date(c).toISOString().split('T')[0]
 }
 
@@ -95,7 +99,7 @@ async function getOrganisationTypeMap(): Promise<Map<string, string>> {
 
 export async function buildJuridicalSituationUri(
   label: string | undefined,
-): Promise<{ uri: string; label: string } | undefined> {
+): Promise<KboConcept | undefined> {
   const c = clean(label)
   if (!c) return undefined
   const map = await getJuridicalSituationMap()
@@ -106,7 +110,7 @@ export async function buildJuridicalSituationUri(
 
 export async function buildJuridicalFormUri(
   label: string | undefined,
-): Promise<{ uri: string; label: string } | undefined> {
+): Promise<KboConcept | undefined> {
   const c = clean(label)
   if (!c) return undefined
   const map = await getJuridicalFormMap()
@@ -121,6 +125,72 @@ export async function buildOrganisationTypeUri(
   const c = clean(label)
   if (!c) return undefined
   const map = await getOrganisationTypeMap()
+  const uri = map.get(c.toLowerCase())
+  if (!uri) return undefined
+  return { uri, label: c }
+}
+
+let doorhalingsTypeCache: Map<string, string> | null = null
+
+async function getDoorhalingsTypeMap(): Promise<Map<string, string>> {
+  if (doorhalingsTypeCache) return doorhalingsTypeCache
+
+  const res = await fetch(DOORHALINGS_TYPE_TTL)
+  const ttl = await res.text()
+
+  const map = new Map<string, string>()
+  const conceptRegex =
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/Doorhalingstype\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
+  let match
+  while ((match = conceptRegex.exec(ttl)) !== null) {
+    const uri = match[1]
+    const label = match[2]
+    map.set(label.toLowerCase(), uri)
+  }
+
+  doorhalingsTypeCache = map
+  return map
+}
+
+export async function buildDoorhalingsTypeUri(
+  label: string | undefined,
+): Promise<KboConcept | undefined> {
+  const c = clean(label)
+  if (!c) return undefined
+  const map = await getDoorhalingsTypeMap()
+  const uri = map.get(c.toLowerCase())
+  if (!uri) return undefined
+  return { uri, label: c }
+}
+
+let doorhalingsRedenCache: Map<string, string> | null = null
+
+async function getDoorhalingsRedenMap(): Promise<Map<string, string>> {
+  if (doorhalingsRedenCache) return doorhalingsRedenCache
+
+  const res = await fetch(DOORHALINGS_REDEN_TTL)
+  const ttl = await res.text()
+
+  const map = new Map<string, string>()
+  const conceptRegex =
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/RedenDoorhaling\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
+  let match
+  while ((match = conceptRegex.exec(ttl)) !== null) {
+    const uri = match[1]
+    const label = match[2]
+    map.set(label.toLowerCase(), uri)
+  }
+
+  doorhalingsRedenCache = map
+  return map
+}
+
+export async function buildDoorhalingsRedenUri(
+  label: string | undefined,
+): Promise<KboConcept | undefined> {
+  const c = clean(label)
+  if (!c) return undefined
+  const map = await getDoorhalingsRedenMap()
   const uri = map.get(c.toLowerCase())
   if (!uri) return undefined
   return { uri, label: c }

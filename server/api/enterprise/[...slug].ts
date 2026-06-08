@@ -11,6 +11,9 @@ import type {
   KboActiviteit,
   KboOprichting,
   KboStopzetting,
+  KboDoorhaling,
+  KboPeriode,
+  KboConcept,
 } from '~/types/KBO'
 import {
   clean,
@@ -19,6 +22,8 @@ import {
   buildJuridicalSituationUri,
   buildJuridicalFormUri,
   buildOrganisationTypeUri,
+  buildDoorhalingsTypeUri,
+  buildDoorhalingsRedenUri,
 } from '../utils/kbo-utils'
 import { KBO_FIELD_URIS } from '~/server/utils/kbo-predicate-uris'
 import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
@@ -122,6 +127,55 @@ export default defineEventHandler(
       const rechtstoestandUri =
         await buildJuridicalSituationUri(rechtstoestandCode)
 
+      // --- Doorhaling Onderneming & Adres ---
+      const doorhaling: KboDoorhaling[] = []
+
+      const redenDoorhalingOnderneming = await buildDoorhalingsRedenUri(
+        props.Reden_ambtsh_doorhaling,
+      )
+      const beginDatumDoorhalingOnderneming = cleanDate(
+        props.Begindat_ambtsh_doorhaling,
+      )
+      const eindDatumDoorhalingOnderneming = cleanDate(
+        props.Einddat_ambtsh_doorhaling,
+      )
+      const doorhalingOndernemingTijd: KboPeriode | undefined =
+        beginDatumDoorhalingOnderneming
+          ? {
+              van: beginDatumDoorhalingOnderneming,
+              tot: eindDatumDoorhalingOnderneming,
+            }
+          : undefined
+      if (redenDoorhalingOnderneming) {
+        doorhaling.push({
+          id: 'doorhaling-0',
+          reden: redenDoorhalingOnderneming,
+          tijd: doorhalingOndernemingTijd,
+          type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling onderneming') as unknown as KboConcept,
+          wijzingsdatum: cleanDate(props.Wijzdat_ambtsh_doorhaling),
+        })
+      }
+
+      const redenDoorhalingAdres = await buildDoorhalingsRedenUri(
+        props.Reden_adresdoorhaling,
+      )
+      const beginDatumDoorhalingAdres = cleanDate(props.Datum_adresdoorhaling)
+      const doorhalingAdresTijd: KboPeriode | undefined =
+        beginDatumDoorhalingAdres
+          ? {
+              van: beginDatumDoorhalingAdres,
+            }
+          : undefined
+      if (redenDoorhalingAdres) {
+        doorhaling.push({
+          id: 'doorhaling-1',
+          reden: redenDoorhalingAdres,
+          tijd: doorhalingAdresTijd,
+          type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling adres') as unknown as KboConcept,
+          wijzingsdatum: cleanDate(props.Wijzdat_adresdoorhaling),
+        })
+      }
+
       // --- NACE activity (BTW fallback to RSZ) ---
       const naceCode =
         clean(props.NACE_hoofdact_BTW) ?? clean(props.NACE_hoofdact_RSZ)
@@ -193,6 +247,7 @@ export default defineEventHandler(
         identificator,
         oprichting,
         stopzetting,
+        doorhaling,
         organisatieType,
         rechtsvorm,
         rechtstoestand: rechtstoestandUri,

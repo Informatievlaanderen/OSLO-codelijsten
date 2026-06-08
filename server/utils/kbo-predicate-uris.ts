@@ -11,4 +11,7 @@ export const KBO_FIELD_URIS = {
   oprichting: 'http://purl.org/dc/terms/date',
   stopzetting: 'http://purl.org/dc/terms/date',
   parentOrganisatie: 'http://www.w3.org/ns/org#siteOf',
+  redenDoorhaling: 'http://purl.org/dc/terms/provenance',
+  typeDoorhaling: 'http://purl.org/dc/terms/type',
+  doorhalingTijd: 'http://www.w3.org/ns/prov#time',
 } as const
