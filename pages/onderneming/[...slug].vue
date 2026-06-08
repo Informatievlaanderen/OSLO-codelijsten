@@ -219,7 +219,9 @@
                       </vl-link>
                     </td>
                     <td>
-                      {{ doorhaling.tijd?.van }} <template v-if="doorhaling.tijd?.tot">- {{ doorhaling.tijd?.tot }}</template>
+                      {{ doorhaling.tijd.van }} -
+                      <template v-if="doorhaling.tijd.tot">{{ doorhaling.tijd.tot }}</template>
+                      <template v-else>heden</template>
                     </td>
                   </tr>
                 </template>

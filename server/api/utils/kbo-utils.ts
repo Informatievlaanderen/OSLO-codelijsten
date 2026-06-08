@@ -5,6 +5,7 @@ import {
   JURIDICAL_SITUATION_TTL,
   ORGANISATIE_TYPE_TTL,
 } from '~/constants/constants'
+import type { KboConcept } from '~/types/KBO'
 
 export function clean(val: string | undefined | null): string | undefined {
   if (!val || !val.trim()) return undefined
@@ -14,6 +15,7 @@ export function clean(val: string | undefined | null): string | undefined {
 export function cleanDate(val: string | undefined | null): string | undefined {
   const c = clean(val)
   if (!c || c.startsWith('1900-01-01')) return undefined
+  if (!c || c.startsWith('9999-12-31')) return undefined
   return new Date(c).toISOString().split('T')[0]
 }
 
@@ -97,7 +99,7 @@ async function getOrganisationTypeMap(): Promise<Map<string, string>> {
 
 export async function buildJuridicalSituationUri(
   label: string | undefined,
-): Promise<{ uri: string; label: string } | undefined> {
+): Promise<KboConcept | undefined> {
   const c = clean(label)
   if (!c) return undefined
   const map = await getJuridicalSituationMap()
@@ -108,7 +110,7 @@ export async function buildJuridicalSituationUri(
 
 export async function buildJuridicalFormUri(
   label: string | undefined,
-): Promise<{ uri: string; label: string } | undefined> {
+): Promise<KboConcept | undefined> {
   const c = clean(label)
   if (!c) return undefined
   const map = await getJuridicalFormMap()
@@ -152,7 +154,7 @@ async function getDoorhalingsTypeMap(): Promise<Map<string, string>> {
 
 export async function buildDoorhalingsTypeUri(
   label: string | undefined,
-): Promise<{ uri: string; label: string } | undefined> {
+): Promise<KboConcept | undefined> {
   const c = clean(label)
   if (!c) return undefined
   const map = await getDoorhalingsTypeMap()
@@ -185,7 +187,7 @@ async function getDoorhalingsRedenMap(): Promise<Map<string, string>> {
 
 export async function buildDoorhalingsRedenUri(
   label: string | undefined,
-): Promise<{ uri: string; label: string } | undefined> {
+): Promise<KboConcept | undefined> {
   const c = clean(label)
   if (!c) return undefined
   const map = await getDoorhalingsRedenMap()

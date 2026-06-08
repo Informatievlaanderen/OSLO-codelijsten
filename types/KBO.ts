@@ -15,8 +15,8 @@ export interface KboStopzetting {
 
 export interface KboDoorhaling {
   id: string
-  reden: { uri: string, label: string }
-  type: { uri: string, label: string }
+  reden: KboConcept
+  type: KboConcept
   tijd?: KboPeriode
   wijzingsdatum?: string
 }

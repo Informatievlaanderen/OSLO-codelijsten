@@ -13,6 +13,7 @@ import type {
   KboStopzetting,
   KboDoorhaling,
   KboPeriode,
+  KboConcept,
 } from '~/types/KBO'
 import {
   clean,
@@ -150,7 +151,7 @@ export default defineEventHandler(
           id: 'doorhaling-0',
           reden: redenDoorhalingOnderming,
           tijd: doorhalingOndernemingTijd,
-          type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling onderneming') as unknown as { uri: string, label: string },
+          type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling onderneming') as unknown as KboConcept,
           wijzingsdatum: cleanDate(props.Wijzdat_ambtsh_doorhaling),
         })
       }
@@ -170,7 +171,7 @@ export default defineEventHandler(
           id: 'doorhaling-1',
           reden: redenDoorhalingAdres,
           tijd: doorhalingAdresTijd,
-          type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling adres') as unknown as { uri: string, label: string },
+          type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling adres') as unknown as KboConcept,
           wijzingsdatum: cleanDate(props.Wijzdat_adresdoorhaling),
         })
       }
