@@ -127,3 +127,6 @@ ADD ALL KBO DATA
   
     1.17.1
     feat: add support for external codelists when navigating to a conceptscheme that's not part of data.vlaanderen.be
+
+    1.17.2
+    feat: added doorhaling to the ondernemingen subjectpage
