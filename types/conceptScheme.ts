@@ -7,6 +7,7 @@ export interface ConceptScheme {
   definition?: string
   status?: string
   dataset?: string
+  notation?: string
   topConcepts?: TopConcept[]
   concepts?: Concept[]
   source: string

@@ -130,3 +130,6 @@ ADD ALL KBO DATA
 
     1.17.2
     feat: added doorhaling to the ondernemingen subjectpage
+
+    1.17.3
+    feat: added specific conceptscheme page for wegenenverkeer with specific columns and information relevant for wegenenverkeer

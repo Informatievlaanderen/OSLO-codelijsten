@@ -69,12 +69,14 @@ export const LICENSE_QUERY = `
 
 export const topConceptQuery = (schemeUri: string) => `
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+      PREFIX adms: <https://www.w3.org/ns/adms#>
 
-      SELECT ?concept ?label ?definition ?notation WHERE {
+      SELECT ?concept ?label ?definition ?notation ?status WHERE {
         ?concept skos:topConceptOf <${schemeUri}> .
         OPTIONAL { ?concept skos:prefLabel ?label . }
         OPTIONAL { ?concept skos:definition ?definition . }
         OPTIONAL { ?concept skos:notation ?notation . }
+        OPTIONAL { ?concept adms:status ?status . }
       }
     `
 

@@ -136,6 +136,7 @@ const buildConceptSchemeResponse = async (
     label: b.get('label')?.value ?? '',
     definition: b.get('definition')?.value ?? '',
     notation: b.get('notation')?.value ?? '',
+    status: b.get('status')?.value ?? '',
     source: config.sourceUrl,
   }))
 

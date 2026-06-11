@@ -23,11 +23,26 @@
         </vl-column>
 
         <concept-scheme-info v-if="data" :concept-scheme="data" />
-        <concept-scheme-concepts
-          v-if="data"
-          :concepts="data?.concepts"
-          :conceptScheme="data.id"
-        />
+        <template v-if="data?.concepts?.length">
+          <vl-column width="12">
+            <vl-title tag-name="h2" mod-h3>Top Concepten</vl-title>
+          </vl-column>
+          <p>{{ runtimeConfig.public.CONCEPT_SCHEME_TABLE }}</p>
+          <template v-if="runtimeConfig.public.CONCEPT_SCHEME_TABLE == 'WG'">
+            <concept-scheme-concepts-wg
+              v-if="data"
+              :concepts="data.concepts"
+              :conceptScheme="data.id"
+            />
+          </template>
+          <template v-else>
+            <concept-scheme-concepts
+              v-if="data"
+              :concepts="data.concepts"
+              :conceptScheme="data.id"
+            />
+          </template>
+        </template>
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -36,10 +51,10 @@
 </template>
 
 <script setup lang="ts">
-import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
-
 import type { ConceptScheme } from '~/types/conceptScheme'
+
+const runtimeConfig = useRuntimeConfig()
 
 const route = useRoute()
 const slug = computed(() => {
