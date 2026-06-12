@@ -1,9 +1,11 @@
 import {
   DOORHALINGS_REDEN_TTL,
   DOORHALINGS_TYPE_TTL,
-  JURIDICAL_FORM_TTL,
-  JURIDICAL_SITUATION_TTL,
-  ORGANISATIE_TYPE_TTL,
+  RECHTSVORMTYPE_TTL,
+  RECHTSTOESTANDTYPE_TTL,
+  RECHTSPERSOONLIJKHEIDTYPE_TTL,
+  ORGANISATIESTATUS_TTL,
+  STOPZETTINGTYPE_TTL,
 } from '~/constants/constants'
 import type { KboConcept } from '~/types/KBO'
 
@@ -35,13 +37,13 @@ let juridicalFormCache: Map<string, string> | null = null
 async function getJuridicalFormMap(): Promise<Map<string, string>> {
   if (juridicalFormCache) return juridicalFormCache
 
-  const res = await fetch(JURIDICAL_FORM_TTL)
+  const res = await fetch(RECHTSVORMTYPE_TTL)
   const ttl = await res.text()
 
   const map = new Map<string, string>()
   // Match each concept URI with its prefLabel
   const conceptRegex =
-    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/JuridicalForm\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"@nl/g
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/Rechtsvormtype\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"@nl/g
   let match
   while ((match = conceptRegex.exec(ttl)) !== null) {
     const uri = match[1]
@@ -58,12 +60,12 @@ let juridicalSituationCache: Map<string, string> | null = null
 async function getJuridicalSituationMap(): Promise<Map<string, string>> {
   if (juridicalSituationCache) return juridicalSituationCache
 
-  const res = await fetch(JURIDICAL_SITUATION_TTL)
+  const res = await fetch(RECHTSTOESTANDTYPE_TTL)
   const ttl = await res.text()
 
   const map = new Map<string, string>()
   const conceptRegex =
-    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/JuridicalSituation\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"@nl/g
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/Rechtstoestandtype\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"@nl/g
   let match
   while ((match = conceptRegex.exec(ttl)) !== null) {
     const uri = match[1]
@@ -80,12 +82,12 @@ let organisationTypeCache: Map<string, string> | null = null
 async function getOrganisationTypeMap(): Promise<Map<string, string>> {
   if (organisationTypeCache) return organisationTypeCache
 
-  const res = await fetch(ORGANISATIE_TYPE_TTL)
+  const res = await fetch(RECHTSPERSOONLIJKHEIDTYPE_TTL)
   const ttl = await res.text()
 
   const map = new Map<string, string>()
   const conceptRegex =
-    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/TypeOfEnterprise\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"@nl/g
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/Rechtspersoonlijkheidtype\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"@nl/g
   let match
   while ((match = conceptRegex.exec(ttl)) !== null) {
     const uri = match[1]
@@ -140,7 +142,7 @@ async function getDoorhalingsTypeMap(): Promise<Map<string, string>> {
 
   const map = new Map<string, string>()
   const conceptRegex =
-    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/Doorhalingstype\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/Doorhalingstype\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
   let match
   while ((match = conceptRegex.exec(ttl)) !== null) {
     const uri = match[1]
@@ -173,7 +175,7 @@ async function getDoorhalingsRedenMap(): Promise<Map<string, string>> {
 
   const map = new Map<string, string>()
   const conceptRegex =
-    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/RedenDoorhaling\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/RedenDoorhaling\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
   let match
   while ((match = conceptRegex.exec(ttl)) !== null) {
     const uri = match[1]
@@ -191,6 +193,72 @@ export async function buildDoorhalingsRedenUri(
   const c = clean(label)
   if (!c) return undefined
   const map = await getDoorhalingsRedenMap()
+  const uri = map.get(c.toLowerCase())
+  if (!uri) return undefined
+  return { uri, label: c }
+}
+
+let organisatieStatusCache: Map<string, string> | null = null
+
+async function getOrganisatieStatusMap(): Promise<Map<string, string>> {
+  if (organisatieStatusCache) return organisatieStatusCache
+
+  const res = await fetch(ORGANISATIESTATUS_TTL)
+  const ttl = await res.text()
+
+  const map = new Map<string, string>()
+  const conceptRegex =
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/OrganisatieStatus\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
+  let match
+  while ((match = conceptRegex.exec(ttl)) !== null) {
+    const uri = match[1]
+    const label = match[2]
+    map.set(label.toLowerCase(), uri)
+  }
+
+  organisatieStatusCache = map
+  return map
+}
+
+export async function buildOrganisatieStatusUri(
+  label: string | undefined,
+): Promise<KboConcept | undefined> {
+  const c = clean(label)
+  if (!c) return undefined
+  const map = await getOrganisatieStatusMap()
+  const uri = map.get(c.toLowerCase())
+  if (!uri) return undefined
+  return { uri, label: c }
+}
+
+let stopzettingTypeCache: Map<string, string> | null = null
+
+async function getStopzettingTypeMap(): Promise<Map<string, string>> {
+  if (stopzettingTypeCache) return stopzettingTypeCache
+
+  const res = await fetch(STOPZETTINGTYPE_TTL)
+  const ttl = await res.text()
+
+  const map = new Map<string, string>()
+  const conceptRegex =
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/StopzettingType\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
+  let match
+  while ((match = conceptRegex.exec(ttl)) !== null) {
+    const uri = match[1]
+    const label = match[2]
+    map.set(label.toLowerCase(), uri)
+  }
+
+  organisatieStatusCache = map
+  return map
+}
+
+export async function buildStopzettingTypeUri(
+  label: string | undefined,
+): Promise<KboConcept | undefined> {
+  const c = clean(label)
+  if (!c) return undefined
+  const map = await getStopzettingTypeMap()
   const uri = map.get(c.toLowerCase())
   if (!uri) return undefined
   return { uri, label: c }

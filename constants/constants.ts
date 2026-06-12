@@ -6,16 +6,24 @@ export const BASEPATH = '/standaarden'
 export const CODELIST_ROOT = 'https://data.vlaanderen.be/id/concept/Domein/'
 export const VKBO_BASE =
   'https://geo.api.vlaanderen.be/VKBO/ogc/features/v1/collections/Vkbo/items'
-export const JURIDICAL_FORM_TTL =
-  'https://data.vlaanderen.be/id/conceptscheme/JuridicalForm.ttl'
-export const JURIDICAL_SITUATION_TTL =
-  'https://data.vlaanderen.be/id/conceptscheme/JuridicalSituation.ttl'
 export const ORGANISATIE_TYPE_TTL =
   'https://data.vlaanderen.be/id/conceptscheme/TypeOfEnterprise.ttl'
 export const DOORHALINGS_TYPE_TTL =
   'https://data.vlaanderen.be/id/conceptscheme/Doorhalingstype/v1.ttl'
 export const DOORHALINGS_REDEN_TTL =
   'https://data.vlaanderen.be/id/conceptscheme/RedenDoorhaling/v1.ttl'
+export const RECHTSPERSOONLIJKHEIDTYPE_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/Rechtspersoonlijkheidtype/v1.ttl'
+export const RECHTSTOESTANDTYPE_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/Rechtstoestandtype/v1.ttl'
+export const RECHTSVORMTYPE_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/Rechtsvormtype/v1.ttl'
+export const ORGANISATIESTATUS_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/OrganisatieStatus/v1.ttl'
+export const STOPZETTINGTYPE_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/StopzettingType/v1.ttl'
+export const PERSOONSKLASSE_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/Persoonsklasse/v1.ttl'
 
 export const CONCEPT_SCHEME_QUERY = `
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>

@@ -24,6 +24,8 @@ import {
   buildOrganisationTypeUri,
   buildDoorhalingsTypeUri,
   buildDoorhalingsRedenUri,
+  buildOrganisatieStatusUri,
+  buildStopzettingTypeUri,
 } from '../utils/kbo-utils'
 import { KBO_FIELD_URIS } from '~/server/utils/kbo-predicate-uris'
 import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
@@ -104,7 +106,10 @@ export default defineEventHandler(
       const stopzetting: KboStopzetting | undefined = stopzettingDatum
         ? {
             datum: stopzettingDatum,
-            redenStopzetting: clean(props.Reden_stopzetting),
+            redenStopzetting: {
+              uri: buildStopzettingTypeUri(clean(props.Reden_stopzetting)),
+              label: clean(props.Reden_stopzetting),
+            },
           }
         : undefined
 
@@ -120,6 +125,9 @@ export default defineEventHandler(
       const organisatieType = await buildOrganisationTypeUri(
         props.Type_onderneming,
       )
+
+      // --- Organisatie.status ---
+      const organisatieStatus = await buildOrganisatieStatusUri('AC')
 
       // --- GeregistreerdeOrganisatie fields ---
       const rechtsvorm = await buildJuridicalFormUri(props.Rechtsvorm)
@@ -151,7 +159,9 @@ export default defineEventHandler(
           id: 'doorhaling-0',
           reden: redenDoorhalingOnderneming,
           tijd: doorhalingOndernemingTijd,
-          type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling onderneming') as unknown as KboConcept,
+          type: (await buildDoorhalingsTypeUri(
+            'Ambstbehalve doorhaling onderneming',
+          )) as unknown as KboConcept,
           wijzingsdatum: cleanDate(props.Wijzdat_ambtsh_doorhaling),
         })
       }
@@ -171,7 +181,9 @@ export default defineEventHandler(
           id: 'doorhaling-1',
           reden: redenDoorhalingAdres,
           tijd: doorhalingAdresTijd,
-          type: await buildDoorhalingsTypeUri('Ambstbehalve doorhaling adres') as unknown as KboConcept,
+          type: (await buildDoorhalingsTypeUri(
+            'Ambstbehalve doorhaling adres',
+          )) as unknown as KboConcept,
           wijzingsdatum: cleanDate(props.Wijzdat_adresdoorhaling),
         })
       }
@@ -249,6 +261,7 @@ export default defineEventHandler(
         stopzetting,
         doorhaling,
         organisatieType,
+        organisatieStatus,
         rechtsvorm,
         rechtstoestand: rechtstoestandUri,
         activiteit,
