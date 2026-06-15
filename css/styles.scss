@@ -54,3 +54,22 @@ dd {
   font-size: 3.2rem;
   font-family: "Flanders Art Sans", sans-serif;
 }
+
+.status-pill {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.status-pill--ingebruik {
+  background-color: #d1fae5;
+}
+
+.status-pill--uitgebruik {
+  background-color: #fef3c7;
+}
+
+.status-pill--verwijderd {
+  background-color: #fee2e2;
+}
+

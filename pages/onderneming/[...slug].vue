@@ -5,13 +5,7 @@
   />
 
   <vl-toaster v-if="showToaster" mod-top-right fade-out>
-    <vl-alert
-      mod-small
-      icon="cross"
-      mod-success
-      mod-fade-out
-      title="URI gekopiëerd"
-    />
+    <vl-alert mod-small mod-success icon="check-circle" mod-fade-out title="URI gekopiëerd" />
   </vl-toaster>
 
   <vl-layout>
@@ -220,7 +214,9 @@
                     </td>
                     <td>
                       {{ doorhaling.tijd.van }} -
-                      <template v-if="doorhaling.tijd.tot">{{ doorhaling.tijd.tot }}</template>
+                      <template v-if="doorhaling.tijd.tot">{{
+                        doorhaling.tijd.tot
+                      }}</template>
                       <template v-else>heden</template>
                     </td>
                   </tr>

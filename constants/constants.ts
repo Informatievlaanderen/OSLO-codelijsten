@@ -69,12 +69,14 @@ export const LICENSE_QUERY = `
 
 export const topConceptQuery = (schemeUri: string) => `
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+      PREFIX adms: <https://www.w3.org/ns/adms#>
 
-      SELECT ?concept ?label ?definition ?notation WHERE {
+      SELECT ?concept ?label ?definition ?notation ?status WHERE {
         ?concept skos:topConceptOf <${schemeUri}> .
         OPTIONAL { ?concept skos:prefLabel ?label . }
         OPTIONAL { ?concept skos:definition ?definition . }
         OPTIONAL { ?concept skos:notation ?notation . }
+        OPTIONAL { ?concept adms:status ?status . }
       }
     `
 
@@ -285,6 +287,15 @@ export const LICENSE_BY_ID_QUERY = (licenseId: string) => `
   }
 `
 
+export const statusLabelQuery = (statusUri: string): string => `
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+  SELECT ?label WHERE {
+    <${statusUri}> skos:prefLabel ?label .
+  }
+  LIMIT 1
+`
+
 export const TTL = '.ttl'
 
 export const SUPPORTED_FORMATS: { [key: string]: string } = {
@@ -294,3 +305,9 @@ export const SUPPORTED_FORMATS: { [key: string]: string } = {
 }
 
 export const SUPPORTED_EXTENSIONS = ['.ttl', '.jsonld', '.nt']
+
+export const WG_STATUS_CODELIST: { [key: string]: string } = {
+  ingebruik: 'In gebruik',
+  uitgebruik: 'Uit gebruik',
+  verwijderd: 'Verwijderd',
+}

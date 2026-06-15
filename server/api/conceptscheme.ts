@@ -2,6 +2,7 @@ import {
   CONCEPT_SCHEME_QUERY,
   CONCEPT_SCHEME_BY_ID_QUERY,
   ITEMS_PER_PAGE,
+  statusLabelQuery,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
 import type { ConceptScheme, ConceptSchemeConfig } from '~/types/conceptScheme'
@@ -21,8 +22,7 @@ export default defineEventHandler(async (event) => {
       `[${new Date().toISOString()}] Fetched concept scheme config from:`,
       DATASET_CONFIG_URL,
     )
-    const data =
-      typeof response === 'string' ? JSON.parse(response) : response
+    const data = typeof response === 'string' ? JSON.parse(response) : response
     const configs: ConceptSchemeConfig[] = data.conceptSchemes
 
     const filtered = search
@@ -42,11 +42,19 @@ export default defineEventHandler(async (event) => {
           )
 
           if (!bindings.length) {
-            bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [config.sourceUrl])
+            bindings = await executeQuery(CONCEPT_SCHEME_QUERY, [
+              config.sourceUrl,
+            ])
           }
 
           if (!bindings.length) {
-            return { id: config.urlRef, uri: '', label: config.urlRef, source: config.sourceUrl, topConcepts: [] }
+            return {
+              id: config.urlRef,
+              uri: '',
+              label: config.urlRef,
+              source: config.sourceUrl,
+              topConcepts: [],
+            }
           }
 
           const binding = bindings[0]
@@ -62,7 +70,13 @@ export default defineEventHandler(async (event) => {
           }
         } catch {
           console.error(`Error fetching scheme ${config.urlRef}`)
-          return { id: config.urlRef, uri: '', label: config.urlRef, source: config.sourceUrl, topConcepts: [] }
+          return {
+            id: config.urlRef,
+            uri: '',
+            label: config.urlRef,
+            source: config.sourceUrl,
+            topConcepts: [],
+          }
         }
       }),
     )
@@ -73,3 +87,27 @@ export default defineEventHandler(async (event) => {
     return { total: 0, items: [] }
   }
 })
+
+export const resolveStatusLabel = async (
+  statusUri?: string,
+): Promise<string> => {
+  if (!statusUri) {
+    return ''
+  }
+
+  const statusSource = statusUri.endsWith('.ttl')
+    ? statusUri
+    : `${statusUri}.ttl`
+
+  try {
+    const result = await executeQuery(statusLabelQuery(statusUri), [
+      statusSource,
+    ])
+
+    const label = result[0]?.get('label')?.value ?? ''
+    return label
+  } catch (error) {
+    console.error(`Error resolving status label for: ${statusUri}`, error)
+    return ''
+  }
+}
