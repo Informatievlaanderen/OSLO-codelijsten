@@ -133,3 +133,6 @@ ADD ALL KBO DATA
 
     1.17.3
     feat: added specific conceptscheme page for wegenenverkeer with specific columns and information relevant for wegenenverkeer
+
+    1.17.4
+    feat: Make the `status` of a conceptscheme more visible on the conceptscheme page by adding a badge with the status and fetching the label at realtime

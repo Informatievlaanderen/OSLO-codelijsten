@@ -287,6 +287,15 @@ export const LICENSE_BY_ID_QUERY = (licenseId: string) => `
   }
 `
 
+export const statusLabelQuery = (statusUri: string): string => `
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+  SELECT ?label WHERE {
+    <${statusUri}> skos:prefLabel ?label .
+  }
+  LIMIT 1
+`
+
 export const TTL = '.ttl'
 
 export const SUPPORTED_FORMATS: { [key: string]: string } = {
@@ -296,3 +305,9 @@ export const SUPPORTED_FORMATS: { [key: string]: string } = {
 }
 
 export const SUPPORTED_EXTENSIONS = ['.ttl', '.jsonld', '.nt']
+
+export const WG_STATUS_CODELIST: { [key: string]: string } = {
+  ingebruik: 'In gebruik',
+  uitgebruik: 'Uit gebruik',
+  verwijderd: 'Verwijderd',
+}

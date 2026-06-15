@@ -27,17 +27,14 @@
           <vl-column width="12">
             <vl-title tag-name="h2" mod-h3>Top Concepten</vl-title>
           </vl-column>
-          <p>{{ runtimeConfig.public.CONCEPT_SCHEME_TABLE }}</p>
           <template v-if="runtimeConfig.public.CONCEPT_SCHEME_TABLE == 'WG'">
             <concept-scheme-concepts-wg
-              v-if="data"
               :concepts="data.concepts"
               :conceptScheme="data.id"
             />
           </template>
           <template v-else>
             <concept-scheme-concepts
-              v-if="data"
               :concepts="data.concepts"
               :conceptScheme="data.id"
             />

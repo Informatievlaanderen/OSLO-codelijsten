@@ -1,4 +1,13 @@
 <template>
+  <vl-toaster v-if="showToaster" mod-top-right fade-out>
+    <vl-alert
+      mod-small
+      mod-success
+      mod-fade-out
+      icon="check-circle"
+      title="Notitie gekopiëerd"
+    />
+  </vl-toaster>
   <vl-column width="12">
     <vl-data-table>
       <thead>
@@ -16,16 +25,23 @@
             <vl-link :href="concept.uri" external>
               {{ concept.notation ?? 'Geen notitie beschikbaar' }}
             </vl-link>
+            <vl-link
+              v-if="concept.notation"
+              class="notation-copy"
+              @click="copyToClipboard(concept.notation)"
+            >
+              <vl-icon icon="file-copy" mod-before></vl-icon>
+            </vl-link>
           </td>
 
           <td>{{ concept.label }}</td>
           <td>{{ concept.definition ?? 'Niet beschikbaar' }}</td>
           <td>
             <span
-              v-if="getStatusLabel(concept.status)"
+              v-if="getStatusLabel(concept.status, concept.statusLabel)"
               :class="['status-pill', getStatusClass(concept.status)]"
             >
-              {{ getStatusLabel(concept.status) }}
+              {{ getStatusLabel(concept.status, concept.statusLabel) }}
             </span>
             <span v-else />
           </td>
@@ -51,55 +67,19 @@ interface Props {
 
 defineProps<Props>()
 
-const getStatusLabel = (status?: string): string => {
-  if (!status) {
-    return ''
+const showToaster = ref(false)
+
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    showToaster.value = true
+    setTimeout(() => {
+      showToaster.value = false
+    }, 3000)
+  } catch (err) {
+    console.error('Failed to copy:', err)
   }
-
-  const value = status.trim()
-  if (!value) {
-    return ''
-  }
-
-  const segments = value.split('/')
-  return segments[segments.length - 1]
-}
-
-const getStatusClass = (status?: string): string => {
-  const label = getStatusLabel(status).toLowerCase()
-
-  if (label === 'ingebruik') {
-    return 'status-pill--ingebruik'
-  }
-
-  if (label === 'uitgebruik') {
-    return 'status-pill--uitgebruik'
-  }
-
-  if (label === 'verwijderd') {
-    return 'status-pill--verwijderd'
-  }
-
-  return ''
 }
 </script>
 
-<style scoped>
-.status-pill {
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 0.25rem;
-}
-
-.status-pill--ingebruik {
-  background-color: #d1fae5;
-}
-
-.status-pill--uitgebruik {
-  background-color: #fef3c7;
-}
-
-.status-pill--verwijderd {
-  background-color: #fee2e2;
-}
-</style>
+<style scoped src="./style.scss" />

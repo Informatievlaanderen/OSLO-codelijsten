@@ -5,13 +5,7 @@
   />
 
   <vl-toaster v-if="showToaster" mod-top-right fade-out>
-    <vl-alert
-      mod-small
-      icon="cross"
-      mod-success
-      mod-fade-out
-      title="URI gekopiëerd"
-    />
+    <vl-alert mod-small mod-success mod-fade-out icon="check-circle" title="URI gekopiëerd" />
   </vl-toaster>
 
   <vl-layout>
@@ -58,7 +52,6 @@
 
 <script setup lang="ts">
 import type { Concept } from '~/types/concept'
-import { openSource } from '~/utils/utils'
 import { useSeoHead } from '~/composables/useSEO'
 
 const showToaster = ref(false)
