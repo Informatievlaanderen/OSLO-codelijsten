@@ -8,7 +8,6 @@ RUN echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > /app/.npmrc
 
 ARG ENVIRONMENT
 RUN echo "VITE_ENVIRONMENT=${ENVIRONMENT}}" > /app/.env
-RUN echo "CONCEPT_SCHEME_TABLE=${CONCEPT_SCHEME_TABLE}}" > /app/.env
 
 RUN apk update
 RUN apk add python3 vim make gcc g++ curl

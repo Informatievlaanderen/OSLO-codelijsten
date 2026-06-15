@@ -14,8 +14,8 @@ export default defineNuxtConfig({
     KBO_TTL_URL: import.meta.env.VITE_KBO_TTL_URL,
     // public runtime env variables
     public: {
-      ENVIRONMENT: process.env.ENVIRONMENT || 'Production',
-      CONCEPT_SCHEME_TABLE: process.env.CONCEPT_SCHEME_TABLE,
+      ENVIRONMENT: process.env.NUXT_ENVIRONMENT || 'Production',
+      CONCEPT_SCHEME_TABLE: process.env.NUXT_CONCEPT_SCHEME_TABLE,
     },
   },
   app: {
