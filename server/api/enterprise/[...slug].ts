@@ -110,7 +110,7 @@ export default defineEventHandler(
               uri: buildStopzettingTypeUri(clean(props.Reden_stopzetting)),
               label: clean(props.Reden_stopzetting),
             },
-          }
+          } as unknown as KboStopzetting
         : undefined
 
       // --- Names ---
@@ -127,7 +127,7 @@ export default defineEventHandler(
       )
 
       // --- Organisatie.status ---
-      const organisatieStatus = await buildOrganisatieStatusUri('AC')
+      const organisatieStatus = await buildOrganisatieStatusUri('Actief')
 
       // --- GeregistreerdeOrganisatie fields ---
       const rechtsvorm = await buildJuridicalFormUri(props.Rechtsvorm)
@@ -258,7 +258,9 @@ export default defineEventHandler(
           : undefined,
         identificator,
         oprichting,
-        stopzetting,
+        stopzetting: {
+          datum: stopzetting ?? "fallback"
+        },
         doorhaling,
         organisatieType,
         organisatieStatus,
