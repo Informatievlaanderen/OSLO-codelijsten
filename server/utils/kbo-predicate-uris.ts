@@ -1,4 +1,6 @@
-export const KBO_FIELD_URIS = {
+import type { KboFieldUris } from '~/types/KBO'
+
+export const KBO_FIELD_URIS: KboFieldUris = {
   type: 'http://www.w3.org/ns/regorg#orgType',
   wettelijkeNaam: 'http://www.w3.org/ns/regorg#legalName',
   voorkeursnaam: 'http://www.w3.org/2004/02/skos/core#prefLabel',

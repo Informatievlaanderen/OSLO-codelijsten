@@ -49,6 +49,10 @@ export interface KboFieldUris {
   oprichting: string
   stopzetting: string
   parentOrganisatie: string
+  status: string
+  typeDoorhaling: string
+  redenDoorhaling: string
+  doorhalingTijd: string
 }
 
 export interface KboPlace {
