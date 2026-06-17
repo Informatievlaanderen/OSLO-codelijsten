@@ -258,9 +258,7 @@ export default defineEventHandler(
           : undefined,
         identificator,
         oprichting,
-        stopzetting: {
-          datum: stopzetting ?? "fallback"
-        },
+        stopzetting,
         doorhaling,
         organisatieType,
         organisatieStatus,
