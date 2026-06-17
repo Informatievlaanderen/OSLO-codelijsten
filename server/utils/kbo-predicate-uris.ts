@@ -14,4 +14,5 @@ export const KBO_FIELD_URIS = {
   redenDoorhaling: 'http://purl.org/dc/terms/provenance',
   typeDoorhaling: 'http://purl.org/dc/terms/type',
   doorhalingTijd: 'http://www.w3.org/ns/prov#time',
+  status: 'https://www.w3.org/ns/regorg#orgStatus',
 } as const
