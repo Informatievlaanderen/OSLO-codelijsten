@@ -8,6 +8,7 @@ export interface Concept {
   additionalInfo?: string
   notation?: string
   status?: string
+  statusLabel?: string
   dataset?: string
   inScheme?: ConceptScheme[]
   topConceptOf?: ConceptScheme[]
@@ -18,5 +19,5 @@ export interface Concept {
 
 export type TopConcept = Pick<
   Concept,
-  'id' | 'uri' | 'label' | 'definition' | 'notation' | 'source'
+  'id' | 'uri' | 'label' | 'definition' | 'notation' | 'status' | 'statusLabel' | 'source'
 >

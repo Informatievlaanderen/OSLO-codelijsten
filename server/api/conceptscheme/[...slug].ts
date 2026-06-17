@@ -12,6 +12,7 @@ import type {
   ConceptSchemeConfig,
   DatasetConfig,
 } from '~/types/conceptScheme'
+import { resolveStatusLabel } from '../conceptscheme'
 
 export default defineEventHandler(
   async (event): Promise<ConceptScheme | string | null> => {
@@ -124,27 +125,38 @@ const buildConceptSchemeResponse = async (
 
   const binding = bindings[0]
   const schemeUri = binding.get('scheme')?.value ?? ''
+  const schemeStatus = binding.get('status')?.value ?? ''
+  const schemeStatusLabel = await resolveStatusLabel(schemeStatus)
 
   const topConceptsQuery = topConceptQuery(schemeUri)
   const topConceptBindings = await executeQuery(topConceptsQuery, [
     config.sourceUrl,
   ])
 
-  const topConcepts = topConceptBindings.map((b) => ({
-    id: b.get('concept')?.value.split('/').pop() ?? '',
-    uri: b.get('concept')?.value ?? '',
-    label: b.get('label')?.value ?? '',
-    definition: b.get('definition')?.value ?? '',
-    notation: b.get('notation')?.value ?? '',
-    source: config.sourceUrl,
-  }))
+  const topConcepts = await Promise.all(
+    topConceptBindings.map(async (b) => {
+      const status = b.get('status')?.value ?? ''
+
+      return {
+        id: b.get('concept')?.value.split('/').pop() ?? '',
+        uri: b.get('concept')?.value ?? '',
+        label: b.get('label')?.value ?? '',
+        definition: b.get('definition')?.value ?? '',
+        notation: b.get('notation')?.value ?? '',
+        status,
+        statusLabel: await resolveStatusLabel(status),
+        source: config.sourceUrl,
+      }
+    }),
+  )
 
   return {
     id: config.urlRef,
     uri: schemeUri,
     label: binding.get('label')?.value ?? config.urlRef,
     definition: binding.get('definition')?.value ?? '',
-    status: binding.get('status')?.value ?? '',
+    status: schemeStatus,
+    statusLabel: schemeStatusLabel,
     dataset: binding.get('dataset')?.value ?? '',
     concepts: topConcepts,
     source: config.sourceUrl,

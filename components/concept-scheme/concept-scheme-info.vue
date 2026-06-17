@@ -37,8 +37,27 @@
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
-            <vl-link v-if="conceptScheme?.status">
-              {{ conceptScheme.status }}
+            <vl-link
+              v-if="conceptScheme?.status"
+              :href="conceptScheme.status"
+              external
+            >
+              <span
+                v-if="
+                  getStatusLabel(
+                    conceptScheme.status,
+                    conceptScheme.statusLabel,
+                  )
+                "
+                :class="['status-pill', getStatusClass(conceptScheme.status)]"
+              >
+                {{
+                  getStatusLabel(
+                    conceptScheme.status,
+                    conceptScheme.statusLabel,
+                  )
+                }}
+              </span>
             </vl-link>
             <span v-else>Niet beschikbaar</span>
           </vl-properties-data>

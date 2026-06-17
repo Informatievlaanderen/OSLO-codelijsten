@@ -69,8 +69,13 @@
             </vl-link>
           </vl-properties-label>
           <vl-properties-data>
-            <vl-link v-if="concept?.status">
-              {{ concept.status }}
+            <vl-link v-if="concept?.status" :href="concept.status" external>
+              <span
+                v-if="getStatusLabel(concept.status, concept.statusLabel)"
+                :class="['status-pill', getStatusClass(concept.status)]"
+              >
+                {{ getStatusLabel(concept.status, concept.statusLabel) }}
+              </span>
             </vl-link>
             <span v-else>Niet beschikbaar</span>
           </vl-properties-data>
