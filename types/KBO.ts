@@ -10,7 +10,7 @@ export interface KboOprichting {
 
 export interface KboStopzetting {
   datum: string
-  redenStopzetting?: string
+  redenStopzetting?: KboConcept
 }
 
 export interface KboDoorhaling {
@@ -79,6 +79,7 @@ export interface KboOrganizationData {
   types: string[]
   fieldUris: KboFieldUris
   organisatieType?: KboConcept
+  organisatieStatus?: KboConcept
   wettelijkeNaam?: string
   voorkeursnaam?: string
   alternatieveNaam?: string[]

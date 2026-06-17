@@ -46,6 +46,16 @@
                   }}</vl-link>
                 </td>
               </tr>
+              <tr v-if="data?.organisatieStatus">
+                <td>
+                  <vl-link :href="data.fieldUris.status" external> Status </vl-link>
+                </td>
+                <td>
+                  <vl-link :href="data.organisatieStatus.uri">{{
+                    data.organisatieStatus.label
+                  }}</vl-link>
+                </td>
+              </tr>
               <tr v-if="data?.wettelijkeNaam">
                 <td>
                   <vl-link :href="data.fieldUris.wettelijkeNaam" external>
