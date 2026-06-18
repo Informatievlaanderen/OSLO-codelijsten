@@ -25,7 +25,7 @@
 <script setup lang="ts" name="contentHeader">
 import type { Header } from '~/types/header'
 const HEADER_URLS: Record<string, Record<string, string>> = {
-  Test: {
+  Development: {
     DEFAULT:
       'https://tni.widgets.burgerprofiel.dev-vlaanderen.be/api/v1/widget/c0df3610-36b9-4113-a487-05dfed92c317/embed',
     WG: 'https://widgets.tni-vlaanderen.be/api/v1/widget/f13dfcd7-430e-41ea-b77f-bddf4b6ca0b8/embed',
@@ -38,12 +38,12 @@ const HEADER_URLS: Record<string, Record<string, string>> = {
 }
 
 const getHeaderUrl = (environment?: string, table?: string) => {
-  const env = environment || 'Test'
+  const env = environment || 'Development'
   const scheme = (table || 'DEFAULT').toUpperCase()
   return (
     HEADER_URLS[env]?.[scheme] ||
     HEADER_URLS[env]?.DEFAULT ||
-    HEADER_URLS.Test.DEFAULT
+    HEADER_URLS.Development.DEFAULT
   )
 }
 

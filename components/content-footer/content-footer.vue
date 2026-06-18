@@ -4,7 +4,7 @@
 
 <script setup lang="ts" name="contentFooter">
 const FOOTER_URLS: Record<string, Record<string, string>> = {
-  Test: {
+  Development: {
     DEFAULT:
       'https://tni.widgets.burgerprofiel.dev-vlaanderen.be/api/v1/widget/c0df3610-36b9-4113-a487-05dfed92c317/embed',
     WG: 'https://widgets.tni-vlaanderen.be/api/v1/widget/9b51d2dc-844e-4962-a214-1fb8691c0375/embed',
@@ -17,17 +17,17 @@ const FOOTER_URLS: Record<string, Record<string, string>> = {
 }
 
 const getFooterUrl = (environment?: string, table?: string) => {
-  const env = environment || 'Test'
+  const env = environment || 'Development'
   const scheme = (table || 'DEFAULT').toUpperCase()
   return (
     FOOTER_URLS[env]?.[scheme] ||
     FOOTER_URLS[env]?.DEFAULT ||
-    FOOTER_URLS.Test.DEFAULT
+    FOOTER_URLS.Development.DEFAULT
   )
 }
 
+const runtimeConfig = useRuntimeConfig()
 onMounted(() => {
-  const runtimeConfig = useRuntimeConfig()
   const footerScript = document.createElement('script')
   footerScript.src = getFooterUrl(
     runtimeConfig.public.ENVIRONMENT,
