@@ -26,3 +26,18 @@ export const extractConcept = (uri: string): string => {
     return ''
   }
 }
+
+export const compareText = (a?: string, b?: string) => {
+  const left = a?.trim()
+  const right = b?.trim()
+
+  // Put empty values at the end
+  if (!left && !right) return 0
+  if (!left) return 1
+  if (!right) return -1
+
+  return left.localeCompare(right, 'nl-BE', {
+    sensitivity: 'base',
+    numeric: true,
+  })
+}

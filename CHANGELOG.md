@@ -139,3 +139,6 @@ ADD ALL KBO DATA
 
     1.17.5
     feat: added status to the onderneming and type fixing for KboFieldUris
+
+    1.17.6
+    feat: Sort WG data based on status and notation

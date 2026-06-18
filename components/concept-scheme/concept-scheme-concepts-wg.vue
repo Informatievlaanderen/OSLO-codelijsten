@@ -20,7 +20,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="concept in concepts" :key="concept.id">
+        <tr v-for="concept in sortedConcepts" :key="concept.id">
           <td>
             <vl-link :href="concept.uri" external>
               {{ concept.notation ?? 'Geen notitie beschikbaar' }}
@@ -65,7 +65,15 @@ interface Props {
   conceptScheme?: string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const sortedConcepts = computed(() => {
+  return [...(props.concepts ?? [])].sort((a, b) => {
+    const byStatus = compareText(a.status, b.status)
+    if (byStatus !== 0) return byStatus
+    return compareText(a.notation, b.notation)
+  })
+})
 
 const showToaster = ref(false)
 
