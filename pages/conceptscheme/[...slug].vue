@@ -27,7 +27,7 @@
           <vl-column width="12">
             <vl-title tag-name="h2" mod-h3>Top Concepten</vl-title>
           </vl-column>
-          <template v-if="runtimeConfig.public.CONCEPT_SCHEME_TABLE == 'WG'">
+          <template v-if="runtimeConfig.public.DEPARTMENT == 'WG'">
             <concept-scheme-concepts-wg
               :concepts="data.concepts"
               :conceptScheme="data.id"

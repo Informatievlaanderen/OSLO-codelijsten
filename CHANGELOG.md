@@ -142,3 +142,7 @@ ADD ALL KBO DATA
 
     1.17.6
     feat: Sort WG data based on status and notation
+
+    1.17.7
+    fix: changed CONCEPT_SCHEME_TABLE to DEPARTMENT to be broader
+    fix: Added logic for different footers/headers based on the DEPARTMENT env variable

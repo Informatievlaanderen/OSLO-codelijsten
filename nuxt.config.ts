@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     // public runtime env variables
     public: {
       ENVIRONMENT: process.env.NUXT_ENVIRONMENT || 'Production',
-      CONCEPT_SCHEME_TABLE: process.env.NUXT_CONCEPT_SCHEME_TABLE,
+      DEPARTMENT: process.env.NUXT_DEPARTMENT,
     },
   },
   app: {

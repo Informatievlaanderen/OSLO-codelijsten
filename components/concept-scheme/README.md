@@ -19,4 +19,4 @@ There is a specific variant for wegenenverkeer, which is used in the concept sch
 ## Possible variations
 
 - `concept-scheme-concepts` - The default variant, used in the concept scheme overview page.
-- `concept-scheme-concepts-wg` - The variant for wegenenverkeer, used in the concept scheme overview page for wegenenverkeer. Triggered by the `CONCEPT_SCHEME_TABLE` env variable set to "WG".
+- `concept-scheme-concepts-wg` - The variant for wegenenverkeer, used in the concept scheme overview page for wegenenverkeer. Triggered by the `DEPARTMENT` env variable set to "WG".

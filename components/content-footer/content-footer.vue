@@ -31,7 +31,7 @@ onMounted(() => {
   const footerScript = document.createElement('script')
   footerScript.src = getFooterUrl(
     runtimeConfig.public.ENVIRONMENT,
-    runtimeConfig.public.CONCEPT_SCHEME_TABLE,
+    runtimeConfig.public.DEPARTMENT,
   )
   document.getElementById('footer-container')?.appendChild(footerScript)
 })

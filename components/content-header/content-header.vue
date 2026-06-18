@@ -52,7 +52,7 @@ onMounted(() => {
   const headerScript = document.createElement('script')
   headerScript.src = getHeaderUrl(
     runtimeConfig.public.ENVIRONMENT,
-    runtimeConfig.public.CONCEPT_SCHEME_TABLE,
+    runtimeConfig.public.DEPARTMENT,
   )
   document.getElementById('header-container')?.appendChild(headerScript)
 })
