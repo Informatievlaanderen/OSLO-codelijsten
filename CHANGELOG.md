@@ -146,3 +146,6 @@ ADD ALL KBO DATA
     1.17.7
     fix: changed CONCEPT_SCHEME_TABLE to DEPARTMENT to be broader
     fix: Added logic for different footers/headers based on the DEPARTMENT env variable
+
+    1.18.0
+    feat: added landingpage explaining the PURI of /vestiging and /ondeneming
