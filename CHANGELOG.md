@@ -149,3 +149,6 @@ ADD ALL KBO DATA
 
     1.18.0
     feat: added landingpage explaining the PURI of /vestiging and /ondeneming
+
+    1.18.1
+    fix: Fix for content-footer in content-header
