@@ -5,6 +5,8 @@ import {
   RECHTSTOESTANDTYPE_TTL,
   RECHTSPERSOONLIJKHEIDTYPE_TTL,
   ORGANISATIESTATUS_TTL,
+  PERSONEELSKLASSE_TTL,
+  RAPPORTTYPE_TTL,
   STOPZETTINGTYPE_TTL,
 } from '~/constants/constants'
 import type { KboConcept } from '~/types/KBO'
@@ -231,6 +233,72 @@ export async function buildOrganisatieStatusUri(
   return { uri, label: c }
 }
 
+let personeelsklasseCache: Map<string, string> | null = null
+
+async function getPersoneelsklasseMap(): Promise<Map<string, string>> {
+  if (personeelsklasseCache) return personeelsklasseCache
+
+  const res = await fetch(PERSONEELSKLASSE_TTL)
+  const ttl = await res.text()
+
+  const map = new Map<string, string>()
+  const conceptRegex =
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/RSZ-Personeelsklasse\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
+  let match
+  while ((match = conceptRegex.exec(ttl)) !== null) {
+    const uri = match[1]
+    const label = match[2]
+    map.set(label.toLowerCase(), uri)
+  }
+
+  personeelsklasseCache = map
+  return map
+}
+
+export async function buildPersoneelsklasseUri(
+  label: string | undefined,
+): Promise<KboConcept | undefined> {
+  const c = clean(label)
+  if (!c) return undefined
+  const map = await getPersoneelsklasseMap()
+  const uri = map.get(c.toLowerCase())
+  if (!uri) return undefined
+  return { uri, label: c }
+}
+
+let rapportTypeCache: Map<string, string> | null = null
+
+async function getRapportTypeMap(): Promise<Map<string, string>> {
+  if (rapportTypeCache) return rapportTypeCache
+
+  const res = await fetch(RAPPORTTYPE_TTL)
+  const ttl = await res.text()
+
+  const map = new Map<string, string>()
+  const conceptRegex =
+    /<(https:\/\/data\.vlaanderen\.be\/id\/concept\/RapportType\/v1\/[^>]+)>[^]*?skos:prefLabel\s+"([^"]+)"/g
+  let match
+  while ((match = conceptRegex.exec(ttl)) !== null) {
+    const uri = match[1]
+    const label = match[2]
+    map.set(label.toLowerCase(), uri)
+  }
+
+  rapportTypeCache = map
+  return map
+}
+
+export async function buildRapportTypeUri(
+  label: string | undefined,
+): Promise<KboConcept | undefined> {
+  const c = clean(label)
+  if (!c) return undefined
+  const map = await getRapportTypeMap()
+  const uri = map.get(c.toLowerCase())
+  if (!uri) return undefined
+  return { uri, label: c }
+}
+
 let stopzettingTypeCache: Map<string, string> | null = null
 
 async function getStopzettingTypeMap(): Promise<Map<string, string>> {
@@ -249,7 +317,7 @@ async function getStopzettingTypeMap(): Promise<Map<string, string>> {
     map.set(label.toLowerCase(), uri)
   }
 
-  organisatieStatusCache = map
+  stopzettingTypeCache = map
   return map
 }
 

@@ -53,6 +53,7 @@ export interface KboFieldUris {
   typeDoorhaling: string
   redenDoorhaling: string
   doorhalingTijd: string
+  omvang: string
 }
 
 export interface KboPlace {
@@ -91,8 +92,9 @@ export interface KboOrganizationData {
   oprichting?: KboOprichting
   stopzetting?: KboStopzetting
   doorhaling?: KboDoorhaling[]
-  jaarrekening?: string
-  personeelsklasse?: string
+  rapportReferentie?: string
+  rapportType?: KboConcept
+  personeelsklasse?: KboConcept
   rechtsvorm?: KboConcept
   rechtstoestand?: KboConcept
   activiteit?: KboActiviteit

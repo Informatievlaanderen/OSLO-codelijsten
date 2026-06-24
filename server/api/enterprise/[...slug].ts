@@ -26,6 +26,8 @@ import {
   buildDoorhalingsRedenUri,
   buildOrganisatieStatusUri,
   buildStopzettingTypeUri,
+  buildRapportTypeUri,
+  buildPersoneelsklasseUri,
 } from '../utils/kbo-utils'
 import { KBO_FIELD_URIS } from '~/server/utils/kbo-predicate-uris'
 import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
@@ -104,13 +106,13 @@ export default defineEventHandler(
       // --- Stopzetting (Veranderingsgebeurtenis, remove 1900 placeholder) ---
       const stopzettingDatum = cleanDate(props.Datum_stopzetting)
       const stopzetting: KboStopzetting | undefined = stopzettingDatum
-        ? {
+        ? ({
             datum: stopzettingDatum,
             redenStopzetting: {
               uri: buildStopzettingTypeUri(clean(props.Reden_stopzetting)),
               label: clean(props.Reden_stopzetting),
             },
-          } as unknown as KboStopzetting
+          } as unknown as KboStopzetting)
         : undefined
 
       // --- Names ---
@@ -241,6 +243,34 @@ export default defineEventHandler(
         })
       }
 
+      // Personeelsklasse
+      let personeelsklasse = undefined
+      if (props.Personeelsklasse.includes('1 tot 4')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 1')
+      } else if (props.Personeelsklasse.includes('5 tot 9')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 2')
+      } else if (props.Personeelsklasse.includes('10 tot 19')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 3')
+      } else if (props.Personeelsklasse.includes('20 tot 49')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 4')
+      } else if (props.Personeelsklasse.includes('50 tot 99')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 5')
+      } else if (props.Personeelsklasse.includes('100 tot 199')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 6')
+      } else if (props.Personeelsklasse.includes('200 tot 499')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 7')
+      } else if (props.Personeelsklasse.includes('500 tot 999')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 8')
+      } else if (props.Personeelsklasse.includes('1000 en meer')) {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 9')
+      } else {
+        personeelsklasse = await buildPersoneelsklasseUri('RSZ Personeelsklasse 0')
+      }
+
+      // Jaarrekening
+      const rapportReferentie = props.JAARREK_URL_NBB
+      const rapportType = await buildRapportTypeUri('Jaarrekening')
+
       // --- Organisatie ---
       const enterprise: KboOrganizationData = {
         id: cleanSlug,
@@ -267,6 +297,9 @@ export default defineEventHandler(
         activiteit,
         contactPoints: contactPoints.length ? contactPoints : undefined,
         source: vkboUrl,
+        personeelsklasse,
+        rapportReferentie,
+        rapportType,
       }
 
       if (requestedFormat) {
