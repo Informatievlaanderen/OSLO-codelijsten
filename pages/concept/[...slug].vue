@@ -20,12 +20,11 @@
               @click="copyToClipboard(data?.uri ?? fullUri)"
               class="uri-link"
             >
-              <vl-icon
-                icon="file-copy"
-                mod-before
-                @click="copyToClipboard(data?.uri ?? fullUri)"
-              ></vl-icon>
-              {{ data?.uri ?? fullUri }}
+            {{ data?.uri ?? fullUri }}
+            <vl-icon
+              icon="file-copy"
+              @click="copyToClipboard(data?.uri ?? fullUri)"
+            ></vl-icon>
             </vl-link>
           </div>
         </vl-column>

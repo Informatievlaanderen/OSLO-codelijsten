@@ -28,8 +28,8 @@
               }}
             </vl-title>
             <vl-link @click="copyToClipboard(data?.uri ?? '')" class="uri-link">
-              <vl-icon icon="file-copy" mod-before></vl-icon>
               {{ data?.uri ?? '' }}
+              <vl-icon icon="file-copy"></vl-icon>
             </vl-link>
           </div>
         </vl-column>
