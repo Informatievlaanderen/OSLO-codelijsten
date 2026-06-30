@@ -5,7 +5,13 @@
   />
 
   <vl-toaster v-if="showToaster" mod-top-right fade-out>
-    <vl-alert mod-small mod-success icon="check-circle" mod-fade-out title="URI gekopiëerd" />
+    <vl-alert
+      mod-small
+      mod-success
+      icon="check-circle"
+      mod-fade-out
+      title="URI gekopiëerd"
+    />
   </vl-toaster>
 
   <vl-layout>
@@ -48,7 +54,9 @@
               </tr>
               <tr v-if="data?.organisatieStatus">
                 <td>
-                  <vl-link :href="data.fieldUris.status" external> Status </vl-link>
+                  <vl-link :href="data.fieldUris.status" external>
+                    Status
+                  </vl-link>
                 </td>
                 <td>
                   <vl-link :href="data.organisatieStatus.uri">{{
@@ -128,7 +136,9 @@
                 </td>
                 <td>
                   <vl-link :href="data.personeelsklasse.uri" external>
-                    {{ data.personeelsklasse.label ?? data.personeelsklasse.uri }}
+                    {{
+                      data.personeelsklasse.label ?? data.personeelsklasse.uri
+                    }}
                   </vl-link>
                 </td>
               </tr>
@@ -179,16 +189,14 @@
                       Type
                     </vl-link>
                   </td>
-                  <td>
+                  <td v-if="data?.rapportType">
                     <vl-link :href="data.rapportType.uri" external>
                       {{ data.rapportType.label ?? data.rapportType.uri }}
                     </vl-link>
                   </td>
                 </tr>
                 <tr>
-                  <td>
-                    @id
-                  </td>
+                  <td>@id</td>
                   <td>
                     <vl-link :href="data.rapportReferentie" external>
                       {{ data.rapportReferentie }}
@@ -241,53 +249,58 @@
         </template>
 
         <!-- Activiteiten -->
-        <template v-for="doorhaling in data?.doorhaling">
+        <template
+          v-if="data?.doorhaling"
+          v-for="doorhaling in data?.doorhaling"
+        >
           <vl-column width="12">
             <vl-title tag-name="h2" mod-h3>Activiteiten</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
-              <th>
-                <vl-title tag-name="h4" mod-h4>Doorhaling</vl-title>
-              </th>
-              <tr v-if="doorhaling.type">
-                <td>
-                  <vl-link :href="data.fieldUris.typeDoorhaling" external>
-                    Type
-                  </vl-link>
-                </td>
-                <td>
-                  <vl-link :href="doorhaling.type.uri" external>
-                    {{ doorhaling.type.label ?? doorhaling.type.uri }}
-                  </vl-link>
-                </td>
-              </tr>
-              <tr v-if="doorhaling.reden">
-                <td>
-                  <vl-link :href="data.fieldUris.redenDoorhaling" external>
-                    Reden
-                  </vl-link>
-                </td>
-                <td>
-                  <vl-link :href="doorhaling.reden.uri" external>
-                    {{ doorhaling.reden.label ?? doorhaling.reden.uri }}
-                  </vl-link>
-                </td>
-              </tr>
-              <tr v-if="doorhaling.tijd?.van">
-                <td>
-                  <vl-link :href="data.fieldUris.doorhalingTijd" external>
-                    Tijd
-                  </vl-link>
-                </td>
-                <td>
-                  {{ doorhaling.tijd.van }} -
-                  <template v-if="doorhaling.tijd.tot">{{
-                    doorhaling.tijd.tot
-                  }}</template>
-                  <template v-else>heden</template>
-                </td>
-              </tr>
+              <tbody>
+                <th>
+                  <vl-title tag-name="h4" mod-h4>Doorhaling</vl-title>
+                </th>
+                <tr v-if="doorhaling.type">
+                  <td>
+                    <vl-link :href="data.fieldUris.typeDoorhaling" external>
+                      Type
+                    </vl-link>
+                  </td>
+                  <td>
+                    <vl-link :href="doorhaling.type.uri" external>
+                      {{ doorhaling.type.label ?? doorhaling.type.uri }}
+                    </vl-link>
+                  </td>
+                </tr>
+                <tr v-if="doorhaling.reden">
+                  <td>
+                    <vl-link :href="data.fieldUris.redenDoorhaling" external>
+                      Reden
+                    </vl-link>
+                  </td>
+                  <td>
+                    <vl-link :href="doorhaling.reden.uri" external>
+                      {{ doorhaling.reden.label ?? doorhaling.reden.uri }}
+                    </vl-link>
+                  </td>
+                </tr>
+                <tr v-if="doorhaling.tijd?.van">
+                  <td>
+                    <vl-link :href="data.fieldUris.doorhalingTijd" external>
+                      Tijd
+                    </vl-link>
+                  </td>
+                  <td>
+                    {{ doorhaling.tijd.van }} -
+                    <template v-if="doorhaling.tijd.tot">{{
+                      doorhaling.tijd.tot
+                    }}</template>
+                    <template v-else>heden</template>
+                  </td>
+                </tr>
+              </tbody>
             </vl-data-table>
           </vl-column>
         </template>
