@@ -99,6 +99,7 @@ export interface KboOrganizationData {
   rechtstoestand?: KboConcept
   activiteit?: KboActiviteit
   contactPoints?: KboContactPoint[]
+  parentOrganisatie?: never
   source: string
 }
 
@@ -120,4 +121,8 @@ export interface KBOBranchData {
   contactPoints?: KboContactPoint[]
   parentOrganisatie?: string
   source: string
+  personeelsklasse?: never
+  organisatieType?: never
+  rapportReferentie?: never
+  rapportType?: never
 }
