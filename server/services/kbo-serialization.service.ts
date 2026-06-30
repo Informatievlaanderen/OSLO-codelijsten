@@ -136,11 +136,16 @@ export function kboDataToQuads(
 
   // --- Jaarrekening organisatie ---
   if ('rapportReferentie' in data && 'rapportType' in data) {
-    const rapportNode = df.blankNode(`report-jaarrekening`)
+    const rapportNode = data.rapportReferentie
+      ? df.namedNode(data.rapportReferentie)
+      : df.blankNode('jaarrekening')
     quads.push(df.quad(subject, dcterms('isReferencedBy'), rapportNode))
-    addNamedNode(quads, subject, dcterms('type'), data.rapportType?.uri)
+    addNamedNode(quads, rapportNode, dcterms('type'), data.rapportType?.uri)
     quads.push(
       df.quad(rapportNode, finreport('FinancieelRapport.gaatOver'), subject),
+    )
+    quads.push(
+      df.quad(rapportNode, rdf('type'), finreport('FinancieelRapport'))
     )
   }
 
