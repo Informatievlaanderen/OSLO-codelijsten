@@ -130,8 +130,15 @@ export function kboDataToQuads(
   )
 
   // --- Personeelsklasse organisatie ---
-  if ('personeelsklasse' in data) {
+  if ('personeelsklasse' in data && data.personeelsklasse) {
     addNamedNode(quads, subject, dcterms('extent'), data.personeelsklasse?.uri)
+    quads.push(
+      df.quad(
+        df.namedNode(data.personeelsklasse?.uri),
+        rdf('type'),
+        xsd('anyType'),
+      ),
+    )
   }
 
   // --- Jaarrekening organisatie ---
@@ -145,7 +152,7 @@ export function kboDataToQuads(
       df.quad(rapportNode, finreport('FinancieelRapport.gaatOver'), subject),
     )
     quads.push(
-      df.quad(rapportNode, rdf('type'), finreport('FinancieelRapport'))
+      df.quad(rapportNode, rdf('type'), finreport('FinancieelRapport')),
     )
   }
 
