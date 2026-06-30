@@ -17,7 +17,7 @@
             <vl-title mod-no-space-bottom tag-name="h1">
               {{ data?.name ?? slug }}
             </vl-title>
-            <vl-link @click="copyToClipboard(data?.uri ?? '')" class="uri-link">
+            <vl-link @click="copyToClipboard(data?.uri ?? '')">
               <vl-icon icon="file-copy" mod-before></vl-icon>
               {{ data?.uri ?? '' }}
             </vl-link>

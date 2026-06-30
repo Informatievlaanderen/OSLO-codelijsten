@@ -161,3 +161,6 @@ ADD ALL KBO DATA
     fix: UI improvements to onderneming page
     feat: added copy-to-clipboard button near financieel rapport
     fix: better typing for onderneming
+
+    1.18.4
+    feat: made the uri still link to the external page of financieel rapport, only the copy-to-clipboard button copies the uri to the clipboard

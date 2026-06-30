@@ -27,7 +27,7 @@
                   : `Onderneming: ${slug}`
               }}
             </vl-title>
-            <vl-link @click="copyToClipboard(data?.uri ?? '')" class="uri-link">
+            <vl-link @click="copyToClipboard(data?.uri ?? '')">
               {{ data?.uri ?? '' }}
               <vl-icon icon="file-copy"></vl-icon>
             </vl-link>
@@ -182,13 +182,16 @@
               <vl-title tag-name="h2" mod-no-space-bottom
                 >Financieel Rapport</vl-title
               >
-              <vl-link
-                @click="copyToClipboard(data.rapportReferentie)"
-                class="uri-link"
-              >
-                {{ data.rapportReferentie }}
-                <vl-icon icon="file-copy"></vl-icon>
-              </vl-link>
+              <div class="uri-copy">
+                <vl-link :href="data.rapportReferentie">
+                  {{ data.rapportReferentie }}
+                </vl-link>
+                <vl-icon
+                  class="uri-copy"
+                  @click="copyToClipboard(data.rapportReferentie)"
+                  icon="file-copy"
+                ></vl-icon>
+              </div>
             </div>
           </vl-column>
           <vl-column width="12">
@@ -262,9 +265,11 @@
           <vl-column width="12">
             <vl-data-table>
               <tbody>
-                <th>
-                  <vl-title tag-name="h4" mod-h4>Doorhaling</vl-title>
-                </th>
+                <tr>
+                  <th>
+                    <vl-title tag-name="h4" mod-h4>Doorhaling</vl-title>
+                  </th>
+                </tr>
                 <tr v-if="doorhaling.type">
                   <td>
                     <vl-link :href="data.fieldUris.typeDoorhaling" external>

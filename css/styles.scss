@@ -73,3 +73,14 @@ dd {
   background-color: #fee2e2;
 }
 
+.uri-copy {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  > span {
+    color: #05c;
+    cursor: pointer
+  }
+}
+

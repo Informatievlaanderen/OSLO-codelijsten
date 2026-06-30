@@ -22,7 +22,7 @@
                   : `Vestiging: ${slug}`
               }}
             </vl-title>
-            <vl-link @click="copyToClipboard(data?.uri ?? '')" class="uri-link">
+            <vl-link @click="copyToClipboard(data?.uri ?? '')">
               {{ data?.uri ?? '' }}
               <vl-icon icon="file-copy"></vl-icon>
             </vl-link>

@@ -18,7 +18,6 @@
             </vl-title>
             <vl-link
               @click="copyToClipboard(data?.uri ?? fullUri)"
-              class="uri-link"
             >
             {{ data?.uri ?? fullUri }}
             <vl-icon
