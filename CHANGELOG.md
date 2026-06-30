@@ -156,3 +156,8 @@ ADD ALL KBO DATA
     1.18.2
     feat: added jaarrekening to the onderneming page
     fix: UI improvements to the doorhaling section of an onderneming
+    
+    1.18.3
+    fix: UI improvements to onderneming page
+    feat: added copy-to-clipboard button near financieel rapport
+    fix: better typing for onderneming
