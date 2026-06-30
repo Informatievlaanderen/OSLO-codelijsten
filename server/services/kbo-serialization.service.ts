@@ -24,7 +24,11 @@ const xsd = ns('http://www.w3.org/2001/XMLSchema#')
 const geosparql = ns('http://www.opengis.net/ont/geosparql#')
 const opengis = ns('http://www.opengis.net/ont/geosparql#')
 const m8g = ns('http://data.europa.eu/m8g/')
-const onderneming = ns('https://implementatie.data.vlaanderen.be/ns/vkbo/onderneming#')
+const onderneming = ns(
+  'https://implementatie.data.vlaanderen.be/ns/vkbo/onderneming#',
+)
+const finreport = ns('https://data.vlaanderen.be/ns/financiele-rapportering#')
+const vcard = ns('http://www.w3.org/2006/vcard/ns#')
 
 const TYPE_MAP: Record<string, RDF.NamedNode> = {
   Organisatie: org('Organization'),
@@ -79,20 +83,8 @@ export function kboDataToQuads(
   }
 
   // --- Names ---
-  addLiteral(
-    quads,
-    subject,
-    reorg('legalName'),
-    data.wettelijkeNaam,
-    'nl',
-  )
-  addLiteral(
-    quads,
-    subject,
-    skos('prefLabel'),
-    data.voorkeursnaam,
-    'nl',
-  )
+  addLiteral(quads, subject, reorg('legalName'), data.wettelijkeNaam, 'nl')
+  addLiteral(quads, subject, skos('prefLabel'), data.voorkeursnaam, 'nl')
   if (data.alternatieveNaam) {
     for (const alt of data.alternatieveNaam) {
       addLiteral(quads, subject, skos('altLabel'), alt, 'nl')
@@ -137,6 +129,21 @@ export function kboDataToQuads(
     data.rechtstoestand?.uri,
   )
 
+  // --- Personeelsklasse organisatie ---
+  if ('personeelsklasse' in data) {
+    addNamedNode(quads, subject, dcterms('extent'), data.personeelsklasse?.uri)
+  }
+
+  // --- Jaarrekening organisatie ---
+  if ('rapportReferentie' in data && 'rapportType' in data) {
+    const rapportNode = df.blankNode(`report-jaarrekening`)
+    quads.push(df.quad(subject, dcterms('isReferencedBy'), rapportNode))
+    addNamedNode(quads, subject, dcterms('type'), data.rapportType?.uri)
+    quads.push(
+      df.quad(rapportNode, finreport('FinancieelRapport.gaatOver'), subject),
+    )
+  }
+
   // --- Veranderinggebeurtenissen ---
   if (data.oprichting) {
     const oprichtingNode = df.blankNode(`oprichting-${data.oprichting.datum}`)
@@ -175,9 +182,22 @@ export function kboDataToQuads(
     for (const doorhaling of data.doorhaling) {
       const doorhalingNode = df.blankNode(doorhaling.id)
       quads.push(df.quad(subject, prov('wasInvalidatedBy'), doorhalingNode))
-      quads.push(df.quad(doorhalingNode, rdf('type'), onderneming('Doorhaling')))
-      addLiteral(quads, doorhalingNode, dcterms('date'), doorhaling.wijzingsdatum, xsd('date'))
-      addNamedNode(quads, doorhalingNode, dcterms('provenance'), doorhaling.reden.uri)
+      quads.push(
+        df.quad(doorhalingNode, rdf('type'), onderneming('Doorhaling')),
+      )
+      addLiteral(
+        quads,
+        doorhalingNode,
+        dcterms('date'),
+        doorhaling.wijzingsdatum,
+        xsd('date'),
+      )
+      addNamedNode(
+        quads,
+        doorhalingNode,
+        dcterms('provenance'),
+        doorhaling.reden.uri,
+      )
       addNamedNode(quads, doorhalingNode, dcterms('type'), doorhaling.type.uri)
 
       if (doorhaling.tijd) {
@@ -190,14 +210,26 @@ export function kboDataToQuads(
           quads.push(df.quad(periodeNode, time('hasBeginning'), vanNode))
           quads.push(df.quad(vanNode, rdf('type'), time('Instant')))
           quads.push(df.quad(vanNode, rdf('type'), time('TemporalEntity')))
-          addLiteral(quads, vanNode, time('inXSDDate'), doorhaling.tijd.van, xsd('date'))
+          addLiteral(
+            quads,
+            vanNode,
+            time('inXSDDate'),
+            doorhaling.tijd.van,
+            xsd('date'),
+          )
         }
         if (doorhaling.tijd.tot) {
           const totNode = df.blankNode(`periode-tot-${doorhaling.id}`)
           quads.push(df.quad(periodeNode, time('hasEnd'), totNode))
           quads.push(df.quad(totNode, rdf('type'), time('Instant')))
           quads.push(df.quad(totNode, rdf('type'), time('TemporalEntity')))
-          addLiteral(quads, totNode, time('inXSDDate'), doorhaling.tijd.tot, xsd('date'))
+          addLiteral(
+            quads,
+            totNode,
+            time('inXSDDate'),
+            doorhaling.tijd.tot,
+            xsd('date'),
+          )
         }
       }
     }
@@ -209,12 +241,7 @@ export function kboDataToQuads(
     addNamedNode(quads, subject, reorg('orgActivity'), data.activiteit.uri)
     quads.push(df.quad(activityNode, rdf('type'), skos('Concept')))
     if (data.activiteit.label) {
-      addLiteral(
-        quads,
-        activityNode,
-        skos('prefLabel'),
-        data.activiteit.label,
-      )
+      addLiteral(quads, activityNode, skos('prefLabel'), data.activiteit.label)
     }
   }
 
@@ -222,15 +249,21 @@ export function kboDataToQuads(
   if (data.contactPoints) {
     for (const cp of data.contactPoints) {
       const cpNode = df.blankNode(`cp-${cp.id}`)
-      quads.push(df.quad(subject, schema('contactPoint'), cpNode))
-      quads.push(df.quad(cpNode, rdf('type'), schema('ContactPoint')))
-      addLiteral(quads, cpNode, schema('email'), cp.email)
-      addLiteral(quads, cpNode, schema('telephone'), cp.telephone)
+      quads.push(df.quad(subject, m8g('contactPoint'), cpNode))
+      quads.push(df.quad(cpNode, rdf('type'), vcard('Kind')))
+      addLiteral(quads, cpNode, vcard('hasEmail'), cp.email)
+      addLiteral(
+        quads,
+        cpNode,
+        vcard('hasTelephone'),
+        cp.telephone,
+        vcard('Voice'),
+      )
 
       if (cp.address) {
         const addrNode = df.blankNode(`addr-${cp.id}`)
         quads.push(df.quad(addrNode, rdf('type'), locn('Address')))
-        quads.push(df.quad(cpNode, locn('address'), addrNode))
+        quads.push(df.quad(cpNode, vcard('hasAddress'), addrNode))
         addLiteral(
           quads,
           addrNode,
@@ -246,13 +279,7 @@ export function kboDataToQuads(
           cp.address.municipality,
           'nl',
         )
-        addLiteral(
-          quads,
-          addrNode,
-          adres('land'),
-          cp.address.country,
-          'nl',
-        )
+        addLiteral(quads, addrNode, adres('land'), cp.address.country, 'nl')
       }
 
       if (cp.place) {

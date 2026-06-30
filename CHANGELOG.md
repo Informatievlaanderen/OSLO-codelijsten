@@ -124,7 +124,7 @@ ADD ALL KBO DATA
 
     1.17.0
     feat: add support for codelists with a large amount of concepts by implementing pagination on the conceptscheme API
-  
+
     1.17.1
     feat: add support for external codelists when navigating to a conceptscheme that's not part of data.vlaanderen.be
 
@@ -152,3 +152,7 @@ ADD ALL KBO DATA
 
     1.18.1
     fix: Fix for content-footer in content-header
+
+    1.18.2
+    feat: added jaarrekening to the onderneming page
+    fix: UI improvements to the doorhaling section of an onderneming

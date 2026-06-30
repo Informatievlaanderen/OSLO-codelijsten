@@ -22,8 +22,10 @@ export const ORGANISATIESTATUS_TTL =
   'https://data.vlaanderen.be/id/conceptscheme/OrganisatieStatus/v1.ttl'
 export const STOPZETTINGTYPE_TTL =
   'https://data.vlaanderen.be/id/conceptscheme/StopzettingType/v1.ttl'
-export const PERSOONSKLASSE_TTL =
-  'https://data.vlaanderen.be/id/conceptscheme/Persoonsklasse/v1.ttl'
+export const PERSONEELSKLASSE_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/RSZ-Personeelsklasse/v1.ttl'
+export const RAPPORTTYPE_TTL =
+  'https://data.vlaanderen.be/id/conceptscheme/RapportType/v1.ttl'
 
 export const CONCEPT_SCHEME_QUERY = `
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
