@@ -28,8 +28,8 @@
               }}
             </vl-title>
             <vl-link @click="copyToClipboard(data?.uri ?? '')" class="uri-link">
-              <vl-icon icon="file-copy" mod-before></vl-icon>
               {{ data?.uri ?? '' }}
+              <vl-icon icon="file-copy"></vl-icon>
             </vl-link>
           </div>
         </vl-column>
@@ -149,7 +149,7 @@
         <!-- Identificator -->
         <template v-if="data?.identificator">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Identificator</vl-title>
+            <vl-title tag-name="h2" mod-h2>Identificator</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
@@ -178,7 +178,18 @@
         <!-- Financieel Rapport -->
         <template v-if="data?.rapportReferentie">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Financieel Rapport</vl-title>
+            <div class="h1-sublink">
+              <vl-title tag-name="h2" mod-no-space-bottom
+                >Financieel Rapport</vl-title
+              >
+              <vl-link
+                @click="copyToClipboard(data.rapportReferentie)"
+                class="uri-link"
+              >
+                {{ data.rapportReferentie }}
+                <vl-icon icon="file-copy"></vl-icon>
+              </vl-link>
+            </div>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
@@ -195,14 +206,6 @@
                     </vl-link>
                   </td>
                 </tr>
-                <tr>
-                  <td>@id</td>
-                  <td>
-                    <vl-link :href="data.rapportReferentie" external>
-                      {{ data.rapportReferentie }}
-                    </vl-link>
-                  </td>
-                </tr>
               </tbody>
             </vl-data-table>
           </vl-column>
@@ -211,7 +214,7 @@
         <!-- Oprichting & Stopzetting -->
         <template v-if="data?.oprichting || data?.stopzetting">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Veranderingsgebeurtenissen</vl-title>
+            <vl-title tag-name="h2" mod-h2>Veranderingsgebeurtenissen</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
@@ -254,7 +257,7 @@
           v-for="doorhaling in data?.doorhaling"
         >
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Activiteiten</vl-title>
+            <vl-title tag-name="h2" mod-h2>Activiteiten</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
@@ -308,7 +311,7 @@
         <!-- Contact Points -->
         <template v-if="data?.contactPoints?.length">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h3>Contactinfo</vl-title>
+            <vl-title tag-name="h2" mod-h2>Contactinfo</vl-title>
           </vl-column>
           <template v-for="contact in data.contactPoints" :key="contact.id">
             <!-- if keys are less than 0, it means that there is a contact point with just an ID. That can be ignored -->

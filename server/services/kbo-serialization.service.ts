@@ -118,7 +118,7 @@ export function kboDataToQuads(
   )
 
   // --- Organisatie-specific fields ---
-  if ('organisatieType' in data) {
+  if (data.organisatieType) {
     addNamedNode(quads, subject, reorg('orgType'), data.organisatieType?.uri)
   }
   addNamedNode(quads, subject, organisatie('rechtsvorm'), data.rechtsvorm?.uri)
@@ -130,17 +130,29 @@ export function kboDataToQuads(
   )
 
   // --- Personeelsklasse organisatie ---
-  if ('personeelsklasse' in data) {
-    addNamedNode(quads, subject, dcterms('extent'), data.personeelsklasse?.uri)
+  if (data.personeelsklasse?.uri) {
+    addNamedNode(quads, subject, dcterms('extent'), data.personeelsklasse.uri)
+    quads.push(
+      df.quad(
+        df.namedNode(data.personeelsklasse.uri),
+        rdf('type'),
+        xsd('anyType'),
+      ),
+    )
   }
 
   // --- Jaarrekening organisatie ---
-  if ('rapportReferentie' in data && 'rapportType' in data) {
-    const rapportNode = df.blankNode(`report-jaarrekening`)
+  if (data.rapportReferentie && data.rapportType) {
+    const rapportNode = data.rapportReferentie
+      ? df.namedNode(data.rapportReferentie)
+      : df.blankNode('jaarrekening')
     quads.push(df.quad(subject, dcterms('isReferencedBy'), rapportNode))
-    addNamedNode(quads, subject, dcterms('type'), data.rapportType?.uri)
+    addNamedNode(quads, rapportNode, dcterms('type'), data.rapportType?.uri)
     quads.push(
       df.quad(rapportNode, finreport('FinancieelRapport.gaatOver'), subject),
+    )
+    quads.push(
+      df.quad(rapportNode, rdf('type'), finreport('FinancieelRapport')),
     )
   }
 
@@ -308,7 +320,7 @@ export function kboDataToQuads(
   }
 
   // --- Branch-specific: parent organisation ---
-  if ('parentOrganisatie' in data && data.parentOrganisatie) {
+  if (data.parentOrganisatie) {
     addNamedNode(
       quads,
       subject,

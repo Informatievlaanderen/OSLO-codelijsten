@@ -97,7 +97,7 @@ export default defineEventHandler(async (event) => {
         },
       })
 
-      setHeader(event, 'Content-Type', contentType)
+      setHeader(event, 'Content-Type', `${contentType}; charset=utf-8`)
       setResponseStatus(event, 200)
 
       return content
