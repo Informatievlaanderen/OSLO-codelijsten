@@ -7,7 +7,7 @@ build-base:
 	docker build -f Dockerfile.base --build-arg "NPM_TOKEN=${NPM_TOKEN}" --build-arg -t informatievlaanderen/codelijsten-base:${VERSION} .
 
 build-base-linux:
-	docker build -f Dockerfile.base --build-arg "NPM_TOKEN=${NPM_TOKEN}" --build-arg --build-arg --platform=linux/amd64 -t informatievlaanderen/codelijsten-base:${VERSION} .
+	docker build -f Dockerfile.base --build-arg "NPM_TOKEN=${NPM_TOKEN}" --platform=linux/amd64 -t informatievlaanderen/codelijsten-base:${VERSION} .
 
 # first build-base should have been run
 build:
