@@ -156,7 +156,7 @@ ADD ALL KBO DATA
     1.18.2
     feat: added jaarrekening to the onderneming page
     fix: UI improvements to the doorhaling section of an onderneming
-    
+
     1.18.3
     fix: UI improvements to onderneming page
     feat: added copy-to-clipboard button near financieel rapport
@@ -164,3 +164,6 @@ ADD ALL KBO DATA
 
     1.18.4
     feat: made the uri still link to the external page of financieel rapport, only the copy-to-clipboard button copies the uri to the clipboard
+
+    1.18.5
+    fix: changed vcard('Kind'), vcard('hasEmail'), vcard('hasTelephone') and vcard('hasAddress') to schema('ContactPoint'), schema('email'), schema('telephone') and locn('address').
