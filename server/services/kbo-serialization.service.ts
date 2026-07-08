@@ -262,12 +262,12 @@ export function kboDataToQuads(
     for (const cp of data.contactPoints) {
       const cpNode = df.blankNode(`cp-${cp.id}`)
       quads.push(df.quad(subject, m8g('contactPoint'), cpNode))
-      quads.push(df.quad(cpNode, rdf('type'), vcard('Kind')))
-      addLiteral(quads, cpNode, vcard('hasEmail'), cp.email)
+      quads.push(df.quad(cpNode, rdf('type'), schema('ContactPoint')))
+      addLiteral(quads, cpNode, schema('email'), cp.email)
       addLiteral(
         quads,
         cpNode,
-        vcard('hasTelephone'),
+        schema('telephone'),
         cp.telephone,
         vcard('Voice'),
       )
@@ -275,7 +275,7 @@ export function kboDataToQuads(
       if (cp.address) {
         const addrNode = df.blankNode(`addr-${cp.id}`)
         quads.push(df.quad(addrNode, rdf('type'), locn('Address')))
-        quads.push(df.quad(cpNode, vcard('hasAddress'), addrNode))
+        quads.push(df.quad(cpNode, locn('address'), addrNode))
         addLiteral(
           quads,
           addrNode,
