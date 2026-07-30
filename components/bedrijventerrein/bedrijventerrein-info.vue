@@ -46,13 +46,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="bedrijventerrein.beschikbareOppervlakte?.startsWith('http')"
-              :href="bedrijventerrein.beschikbareOppervlakte"
-            >
+            <vl-link :href="bedrijventerrein.beschikbareOppervlakte">
               {{ bedrijventerrein.beschikbareOppervlakte }}
             </vl-link>
-            <span v-else>{{ bedrijventerrein.beschikbareOppervlakte }}</span>
           </td>
         </tr>
         <tr v-if="bedrijventerrein?.geldigheidsperiode">
@@ -65,13 +61,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="bedrijventerrein.geldigheidsperiode?.startsWith('http')"
-              :href="bedrijventerrein.geldigheidsperiode"
-            >
+            <vl-link :href="bedrijventerrein.geldigheidsperiode">
               {{ bedrijventerrein.geldigheidsperiode }}
             </vl-link>
-            <span v-else>{{ bedrijventerrein.geldigheidsperiode }}</span>
           </td>
         </tr>
         <tr v-if="bedrijventerrein?.geometrie">
@@ -111,13 +103,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="bedrijventerrein.oppervlakte?.startsWith('http')"
-              :href="bedrijventerrein.oppervlakte"
-            >
+            <vl-link :href="bedrijventerrein.oppervlakte">
               {{ bedrijventerrein.oppervlakte }}
             </vl-link>
-            <span v-else>{{ bedrijventerrein.oppervlakte }}</span>
           </td>
         </tr>
         <tr v-if="bedrijventerrein?.type">
@@ -143,9 +131,7 @@
                 v-for="perceel in bedrijventerrein.percelen"
                 :key="perceel.uri"
               >
-                <vl-link
-                  :href="`/doc/${perceel.id}`"
-                >
+                <vl-link :href="`/doc/${perceel.id}`">
                   {{ perceel.id }}
                 </vl-link>
               </li>
@@ -164,4 +150,3 @@ defineProps<{
   bedrijventerrein?: Bedrijventerrein
 }>()
 </script>
-

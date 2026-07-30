@@ -35,13 +35,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.aanspreekpunt?.startsWith('http')"
-              :href="zone.aanspreekpunt"
-            >
+            <vl-link :href="zone.aanspreekpunt">
               {{ zone.aanspreekpunt }}
             </vl-link>
-            <span v-else>{{ zone.aanspreekpunt }}</span>
           </td>
         </tr>
         <tr v-if="zone?.digitaleBeheerder !== undefined">
@@ -54,13 +50,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.digitaleBeheerder?.startsWith('http')"
-              :href="zone.digitaleBeheerder"
-            >
+            <vl-link :href="zone.digitaleBeheerder">
               {{ zone.digitaleBeheerder }}
             </vl-link>
-            <span v-else>{{ zone.digitaleBeheerder }}</span>
           </td>
         </tr>
         <tr v-if="zone?.geldigheidsperiode">
@@ -73,13 +65,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.geldigheidsperiode?.startsWith('http')"
-              :href="zone.geldigheidsperiode"
-            >
+            <vl-link :href="zone.geldigheidsperiode">
               {{ zone.geldigheidsperiode }}
             </vl-link>
-            <span v-else>{{ zone.geldigheidsperiode }}</span>
           </td>
         </tr>
         <tr v-if="zone?.identificator">
@@ -116,13 +104,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.juridischeHandhaver?.startsWith('http')"
-              :href="zone.juridischeHandhaver"
-            >
+            <vl-link :href="zone.juridischeHandhaver">
               {{ zone.juridischeHandhaver }}
             </vl-link>
-            <span v-else>{{ zone.juridischeHandhaver }}</span>
           </td>
         </tr>
         <tr v-if="zone?.type">
@@ -182,13 +166,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.oppervlakte?.startsWith('http')"
-              :href="zone.oppervlakte"
-            >
+            <vl-link :href="zone.oppervlakte">
               {{ zone.oppervlakte }}
             </vl-link>
-            <span v-else>{{ zone.oppervlakte }}</span>
           </td>
         </tr>
       </tbody>

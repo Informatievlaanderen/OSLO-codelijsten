@@ -50,13 +50,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="perceel.geldigheidsperiode?.startsWith('http')"
-              :href="perceel.geldigheidsperiode"
-            >
+            <vl-link :href="perceel.geldigheidsperiode">
               {{ perceel.geldigheidsperiode }}
             </vl-link>
-            <span v-else>{{ perceel.geldigheidsperiode }}</span>
           </td>
         </tr>
         <tr v-if="perceel?.identificator">

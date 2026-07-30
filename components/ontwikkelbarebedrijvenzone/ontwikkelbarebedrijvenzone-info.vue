@@ -77,13 +77,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.geldigheidsperiode?.startsWith('http')"
-              :href="zone.geldigheidsperiode"
-            >
+            <vl-link :href="zone.geldigheidsperiode">
               {{ zone.geldigheidsperiode }}
             </vl-link>
-            <span v-else>{{ zone.geldigheidsperiode }}</span>
           </td>
         </tr>
         <tr v-if="zone?.identificator">
@@ -150,13 +146,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.oppervlakte?.startsWith('http')"
-              :href="zone.oppervlakte"
-            >
+            <vl-link :href="zone.oppervlakte">
               {{ zone.oppervlakte }}
             </vl-link>
-            <span v-else>{{ zone.oppervlakte }}</span>
           </td>
         </tr>
         <tr v-if="zone?.percelen?.length">
