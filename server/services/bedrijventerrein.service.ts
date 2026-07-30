@@ -294,23 +294,49 @@ export const getBedrijventerreinperceel = async (
       zoneUris.map((zUri: string) => getConceptLabel(zUri)),
     )
 
-    const beheerdeBedrijvenzones = zoneUris.map((zUri: string, i: number) => ({
-      id: `beheerdebedrijvenzone/${zUri.replace(BEHEERDEBEDRIJVENZONE_URI_BASE, '')}`,
-      uri: zUri,
-      label: zoneLabels[i] ?? undefined,
-    }))
+    const beheerdeBedrijvenzonesMap = new Map<string, { id: string; uri: string; label?: string }>()
+    zoneUris.forEach((zUri: string, i: number) => {
+      let id: string
+      if (zUri.startsWith(BEHEERDEBEDRIJVENZONE_URI_BASE)) {
+        id = `beheerdebedrijvenzone/${zUri.replace(BEHEERDEBEDRIJVENZONE_URI_BASE, '')}`
+      } else if (zUri.startsWith(ONTWIKKELBAREBEDRIJVENZONE_URI_BASE)) {
+        id = `ontwikkelbarebedrijvenzone/${zUri.replace(ONTWIKKELBAREBEDRIJVENZONE_URI_BASE, '')}`
+      } else {
+        id = zUri
+      }
+      if (!beheerdeBedrijvenzonesMap.has(id)) {
+        beheerdeBedrijvenzonesMap.set(id, {
+          id,
+          uri: zUri,
+          label: zoneLabels[i] ?? undefined,
+        })
+      }
+    })
+    const beheerdeBedrijvenzones = Array.from(beheerdeBedrijvenzonesMap.values())
 
     const ontwikkelbareUris = allUris(triples, NS.btOntwikkelbareBedrijvenzones)
     const ontwikkelbareLabels = await Promise.all(
       ontwikkelbareUris.map((uri: string) => getConceptLabel(uri)),
     )
-    const ontwikkelbareBedrijvenzones: { id: string; uri: string; label?: string }[] = ontwikkelbareUris.map(
-      (uri: string, i: number) => ({
-        id: `beheerdebedrijvenzone/${uri.replace(BEHEERDEBEDRIJVENZONE_URI_BASE, '')}`,
-        uri,
-        label: ontwikkelbareLabels[i] ?? undefined,
-      }),
-    )
+    const ontwikkelbareBedrijvenzonesMap = new Map<string, { id: string; uri: string; label?: string }>()
+    ontwikkelbareUris.forEach((uri: string, i: number) => {
+      let id: string
+      if (uri.startsWith(ONTWIKKELBAREBEDRIJVENZONE_URI_BASE)) {
+        id = `ontwikkelbarebedrijvenzone/${uri.replace(ONTWIKKELBAREBEDRIJVENZONE_URI_BASE, '')}`
+      } else if (uri.startsWith(BEHEERDEBEDRIJVENZONE_URI_BASE)) {
+        id = `beheerdebedrijvenzone/${uri.replace(BEHEERDEBEDRIJVENZONE_URI_BASE, '')}`
+      } else {
+        id = uri
+      }
+      if (!ontwikkelbareBedrijvenzonesMap.has(id)) {
+        ontwikkelbareBedrijvenzonesMap.set(id, {
+          id,
+          uri,
+          label: ontwikkelbareLabels[i] ?? undefined,
+        })
+      }
+    })
+    const ontwikkelbareBedrijvenzones = Array.from(ontwikkelbareBedrijvenzonesMap.values())
 
     return {
       id,
