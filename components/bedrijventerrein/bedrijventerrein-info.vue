@@ -138,7 +138,7 @@
             </vl-link>
           </td>
           <td>
-            <ul class="list-unstyled">
+            <ul>
               <li
                 v-for="perceel in bedrijventerrein.percelen"
                 :key="perceel.uri"
@@ -165,13 +165,3 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
-.list-unstyled {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-.list-unstyled li {
-  margin-bottom: 0.25rem;
-}
-</style>

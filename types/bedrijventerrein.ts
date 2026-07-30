@@ -100,3 +100,60 @@ export interface BeheerdeBedrijvenzoneListItem {
   uri: string
   name?: string
 }
+
+export interface OntwikkelbareBedrijvenzone {
+  id: string
+  uri: string
+  name: string
+  homepage?: string
+  voorzieneUitgifte?: string
+  ontwikkelaar?: string
+  ontwikkelaarLabel?: string
+  statusOntwikkeling?: string
+  statusOntwikkelingLabel?: string
+  bedrijventerrein?: string
+  bedrijventerreinLabel?: string
+  geometrie?: string
+  identificator?: string
+  oppervlakte?: string
+  type?: string
+  geldigheidsperiode?: string
+  percelen?: BedrijventerreinperceelRef[]
+  source: string
+}
+
+export interface OntwikkelbareBedrijvenzoneList {
+  items: OntwikkelbareBedrijvenzoneListItem[]
+  totalCount: number
+}
+
+export interface OntwikkelbareBedrijvenzoneListItem {
+  id: string
+  uri: string
+  name?: string
+}
+
+export interface GenidResource {
+  uri: string
+  type: string
+  typeLabel: string
+  triples: GenidTriple[]
+  reverseReferences: GenidReverseReference[]
+  source: string
+}
+
+export interface GenidTriple {
+  predicate: string
+  predicateLabel: string
+  value: string
+  valueType: 'uri' | 'literal'
+}
+
+export interface GenidReverseReference {
+  predicate: string
+  predicateLabel: string
+  subjectUri: string
+  subjectId: string
+  subjectLabel: string
+  subjectType: string
+}

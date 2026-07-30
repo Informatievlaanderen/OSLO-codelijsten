@@ -66,6 +66,8 @@ export default defineEventHandler(async (event) => {
     const bedrijventerreinMatch = cleanPath.match(/\/bedrijventerrein\/(.+)$/)
     const bedrijventerreinperceelMatch = cleanPath.match(/\/bedrijventerreinperceel\/(.+)$/)
     const beheerdebedrijvenzoneMatch = cleanPath.match(/\/beheerdebedrijvenzone\/(.+)$/)
+    const ontwikkelbarebedrijvenzoneMatch = cleanPath.match(/\/ontwikkelbarebedrijvenzone\/(.+)$/)
+    const genidMatch = cleanPath.match(/\/.well-known\/genid\/(.+)$/)
 
     // Redirect to appropriate API endpoint
     switch (true) {
@@ -95,6 +97,12 @@ export default defineEventHandler(async (event) => {
         break
       case !!beheerdebedrijvenzoneMatch:
         apiPath = `/doc/api/beheerdebedrijvenzone/${beheerdebedrijvenzoneMatch![1]}${extension}`
+        break
+      case !!ontwikkelbarebedrijvenzoneMatch:
+        apiPath = `/doc/api/ontwikkelbarebedrijvenzone/${ontwikkelbarebedrijvenzoneMatch![1]}${extension}`
+        break
+      case !!genidMatch:
+        apiPath = `/doc/api/genid/${genidMatch![1]}${extension}`
         break
     }
     if (!apiPath) {

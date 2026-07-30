@@ -177,3 +177,6 @@ ADD ALL KBO DATA
     - /beheerdebedrijvenzone/:id
     - /bedrijventerreinperceel
     - /bedrijventerreinperceel/:id
+    - /ontwikkelbarebedrijvenzone
+    - /ontwikkelbarebedrijvenzone/:id
+    - /.well-known/genid/:id

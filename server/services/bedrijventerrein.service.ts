@@ -3,19 +3,27 @@ import {
   BEDRIJVENTERREIN_LIST_QUERY,
   BEDRIJVENTERREINPERCEEL_LIST_QUERY,
   BEHEERDEBEDRIJVENZONE_LIST_QUERY,
+  ONTWIKKELBAREBEDRIJVENZONE_LIST_QUERY,
   CONCEPT_LABEL_QUERY,
   BEDRIJVENTERREIN_URI_BASE,
   BEDRIJVENTERREINPERCEEL_URI_BASE,
   BEHEERDEBEDRIJVENZONE_URI_BASE,
+  ONTWIKKELBAREBEDRIJVENZONE_URI_BASE,
+  GENID_URI_BASE,
 } from '~/constants/bedrijventerrein.constants'
 import type {
   Bedrijventerrein,
   Bedrijventerreinperceel,
   BeheerdeBedrijvenzone,
+  OntwikkelbareBedrijvenzone,
   BedrijventerreinListItem,
   BedrijventerreinperceelListItem,
   BeheerdeBedrijvenzoneListItem,
+  OntwikkelbareBedrijvenzoneListItem,
   BedrijventerreinperceelRef,
+  GenidResource,
+  GenidTriple,
+  GenidReverseReference,
 } from '~/types/bedrijventerrein'
 
 const queryEngine = new QueryEngine()
@@ -62,9 +70,16 @@ const fetchAllTriples = async (
 
 const getConceptLabel = async (uri: string): Promise<string | null> => {
   try {
+    // Try skos:prefLabel / rdfs:label first
     const result = await executeQuery(CONCEPT_LABEL_QUERY(uri))
     if (result.length > 0) {
       return result[0].get('label')?.value ?? null
+    }
+    // Try regorg:legalName for organisations
+    const orgQuery = `SELECT ?label WHERE { <${uri}> <http://www.w3.org/ns/regorg#legalName> ?label . } LIMIT 1`
+    const orgResult = await executeQuery(orgQuery)
+    if (orgResult.length > 0) {
+      return orgResult[0].get('label')?.value ?? null
     }
     return null
   } catch {
@@ -107,6 +122,10 @@ const NS = {
   btJuridischeHandhaver: 'https://data.vlaanderen.be/ns/bedrijventerrein#juridischeHandhaver',
   btDigitaleBeheerder: 'https://data.vlaanderen.be/ns/bedrijventerrein#digitalebeheerder',
   btOntwikkelbareBedrijvenzones: 'https://data.vlaanderen.be/ns/bedrijventerrein#ontwikkelbareBedrijvenzones',
+  btOntwikkelaar: 'https://data.vlaanderen.be/ns/bedrijventerrein#ontwikkelaar',
+  btStatusOntwikkeling: 'https://data.vlaanderen.be/ns/bedrijventerrein#statusOntwikkeling',
+  btVoorzieneUitgifte: 'https://data.vlaanderen.be/ns/bedrijventerrein#voorzieneUitgifte',
+  foafHomepage: 'http://xmlns.com/foaf/0.1/homepage',
 }
 
 const firstUri = (map: Map<string, { value: string; type: string }[]>, key: string): string | undefined => {
@@ -123,6 +142,37 @@ const allUris = (map: Map<string, { value: string; type: string }[]>, key: strin
   const vals = map.get(key)
   if (!vals) return []
   return vals.filter(v => v.type === 'uri' || v.type === 'NamedNode').map(v => v.value)
+}
+
+/**
+ * Convert absolute bedrijventerrein URIs to relative doc paths.
+ * e.g. https://bedrijventerrein.vlaanderen.be/doc/.well-known/genid/geometrie/abc -> /doc/.well-known/genid/geometrie/abc
+ */
+const toRelativeUri = (uri: string | undefined): string | undefined => {
+  if (!uri) return uri
+  // Genid doc URIs
+  if (uri.startsWith(GENID_URI_BASE)) {
+    return `/doc/.well-known/genid/${uri.replace(GENID_URI_BASE, '')}`
+  }
+  // Literal genid refs: .well-known-genid-identifier-abc... -> /doc/.well-known/genid/identifier/abc...
+  if (uri.startsWith('.well-known-genid-')) {
+    const parts = uri.replace('.well-known-genid-', '').split('-')
+    const type = parts[0]
+    const hash = parts.slice(1).join('-')
+    return `/doc/.well-known/genid/${type}/${hash}`
+  }
+  // Entity URIs
+  for (const { base, prefix } of [
+    { base: BEDRIJVENTERREIN_URI_BASE, prefix: 'bedrijventerrein' },
+    { base: BEDRIJVENTERREINPERCEEL_URI_BASE, prefix: 'bedrijventerreinperceel' },
+    { base: BEHEERDEBEDRIJVENZONE_URI_BASE, prefix: 'beheerdebedrijvenzone' },
+    { base: ONTWIKKELBAREBEDRIJVENZONE_URI_BASE, prefix: 'ontwikkelbarebedrijvenzone' },
+  ]) {
+    if (uri.startsWith(base)) {
+      return `/doc/${prefix}/${uri.replace(base, '')}`
+    }
+  }
+  return uri
 }
 
 export const getBedrijventerrein = async (
@@ -175,12 +225,12 @@ export const getBedrijventerrein = async (
       alternativeName: firstLiteral(triples, NS.skosAltLabel),
       beschikbareKavels:
         beschikbareKavelsRaw === '1' || beschikbareKavelsRaw === 'true',
-      beschikbareOppervlakte: firstUri(triples, NS.btBeschikbareOppervlakte),
-      oppervlakte: firstUri(triples, NS.perceelOppervlakte),
-      geometrie: firstUri(triples, NS.perceelGeometrie) ?? firstUri(triples, NS.perceelGeometrieAlt),
-      identificator: firstUri(triples, NS.admsIdentifier),
-      type: firstUri(triples, NS.perceelType) ?? firstUri(triples, NS.perceelTypeAlt),
-      geldigheidsperiode: firstUri(triples, NS.perceelGeldigheid) ?? firstUri(triples, NS.perceelGeldigheidAlt),
+      beschikbareOppervlakte: toRelativeUri(firstUri(triples, NS.btBeschikbareOppervlakte)),
+      oppervlakte: toRelativeUri(firstUri(triples, NS.perceelOppervlakte)),
+      geometrie: toRelativeUri(firstUri(triples, NS.perceelGeometrie) ?? firstUri(triples, NS.perceelGeometrieAlt)),
+      identificator: toRelativeUri(firstUri(triples, NS.admsIdentifier)),
+      type: toRelativeUri(firstUri(triples, NS.perceelType) ?? firstUri(triples, NS.perceelTypeAlt)),
+      geldigheidsperiode: toRelativeUri(firstUri(triples, NS.perceelGeldigheid) ?? firstUri(triples, NS.perceelGeldigheidAlt)),
       percelen,
       source: getSparqlEndpoint(),
     }
@@ -274,12 +324,12 @@ export const getBedrijventerreinperceel = async (
       aanbieder: firstLiteral(triples, NS.btAanbieder),
       beperking: beperkingUris,
       functie: firstLiteral(triples, NS.btFunctie),
-      geometrie: firstUri(triples, NS.perceelGeometrie) ?? firstUri(triples, NS.perceelGeometrieAlt),
-      identificator: firstUri(triples, NS.admsIdentifier),
-      oppervlakte: firstUri(triples, NS.perceelOppervlakte),
-      type: firstUri(triples, NS.perceelType) ?? firstUri(triples, NS.perceelTypeAlt),
-      geldigheidsperiode: firstUri(triples, NS.perceelGeldigheid) ?? firstUri(triples, NS.perceelGeldigheidAlt),
-      isDeelVan: isPartOfUri,
+      geometrie: toRelativeUri(firstUri(triples, NS.perceelGeometrie) ?? firstUri(triples, NS.perceelGeometrieAlt)),
+      identificator: toRelativeUri(firstUri(triples, NS.admsIdentifier)),
+      oppervlakte: toRelativeUri(firstUri(triples, NS.perceelOppervlakte)),
+      type: toRelativeUri(firstUri(triples, NS.perceelType) ?? firstUri(triples, NS.perceelTypeAlt)),
+      geldigheidsperiode: toRelativeUri(firstUri(triples, NS.perceelGeldigheid) ?? firstUri(triples, NS.perceelGeldigheidAlt)),
+      isDeelVan: toRelativeUri(isPartOfUri),
       isDeelVanLabel: isPartOfLabel ?? undefined,
       beheerdeBedrijvenzones,
       ontwikkelbareBedrijvenzones,
@@ -341,16 +391,16 @@ export const getBeheerdeBedrijvenzone = async (
       id,
       uri,
       name: firstLiteral(triples, NS.skosPrefLabel) ?? id,
-      aanspreekpunt: firstUri(triples, NS.btAanspreekpunt),
-      juridischeHandhaver: firstUri(triples, NS.btJuridischeHandhaver),
-      digitaleBeheerder: firstUri(triples, NS.btDigitaleBeheerder),
-      bedrijventerrein: isPartOfUri,
+      aanspreekpunt: toRelativeUri(firstUri(triples, NS.btAanspreekpunt)),
+      juridischeHandhaver: toRelativeUri(firstUri(triples, NS.btJuridischeHandhaver)),
+      digitaleBeheerder: toRelativeUri(firstUri(triples, NS.btDigitaleBeheerder)),
+      bedrijventerrein: toRelativeUri(isPartOfUri),
       bedrijventerreinLabel: isPartOfLabel ?? undefined,
-      geometrie: firstUri(triples, NS.perceelGeometrie) ?? firstUri(triples, NS.perceelGeometrieAlt),
-      identificator: firstUri(triples, NS.admsIdentifier),
-      oppervlakte: firstUri(triples, NS.perceelOppervlakte),
-      type: firstUri(triples, NS.perceelType) ?? firstUri(triples, NS.perceelTypeAlt),
-      geldigheidsperiode: firstUri(triples, NS.perceelGeldigheid) ?? firstUri(triples, NS.perceelGeldigheidAlt),
+      geometrie: toRelativeUri(firstUri(triples, NS.perceelGeometrie) ?? firstUri(triples, NS.perceelGeometrieAlt)),
+      identificator: toRelativeUri(firstUri(triples, NS.admsIdentifier)),
+      oppervlakte: toRelativeUri(firstUri(triples, NS.perceelOppervlakte)),
+      type: toRelativeUri(firstUri(triples, NS.perceelType) ?? firstUri(triples, NS.perceelTypeAlt)),
+      geldigheidsperiode: toRelativeUri(firstUri(triples, NS.perceelGeldigheid) ?? firstUri(triples, NS.perceelGeldigheidAlt)),
       percelen,
       source: getSparqlEndpoint(),
     }
@@ -383,6 +433,194 @@ export const getBeheerdeBedrijvenzoneList = async (): Promise<
     return items
   } catch (error) {
     console.error('Error fetching beheerdebedrijvenzone list:', error)
+    return []
+  }
+}
+
+export const getGenidResource = async (
+  type: string,
+  hash: string,
+): Promise<GenidResource | null> => {
+  try {
+    const uri = `${GENID_URI_BASE}${type}/${hash}`
+    const triples = await fetchAllTriples(uri)
+
+    if (triples.size === 0) return null
+
+    const rdfType = firstUri(triples, NS.rdf) ?? ''
+    const typeLabel = rdfType ? (await getConceptLabel(rdfType)) ?? rdfType : rdfType
+
+    // Forward triples (skip rdf:type and blank nodes)
+    const result: GenidTriple[] = []
+    const seen = new Set<string>()
+    for (const [predicate, values] of triples) {
+      if (predicate === NS.rdf) continue
+      const predicateLabel = await getConceptLabel(predicate)
+      for (const v of values) {
+        const key = `${predicate}|${v.value}`
+        if (seen.has(key)) continue
+        seen.add(key)
+        // Skip blank nodes
+        if (v.value.startsWith('nodeID://') || v.value.startsWith('bc_0_nodeID://')) continue
+        const isUri = v.type === 'uri' || v.type === 'NamedNode'
+        // Also resolve literal values that look like bedrijventerrein URIs or genid refs
+        let value = v.value
+        if (value.startsWith('https://bedrijventerrein.vlaanderen.be/') || value.startsWith('.well-known-genid-')) {
+          value = toRelativeUri(value) ?? value
+        }
+        result.push({
+          predicate,
+          predicateLabel: predicateLabel ?? predicate,
+          value,
+          valueType: isUri ? 'uri' : 'literal',
+        })
+      }
+    }
+
+    // Reverse lookup: find all entities that reference this genid URI
+    const reverseQuery = `
+      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+      SELECT ?subject ?pred ?subjectType WHERE {
+        ?subject ?pred <${uri}> .
+        OPTIONAL { ?subject a ?subjectType . }
+      }
+    `
+    const reverseBindings = await executeQuery(reverseQuery)
+    const reverseRefs: GenidReverseReference[] = []
+    const seenRefs = new Set<string>()
+
+    for (const b of reverseBindings) {
+      const subjectUri = b.get('subject')?.value ?? ''
+      const pred = b.get('pred')?.value ?? ''
+      const subjectType = b.get('subjectType')?.value ?? ''
+
+      const key = `${subjectUri}|${pred}`
+      if (seenRefs.has(key)) continue
+      seenRefs.add(key)
+
+      const [predLabel, subjectLabel] = await Promise.all([
+        getConceptLabel(pred),
+        getConceptLabel(subjectUri),
+      ])
+
+      // Use toRelativeUri for both the subjectId and subjectUri
+      const relativeUri = toRelativeUri(subjectUri) ?? subjectUri
+      const subjectId = relativeUri.startsWith('/doc/') ? relativeUri.replace('/doc/', '') : ''
+
+      reverseRefs.push({
+        predicate: pred,
+        predicateLabel: predLabel ?? pred,
+        subjectUri: relativeUri,
+        subjectId,
+        subjectLabel: subjectLabel ?? subjectUri,
+        subjectType,
+      })
+    }
+
+    return {
+      uri,
+      type: rdfType,
+      typeLabel,
+      triples: result,
+      reverseReferences: reverseRefs,
+      source: getSparqlEndpoint(),
+    }
+  } catch (error) {
+    console.error('Error fetching genid resource:', error)
+    return null
+  }
+}
+
+export const getOntwikkelbareBedrijvenzone = async (
+  id: string,
+): Promise<OntwikkelbareBedrijvenzone | null> => {
+  try {
+    const uri = `${ONTWIKKELBAREBEDRIJVENZONE_URI_BASE}${id}`
+    const triples = await fetchAllTriples(uri)
+
+    if (triples.size === 0) return null
+
+    const isPartOfUri = firstUri(triples, NS.dctIsPartOf)
+    const isPartOfLabel = isPartOfUri ? await getConceptLabel(isPartOfUri) : null
+    const ontwikkelaarUri = firstUri(triples, NS.btOntwikkelaar)
+    const ontwikkelaarLabel = ontwikkelaarUri ? await getConceptLabel(ontwikkelaarUri) : null
+    const statusUri = firstUri(triples, NS.btStatusOntwikkeling)
+    const statusLabel = statusUri ? await getConceptLabel(statusUri) : null
+
+    // Get percelen via reverse lookup: ?perceel dct:relation <thisZone>
+    const partsQuery = `
+      PREFIX dct: <http://purl.org/dc/terms/>
+      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+      SELECT ?perceel ?label WHERE {
+        ?perceel dct:relation <${uri}> .
+        OPTIONAL { ?perceel skos:prefLabel ?label . }
+      }
+    `
+    const partsBindings = await executeQuery(partsQuery)
+    const percelenMap = new Map<string, BedrijventerreinperceelRef>()
+    for (const pb of partsBindings) {
+      const pUri = (pb as any).get('perceel')?.value ?? ''
+      const perceelId = `bedrijventerreinperceel/${pUri.replace(BEDRIJVENTERREINPERCEEL_URI_BASE, '')}`
+      if (!perceelId || perceelId === pUri || percelenMap.has(perceelId)) continue
+      percelenMap.set(perceelId, {
+        id: perceelId,
+        uri: pUri,
+        label: (pb as any).get('label')?.value ?? perceelId,
+      })
+    }
+    const percelen: BedrijventerreinperceelRef[] = Array.from(percelenMap.values())
+
+    return {
+      id,
+      uri,
+      name: firstLiteral(triples, NS.skosPrefLabel) ?? id,
+      homepage: firstLiteral(triples, NS.foafHomepage),
+      voorzieneUitgifte: firstLiteral(triples, NS.btVoorzieneUitgifte),
+      ontwikkelaar: toRelativeUri(ontwikkelaarUri),
+      ontwikkelaarLabel: ontwikkelaarLabel ?? undefined,
+      statusOntwikkeling: statusUri,
+      statusOntwikkelingLabel: statusLabel ?? undefined,
+      bedrijventerrein: toRelativeUri(isPartOfUri),
+      bedrijventerreinLabel: isPartOfLabel ?? undefined,
+      geometrie: toRelativeUri(firstUri(triples, NS.perceelGeometrie) ?? firstUri(triples, NS.perceelGeometrieAlt)),
+      identificator: toRelativeUri(firstUri(triples, NS.admsIdentifier)),
+      oppervlakte: toRelativeUri(firstUri(triples, NS.perceelOppervlakte)),
+      type: toRelativeUri(firstUri(triples, NS.perceelType) ?? firstUri(triples, NS.perceelTypeAlt)),
+      geldigheidsperiode: toRelativeUri(firstUri(triples, NS.perceelGeldigheid) ?? firstUri(triples, NS.perceelGeldigheidAlt)),
+      percelen,
+      source: getSparqlEndpoint(),
+    }
+  } catch (error) {
+    console.error('Error fetching ontwikkelbarebedrijvenzone:', error)
+    return null
+  }
+}
+
+export const getOntwikkelbareBedrijvenzoneList = async (): Promise<
+  OntwikkelbareBedrijvenzoneListItem[]
+> => {
+  try {
+    const bindings = await executeQuery(ONTWIKKELBAREBEDRIJVENZONE_LIST_QUERY)
+    const seen = new Set<string>()
+    const items: OntwikkelbareBedrijvenzoneListItem[] = []
+
+    for (const b of bindings) {
+      const uri = b.get('subject')?.value ?? ''
+      const id = `ontwikkelbarebedrijvenzone/${uri.replace(ONTWIKKELBAREBEDRIJVENZONE_URI_BASE, '')}`
+      if (seen.has(id)) continue
+      seen.add(id)
+      items.push({
+        id,
+        uri,
+        name: b.get('name')?.value,
+      })
+    }
+
+    return items
+  } catch (error) {
+    console.error('Error fetching ontwikkelbarebedrijvenzone list:', error)
     return []
   }
 }

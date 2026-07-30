@@ -1,6 +1,8 @@
 export const BEDRIJVENTERREIN_URI_BASE = 'https://bedrijventerrein.vlaanderen.be/id/bedrijventerrein/'
 export const BEDRIJVENTERREINPERCEEL_URI_BASE = 'https://bedrijventerrein.vlaanderen.be/id/bedrijventerreinperceel/'
 export const BEHEERDEBEDRIJVENZONE_URI_BASE = 'https://bedrijventerrein.vlaanderen.be/id/beheerdebedrijvenzone/'
+export const ONTWIKKELBAREBEDRIJVENZONE_URI_BASE = 'https://bedrijventerrein.vlaanderen.be/id/ontwikkelbarebedrijvenzone/'
+export const GENID_URI_BASE = 'https://bedrijventerrein.vlaanderen.be/doc/.well-known/genid/'
 export const OVO_VLAIO = "OVO000039"
 
 export const BEDRIJVENTERREIN_BY_ID_QUERY = (id: string) => `
@@ -138,4 +140,15 @@ export const BEHEERDEBEDRIJVENZONE_HAS_PARTS_QUERY = (uri: string) => `
     <${uri}> dct:relation ?perceel .
     OPTIONAL { ?perceel skos:prefLabel ?label . }
   }
+`
+
+export const ONTWIKKELBAREBEDRIJVENZONE_LIST_QUERY = `
+  PREFIX bt: <https://data.vlaanderen.be/ns/bedrijventerrein#>
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+  SELECT ?subject ?name WHERE {
+    ?subject a bt:OntwikkelbareBedrijvenzone .
+    OPTIONAL { ?subject skos:prefLabel ?name . }
+  }
+  ORDER BY ?name
 `

@@ -14,53 +14,57 @@
           </td>
           <td>{{ zone.name }}</td>
         </tr>
-        <tr v-if="zone?.subsidie">
+        <tr v-if="zone?.homepage">
           <td>
-            <vl-link
-              href="https://data.vlaanderen.be/ns/bedrijventerrein#subsidie"
-              external
-            >
-              subsidie
-            </vl-link>
-          </td>
-          <td>{{ zone.subsidie }}</td>
-        </tr>
-        <tr v-if="zone?.aanspreekpunt !== undefined">
-          <td>
-            <vl-link
-              href="https://data.vlaanderen.be/ns/bedrijventerrein#aanspreekpunt"
-              external
-            >
-              Aanspreekpunt
+            <vl-link href="http://xmlns.com/foaf/0.1/homepage" external>
+              homepage
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.aanspreekpunt?.startsWith('http')"
-              :href="zone.aanspreekpunt"
-            >
-              {{ zone.aanspreekpunt }}
+            <vl-link :href="zone.homepage" external>
+              {{ zone.homepage }}
             </vl-link>
-            <span v-else>{{ zone.aanspreekpunt }}</span>
           </td>
         </tr>
-        <tr v-if="zone?.digitaleBeheerder !== undefined">
+        <tr v-if="zone?.voorzieneUitgifte">
           <td>
             <vl-link
-              href="https://data.vlaanderen.be/ns/bedrijventerrein#digitalebeheerder"
+              href="https://data.vlaanderen.be/ns/bedrijventerrein#voorzieneUitgifte"
               external
             >
-              Digitale beheerder
+              voorziene uitgifte
+            </vl-link>
+          </td>
+          <td>{{ zone.voorzieneUitgifte }}</td>
+        </tr>
+        <tr v-if="zone?.statusOntwikkeling">
+          <td>
+            <vl-link
+              href="https://data.vlaanderen.be/ns/bedrijventerrein#statusOntwikkeling"
+              external
+            >
+              status
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="zone.digitaleBeheerder?.startsWith('http')"
-              :href="zone.digitaleBeheerder"
-            >
-              {{ zone.digitaleBeheerder }}
+            <vl-link :href="zone.statusOntwikkeling">
+              {{ zone.statusOntwikkelingLabel ?? zone.statusOntwikkeling }}
             </vl-link>
-            <span v-else>{{ zone.digitaleBeheerder }}</span>
+          </td>
+        </tr>
+        <tr v-if="zone?.ontwikkelaar">
+          <td>
+            <vl-link
+              href="https://data.vlaanderen.be/ns/bedrijventerrein#ontwikkelaar"
+              external
+            >
+              ontwikkelaar
+            </vl-link>
+          </td>
+          <td>
+            <vl-link :href="zone.ontwikkelaar">
+              {{ zone.ontwikkelaarLabel ?? zone.ontwikkelaar }}
+            </vl-link>
           </td>
         </tr>
         <tr v-if="zone?.geldigheidsperiode">
@@ -85,7 +89,7 @@
         <tr v-if="zone?.identificator">
           <td>
             <vl-link href="http://www.w3.org/ns/adms#identifier" external>
-              Identificator
+              identificator
             </vl-link>
           </td>
           <td>
@@ -97,7 +101,7 @@
         <tr v-if="zone?.bedrijventerrein">
           <td>
             <vl-link href="http://purl.org/dc/terms/isPartOf" external>
-              Bedrijventerrein
+              bedrijventerrein
             </vl-link>
           </td>
           <td>
@@ -106,35 +110,15 @@
             </vl-link>
           </td>
         </tr>
-        <tr v-if="zone?.juridischeHandhaver !== undefined">
-          <td>
-            <vl-link
-              href="https://data.vlaanderen.be/ns/bedrijventerrein#juridischeHandhaver"
-              external
-            >
-              JuridischeHandhaver
-            </vl-link>
-          </td>
-          <td>
-            <vl-link
-              v-if="zone.juridischeHandhaver?.startsWith('http')"
-              :href="zone.juridischeHandhaver"
-            >
-              {{ zone.juridischeHandhaver }}
-            </vl-link>
-            <span v-else>{{ zone.juridischeHandhaver }}</span>
-          </td>
-        </tr>
         <tr v-if="zone?.type">
           <td>
             <vl-link
               href="https://data.vlaanderen.be/ns/perceel#RuimtelijkeEenheid.type"
               external
             >
-              Type
+              type
             </vl-link>
           </td>
-
           <td>
             <vl-link :href="zone.type" external>
               {{ zone.type }}
@@ -156,29 +140,13 @@
             </vl-link>
           </td>
         </tr>
-        <tr v-if="zone?.percelen?.length">
-          <td>
-            <vl-link href="http://purl.org/dc/terms/relation" external>
-              Bedrijventerreinperceel
-            </vl-link>
-          </td>
-          <td>
-            <ul>
-              <li v-for="perceel in zone.percelen" :key="perceel.uri">
-                <vl-link :href="`/doc/${perceel.id}`">
-                  {{ perceel.label ?? perceel.id }}
-                </vl-link>
-              </li>
-            </ul>
-          </td>
-        </tr>
         <tr v-if="zone?.oppervlakte">
           <td>
             <vl-link
               href="https://data.vlaanderen.be/ns/perceel#RuimtelijkeEenheidOppervlakte"
               external
             >
-              RuimtelijkeEenheidOppervlakte
+              oppervlakte
             </vl-link>
           </td>
           <td>
@@ -191,15 +159,31 @@
             <span v-else>{{ zone.oppervlakte }}</span>
           </td>
         </tr>
+        <tr v-if="zone?.percelen?.length">
+          <td>
+            <vl-link href="http://purl.org/dc/terms/hasPart" external>
+              percelen
+            </vl-link>
+          </td>
+          <td>
+            <ul>
+              <li v-for="perceel in zone.percelen" :key="perceel.uri">
+                <vl-link :href="`/doc/${perceel.id}`">
+                  {{ perceel.label ?? perceel.id }}
+                </vl-link>
+              </li>
+            </ul>
+          </td>
+        </tr>
       </tbody>
     </vl-data-table>
   </vl-column>
 </template>
 
-<script setup lang="ts" name="beheerdeBedrijvenzoneInfo">
-import type { BeheerdeBedrijvenzone } from '~/types/bedrijventerrein'
+<script setup lang="ts" name="ontwikkelbareBedrijvenzoneInfo">
+import type { OntwikkelbareBedrijvenzone } from '~/types/bedrijventerrein'
 
 defineProps<{
-  zone?: BeheerdeBedrijvenzone
+  zone?: OntwikkelbareBedrijvenzone
 }>()
 </script>

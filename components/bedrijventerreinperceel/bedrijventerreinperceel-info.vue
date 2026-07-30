@@ -134,7 +134,7 @@
             </vl-link>
           </td>
           <td>
-            <ul class="list-unstyled">
+            <ul>
               <li
                 v-for="(beperkingUri, i) in perceel.beperking"
                 :key="beperkingUri"
@@ -182,13 +182,9 @@
             </vl-link>
           </td>
           <td>
-            <vl-link
-              v-if="perceel.oppervlakte?.startsWith('http')"
-              :href="perceel.oppervlakte"
-            >
+            <vl-link :href="perceel.oppervlakte">
               {{ perceel.oppervlakte }}
             </vl-link>
-            <span v-else>{{ perceel.oppervlakte }}</span>
           </td>
         </tr>
         <tr v-if="perceel?.beheerdeBedrijvenzones?.length">
@@ -201,7 +197,7 @@
             </vl-link>
           </td>
           <td>
-            <ul class="list-unstyled">
+            <ul>
               <li
                 v-for="zone in perceel.beheerdeBedrijvenzones"
                 :key="zone.uri"
@@ -223,7 +219,7 @@
             </vl-link>
           </td>
           <td>
-            <ul class="list-unstyled">
+            <ul>
               <li
                 v-for="zone in perceel.ontwikkelbareBedrijvenzones"
                 :key="zone.uri"
@@ -247,14 +243,3 @@ defineProps<{
   perceel?: Bedrijventerreinperceel
 }>()
 </script>
-
-<style scoped>
-.list-unstyled {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-.list-unstyled li {
-  margin-bottom: 0.25rem;
-}
-</style>
