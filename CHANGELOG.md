@@ -167,3 +167,13 @@ ADD ALL KBO DATA
 
     1.18.5
     fix: changed vcard('Kind'), vcard('hasEmail'), vcard('hasTelephone') and vcard('hasAddress') to schema('ContactPoint'), schema('email'), schema('telephone') and locn('address').
+
+    1.19.0
+    feat: support for the bedrijventerreinen PURI service
+
+    - /bedrijventerreinen
+    - /bedrijventerrein/:id
+    - /beheerdebedrijvenzone
+    - /beheerdebedrijvenzone/:id
+    - /bedrijventerreinperceel
+    - /bedrijventerreinperceel/:id

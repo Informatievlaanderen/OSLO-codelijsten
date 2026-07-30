@@ -1,14 +1,15 @@
 <template>
   <content-header
-    title="Concept Schema's"
+    title="Bedrijventerrein perceel"
     href="https://www.vlaanderen.be/digitaal-vlaanderen"
   />
+
   <vl-layout>
     <vl-region>
-      <vl-grid mod-v-center mod-center mod-stacked>
+      <vl-grid mod-v-center mod-stacked>
         <vl-column width="12">
           <vl-title mod-no-space-bottom tag-name="h1">
-            Conceptschema's
+            Bedrijventerrein percelen
           </vl-title>
         </vl-column>
 
@@ -17,7 +18,7 @@
           <vl-form-group>
             <vl-input-field
               v-model="searchQuery"
-              placeholder="Zoek op label of URI..."
+              placeholder="Zoek op ID of URI..."
               mod-block
             >
               <vl-icon slot="before" icon="search"></vl-icon>
@@ -29,37 +30,33 @@
           <vl-data-table>
             <thead>
               <tr>
+                <th>ID</th>
                 <th>URI</th>
-                <th>Label</th>
-                <th>Definitie</th>
                 <th>Acties</th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-if="pagedDatasets().length"
-                v-for="scheme in pagedDatasets()"
-                :key="scheme.id"
+                v-if="pagedItems().length"
+                v-for="item in pagedItems()"
+                :key="item.id"
               >
+                <td>{{ item.id }}</td>
                 <td>
-                  <vl-link :href="scheme.uri" external>
-                    {{ scheme.uri }}
+                  <vl-link :href="item.uri" external>
+                    {{ item.uri }}
                   </vl-link>
                 </td>
-                <td>{{ scheme.label ?? scheme.id }}</td>
                 <td>
-                  {{ scheme.definition ?? 'Geen definitie beschikbaar' }}
-                </td>
-                <td>
-                  <vl-link :href="`/doc/conceptscheme/${scheme.id}`">
+                  <vl-link :href="`/doc/${item.id}`">
                     Bekijk details
                   </vl-link>
                 </td>
               </tr>
               <tr v-else>
-                <td colspan="5" class="vl-u-align-center">
-                  <span v-if="isLoading">Conceptschema's inladen...</span>
-                  <span v-else>Geen schema's gevonden</span>
+                <td colspan="3" class="vl-u-align-center">
+                  <span v-if="isLoading">Bedrijventerrein percelen inladen...</span>
+                  <span v-else>Geen bedrijventerrein percelen gevonden</span>
                 </td>
               </tr>
             </tbody>
@@ -96,26 +93,29 @@
 </template>
 
 <script setup lang="ts">
-import type { ConceptScheme } from '~/types/conceptScheme'
+import type { BedrijventerreinperceelListItem } from '~/types/bedrijventerrein'
 import { ITEMS_PER_PAGE } from '~/constants/constants'
+import { useSeoHead } from '~/composables/useSEO'
 
 const paginationIndex = ref(1)
 const searchQuery = ref('')
 const isLoading = ref(false)
 const total = ref(0)
-const currentPageItems = ref<ConceptScheme[]>([])
+const currentPageItems = ref<BedrijventerreinperceelListItem[]>([])
 
 async function fetchPage() {
   isLoading.value = true
   try {
-    const response = await $fetch<{ total: number; items: ConceptScheme[] }>(
-      '/doc/api/conceptscheme',
-      { query: { page: paginationIndex.value, search: searchQuery.value } },
-    )
+    const response = await $fetch<{
+      total: number
+      items: BedrijventerreinperceelListItem[]
+    }>('/doc/api/bedrijventerreinperceel', {
+      query: { page: paginationIndex.value, search: searchQuery.value },
+    })
     total.value = response.total ?? 0
     currentPageItems.value = response.items ?? []
   } catch (err) {
-    console.error('Error loading concept schemes:', err)
+    console.error('Error loading bedrijventerrein percelen:', err)
     total.value = 0
     currentPageItems.value = []
   } finally {
@@ -123,15 +123,13 @@ async function fetchPage() {
   }
 }
 
-// Reset to page 1 when search changes
 watch(searchQuery, () => {
   paginationIndex.value = 1
 })
 
-// Fetch from server whenever page or search changes
 watch([paginationIndex, searchQuery], fetchPage, { immediate: true })
 
-const pagedDatasets = (): ConceptScheme[] => currentPageItems.value
+const pagedItems = (): BedrijventerreinperceelListItem[] => currentPageItems.value
 
 const paginationFrom = computed(() => {
   if (total.value === 0) return 0
@@ -156,6 +154,7 @@ const setNextPage = () => {
 }
 
 useSeoHead({
-  title: "Conceptschema's",
+  title: 'Bedrijventerrein percelen',
+  description: 'Overzicht van alle bedrijventerrein percelen',
 })
 </script>

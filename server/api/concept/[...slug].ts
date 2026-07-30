@@ -2,7 +2,7 @@ import { SUPPORTED_EXTENSIONS, SUPPORTED_FORMATS } from '~/constants/constants'
 import { getConcept } from '~/server/services/rdfquery.service'
 import type { Concept } from '~/types/concept'
 import type { DatasetConfig } from '~/types/conceptScheme'
-import { serializeAllTriples } from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization.service'
 
 export default defineEventHandler(
   async (event): Promise<Concept | string | null> => {

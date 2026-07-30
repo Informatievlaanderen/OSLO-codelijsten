@@ -5,7 +5,7 @@ import {
   SUPPORTED_EXTENSIONS,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import { serializeAllTriples } from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization.service'
 import type { OrganizationData, ContactPoint } from '~/types/organization'
 
 export default defineEventHandler(

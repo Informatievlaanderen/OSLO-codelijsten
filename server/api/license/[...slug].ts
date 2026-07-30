@@ -2,10 +2,9 @@ import {
   LICENSE_BY_ID_QUERY,
   SUPPORTED_EXTENSIONS,
   SUPPORTED_FORMATS,
-  TTL,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import { serializeAllTriples } from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization.service'
 import type { License } from '~/types/license'
 
 export default defineEventHandler(
@@ -22,8 +21,6 @@ export default defineEventHandler(
 
       console.log(`[${new Date().toISOString()}] Fetching license: ${slug}`)
 
-      // Handle slug array and .ttl extension
-      const slugString = Array.isArray(slug) ? slug.join('/') : slug
       // Detect supported file extension (.ttl, .jsonld, .nt)
       const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
         slug.endsWith(ext),
@@ -31,8 +28,8 @@ export default defineEventHandler(
       const cleanSlug = extension ? slug.replace(extension, '') : slug
       // Get the TTL file URL from runtime config
       const runtimeConfig = useRuntimeConfig()
-      const LICENSE_TTL_URL =
-        process.env.LICENSE_TTL_URL ?? runtimeConfig.LICENSE_TTL_URL
+      const LICENSE_TTL_URL: string =
+        process.env.LICENSE_TTL_URL ?? <string>runtimeConfig.LICENSE_TTL_URL
 
       if (!LICENSE_TTL_URL) {
         throw createError({
@@ -45,8 +42,8 @@ export default defineEventHandler(
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
         ? SUPPORTED_FORMATS[
-            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
-          ]
+        extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+        ]
         : null
       const requestedFormat =
         extensionFormat ||

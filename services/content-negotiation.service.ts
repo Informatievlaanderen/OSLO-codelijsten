@@ -1,5 +1,5 @@
 import { SUPPORTED_FORMATS } from '~/constants/constants'
-import { serializeAllTriples } from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization.service'
 
 export const handleContentNegotiation = async (
   event: any,

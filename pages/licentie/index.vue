@@ -23,7 +23,7 @@
           </vl-form-group>
         </vl-column>
 
-        <vl-column class="vl-u-table-overflow">
+        <vl-column>
           <vl-data-table>
             <thead>
               <tr>

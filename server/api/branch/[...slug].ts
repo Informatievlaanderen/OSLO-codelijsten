@@ -21,7 +21,7 @@ import {
 } from '../utils/kbo-utils'
 import { KBO_FIELD_URIS } from '~/server/utils/kbo-predicate-uris'
 import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
-import { serializeQuadsToString } from '~/services/serialization-service'
+import { serializeQuadsToString } from '~/services/serialization.service'
 
 export default defineEventHandler(
   async (event): Promise<KBOBranchData | string | null> => {
