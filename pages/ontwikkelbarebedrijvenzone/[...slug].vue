@@ -24,7 +24,7 @@
         </vl-column>
 
         <vl-column width="12">
-          <action-buttons :source="data?.source ?? ''">
+          <action-buttons :source="data?.source ?? ''" :sparql-query="sparqlQuery">
             <a href="/doc/ontwikkelbarebedrijvenzone"
               ><vl-button type="button">Terug naar overzicht</vl-button></a
             >
@@ -41,6 +41,7 @@
 
 <script setup lang="ts">
 import type { OntwikkelbareBedrijvenzone } from '~/types/bedrijventerrein'
+import { ONTWIKKELBAREBEDRIJVENZONE_BY_ID_QUERY } from '~/constants/bedrijventerrein.constants'
 import { useSeoHead } from '~/composables/useSEO'
 
 const showToaster = ref(false)
@@ -50,6 +51,8 @@ const slug = computed(() => {
   const params = route.params.slug
   return Array.isArray(params) ? params.join('/') : params
 })
+
+const sparqlQuery = computed(() => ONTWIKKELBAREBEDRIJVENZONE_BY_ID_QUERY(slug.value))
 
 const copyToClipboard = async (text: string) => {
   try {

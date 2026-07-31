@@ -152,3 +152,30 @@ export const ONTWIKKELBAREBEDRIJVENZONE_LIST_QUERY = `
   }
   ORDER BY ?name
 `
+
+export const ONTWIKKELBAREBEDRIJVENZONE_BY_ID_QUERY = (id: string) => `
+  PREFIX bt: <https://data.vlaanderen.be/ns/bedrijventerrein#>
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+  PREFIX adms: <http://www.w3.org/ns/adms#>
+  PREFIX perceel: <https://data.vlaanderen.be/ns/perceel#>
+  PREFIX dct: <http://purl.org/dc/terms/>
+  PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+  SELECT DISTINCT ?subject ?name ?homepage ?voorzieneUitgifte ?ontwikkelaar ?statusOntwikkeling ?geometrie ?identifier ?oppervlakte ?type ?geldigheidsperiode ?isPartOf ?perceelUri
+  WHERE {
+    ?subject a bt:OntwikkelbareBedrijvenzone .
+    FILTER(STRENDS(STR(?subject), "${id}"))
+    OPTIONAL { ?subject skos:prefLabel ?name . }
+    OPTIONAL { ?subject foaf:homepage ?homepage . }
+    OPTIONAL { ?subject bt:voorzieneUitgifte ?voorzieneUitgifte . }
+    OPTIONAL { ?subject bt:ontwikkelaar ?ontwikkelaar . }
+    OPTIONAL { ?subject bt:statusOntwikkeling ?statusOntwikkeling . }
+    OPTIONAL { ?subject perceel:geometrie ?geometrie . }
+    OPTIONAL { ?subject adms:identifier ?identifier . }
+    OPTIONAL { ?subject perceel:oppervlakte ?oppervlakte . }
+    OPTIONAL { ?subject perceel:RuimtelijkeEenheid.type ?type . }
+    OPTIONAL { ?subject perceel:geldigheidsperiode ?geldigheidsperiode . }
+    OPTIONAL { ?subject dct:isPartOf ?isPartOf . }
+    OPTIONAL { ?subject dct:hasPart ?perceelUri . }
+  }
+`

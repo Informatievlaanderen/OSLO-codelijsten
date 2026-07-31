@@ -30,7 +30,7 @@
         </vl-column>
 
         <vl-column width="12">
-          <action-buttons :source="data?.source ?? ''" />
+          <action-buttons :source="data?.source ?? ''" :sparql-query="sparqlQuery" />
         </vl-column>
 
         <genid-info v-if="data" :resource="data" />
@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import type { GenidResource } from '~/types/bedrijventerrein'
+import { GENID_URI_BASE } from '~/constants/bedrijventerrein.constants'
 import { useSeoHead } from '~/composables/useSEO'
 
 const showToaster = ref(false)
@@ -62,6 +63,11 @@ if (!slug.value.startsWith('.well-known/genid/')) {
 }
 
 const genidSlug = slug.value.replace('.well-known/genid/', '')
+
+const sparqlQuery = computed(() => {
+  const uri = `${GENID_URI_BASE}${genidSlug}`
+  return `SELECT * WHERE { <${uri}> ?p ?o . }`
+})
 
 const copyToClipboard = async (text: string) => {
   try {
