@@ -4,7 +4,7 @@ export const useSeoHead = (config: SeoConfig) => {
   const { title, description, type = 'website' } = config
 
   useHead({
-    title: `${title} | Codelijsten`,
+    title: `${title}`,
     meta: [
       {
         name: 'description',
