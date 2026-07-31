@@ -117,7 +117,11 @@
               type
             </vl-link>
           </td>
-          <td>{{ bedrijventerrein.type }}</td>
+          <td>
+            <vl-link :href="bedrijventerrein.type" external>{{
+              bedrijventerrein.type
+            }}</vl-link>
+          </td>
         </tr>
         <tr v-if="bedrijventerrein?.percelen?.length">
           <td>

@@ -181,6 +181,6 @@ ADD ALL KBO DATA
     - /ontwikkelbarebedrijvenzone/:id
     - /.well-known/genid/:id
 
-
     1.19.1
-    fix: remove `Codelijsten` from SEO header since no longer relevant
+      fix: remove `Codelijsten` from SEO header since no longer relevant
+      fix: make the `type` always show up as an anchor tag instead of just a string

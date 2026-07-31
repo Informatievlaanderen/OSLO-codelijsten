@@ -104,7 +104,7 @@
             </vl-link>
           </td>
           <td>
-            <vl-link :href="perceel.type">
+            <vl-link :href="perceel.type" external>
               {{ perceel.type }}
             </vl-link>
           </td>
