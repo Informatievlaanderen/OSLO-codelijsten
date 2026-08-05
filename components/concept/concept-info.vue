@@ -1,74 +1,59 @@
 <template>
   <vl-column width="12">
-    <vl-title tag-name="h2" mod-h3>Gegevens</vl-title>
-    <vl-properties mod-bordered>
-      <vl-properties-title>Concepteigenschappen</vl-properties-title>
-      <vl-properties-column>
-        <vl-properties-list>
-          <vl-properties-label>
+    <vl-title tag-name="h2" mod-h3>Concepteigenschappen</vl-title>
+    <vl-data-table>
+      <tbody>
+        <tr>
+          <td>
             <vl-link
               href="https://www.w3.org/2009/08/skos-reference/skos.html#prefLabel"
               external
             >
               Label
             </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
-            {{ concept?.label ?? 'Niet beschikbaar' }}
-          </vl-properties-data>
-
-          <vl-properties-label>
+          </td>
+          <td>{{ concept?.label ?? 'Niet beschikbaar' }}</td>
+        </tr>
+        <tr>
+          <td>
             <vl-link
               href="https://www.w3.org/2009/08/skos-reference/skos.html#definition"
               external
             >
               Definitie
             </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
-            {{ concept?.definition ?? 'Niet beschikbaar' }}
-          </vl-properties-data>
-
-          <vl-properties-label>
+          </td>
+          <td>{{ concept?.definition ?? 'Niet beschikbaar' }}</td>
+        </tr>
+        <tr>
+          <td>
             <vl-link
               href="https://www.w3.org/2009/08/skos-reference/skos.html#note"
               external
             >
               Aanvullende informatie
             </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
-            {{ concept?.additionalInfo ?? 'Niet beschikbaar' }}
-          </vl-properties-data>
-          <vl-properties-label>
+          </td>
+          <td>{{ concept?.additionalInfo ?? 'Niet beschikbaar' }}</td>
+        </tr>
+        <tr>
+          <td>
             <vl-link
-              href="https://www.w3.org/2009/08/skos-reference/skos.html#topConceptOf"
+              href="https://www.w3.org/2009/08/skos-reference/skos.html#notation"
               external
             >
-              Concept in schema
+              Notatie
             </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
-            <template v-if="concept?.topConceptOf?.length">
-              <vl-link
-                v-for="scheme in concept.topConceptOf"
-                :key="scheme.id"
-                :href="scheme.uri"
-                external
-                class="link--icon--caret vl-u-display-block"
-              >
-                {{ scheme.label }}
-              </vl-link>
-            </template>
-            <span v-else>Niet beschikbaar</span>
-          </vl-properties-data>
-
-          <vl-properties-label>
+          </td>
+          <td>{{ concept?.notation ?? 'Niet beschikbaar' }}</td>
+        </tr>
+        <tr>
+          <td>
             <vl-link href="https://www.w3.org/ns/adms#status" external>
               Status
             </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
+          </td>
+          <td>
             <vl-link v-if="concept?.status" :href="concept.status" external>
               <span
                 v-if="getStatusLabel(concept.status, concept.statusLabel)"
@@ -78,100 +63,114 @@
               </span>
             </vl-link>
             <span v-else>Niet beschikbaar</span>
-          </vl-properties-data>
-        </vl-properties-list>
-      </vl-properties-column>
-      <vl-properties-column>
-        <vl-properties-list>
-          <vl-properties-label>
+          </td>
+        </tr>
+        <tr>
+          <td>
             <vl-link
-              href="https://www.w3.org/2009/08/skos-reference/skos.html#notation"
+              href="https://www.w3.org/2009/08/skos-reference/skos.html#topConceptOf"
               external
             >
-              Notatie
+              Concept in schema
             </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
-            {{ concept?.notation ?? 'Niet beschikbaar' }}
-          </vl-properties-data>
-
-          <vl-properties-label>
-            <vl-link
-              href="https://www.w3.org/2009/08/skos-reference/skos.html#narrower"
-              external
-            >
-              Beperktere betekenis
-            </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
-            <template v-if="concept?.narrower?.length">
-              <vl-link
-                v-for="narrower in concept.narrower"
-                :key="narrower.id"
-                :href="narrower.uri"
-                external
-                class="vl-u-display-block"
-              >
-                {{ narrower.label }}
-              </vl-link>
+          </td>
+          <td>
+            <template v-if="concept?.topConceptOf?.length">
+              <ul>
+                <li v-for="scheme in concept.topConceptOf" :key="scheme.id">
+                  <vl-link :href="scheme.uri" external>
+                    {{ scheme.label }}
+                  </vl-link>
+                </li>
+              </ul>
             </template>
             <span v-else>Niet beschikbaar</span>
-          </vl-properties-data>
-
-          <vl-properties-label>
-            <vl-link
-              href="https://www.w3.org/2009/08/skos-reference/skos.html#broader"
-              external
-            >
-              Bredere betekenis
-            </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
-            <template v-if="concept?.broader?.length">
-              <vl-link
-                v-for="broader in concept.broader"
-                :key="broader.id"
-                :href="broader.uri"
-                external
-                class="vl-u-display-block"
-              >
-                {{ broader.label }}
-              </vl-link>
-            </template>
-            <span v-else>Niet beschikbaar</span>
-          </vl-properties-data>
-          <vl-properties-label>
+          </td>
+        </tr>
+        <tr>
+          <td>
             <vl-link
               href="https://www.w3.org/2009/08/skos-reference/skos.html#inScheme"
               external
             >
               Onderdeel van schema
             </vl-link>
-          </vl-properties-label>
-          <vl-properties-data>
+          </td>
+          <td>
             <template v-if="concept?.inScheme?.length">
-              <vl-link
-                v-for="scheme in concept.inScheme"
-                :key="scheme.id"
-                :href="scheme.uri"
-                external
-              >
-                {{ scheme.label }}
-              </vl-link>
+              <ul>
+                <li v-for="scheme in concept.inScheme" :key="scheme.id">
+                  <vl-link :href="scheme.uri" external>
+                    {{ scheme.label }}
+                  </vl-link>
+                </li>
+              </ul>
             </template>
             <span v-else>Niet beschikbaar</span>
-          </vl-properties-data>
-
-          <vl-properties-label>dataset</vl-properties-label>
-          <vl-properties-data>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <vl-link
+              href="https://www.w3.org/2009/08/skos-reference/skos.html#narrower"
+              external
+            >
+              Heeft beperktere betekenis
+            </vl-link>
+          </td>
+          <td>
+            <template v-if="concept?.narrower?.length">
+              <ul>
+                <li v-for="narrower in concept.narrower" :key="narrower.id">
+                  <vl-link :href="narrower.uri" external>
+                    {{ narrower.label }}
+                  </vl-link>
+                </li>
+              </ul>
+            </template>
+            <span v-else>Niet beschikbaar</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <vl-link
+              href="https://www.w3.org/2009/08/skos-reference/skos.html#broader"
+              external
+            >
+              Heeft breder concept
+            </vl-link>
+          </td>
+          <td>
+            <template v-if="concept?.broader?.length">
+              <ul>
+                <li v-for="broader in concept.broader" :key="broader.id">
+                  <vl-link :href="broader.uri" external>
+                    {{ broader.label }}
+                  </vl-link>
+                </li>
+              </ul>
+            </template>
+            <span v-else>Niet beschikbaar</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <vl-link
+              href="http://www.w3.org/ns/dcat#dataset"
+              external
+            >
+              Dataset
+            </vl-link>
+          </td>
+          <td>
             <vl-link v-if="concept?.dataset" :href="concept.dataset" external>
               {{ concept.dataset }}
             </vl-link>
             <span v-else>Niet beschikbaar</span>
-          </vl-properties-data>
-        </vl-properties-list>
-      </vl-properties-column>
-    </vl-properties>
+          </td>
+        </tr>
+      </tbody>
+    </vl-data-table>
   </vl-column>
 </template>
 

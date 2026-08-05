@@ -47,7 +47,7 @@
             >
               {{ triple.value }}
             </vl-link>
-            <span v-else>{{ triple.value }}</span>
+            <span v-else>{{ formatLiteralValue(triple.value) }}</span>
           </td>
         </tr>
       </tbody>
@@ -100,5 +100,11 @@ const isIdentificatorPredicate = (predicate: string): boolean => {
     predicate === 'http://mu.semte.ch/vocabularies/core/uuid' ||
     predicate === 'https://www.w3.org/ns/legacy_adms#identifier'
   )
+}
+
+const formatLiteralValue = (value: string): string => {
+  if (value === '0' || value === 'false' || value === 'False') return 'false'
+  if (value === '1' || value === 'true' || value === 'True') return 'true'
+  return value
 }
 </script>

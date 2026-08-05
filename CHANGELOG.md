@@ -185,3 +185,5 @@ ADD ALL KBO DATA
       fix: remove `Codelijsten` from SEO header since no longer relevant
       fix: make the `type` always show up as an anchor tag instead of just a string
       feat: include the sparql query in the link to the source code
+      fix: change O and 1 values to false and true
+      feat: other definition for broader/narrower
