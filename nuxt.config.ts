@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     public: {
       ENVIRONMENT: process.env.NUXT_ENVIRONMENT || 'Production',
       DEPARTMENT: process.env.NUXT_DEPARTMENT,
+      BEDRIJVENTERREIN_SPARQL_ENDPOINT: process.env.NUXT_BEDRIJVENTERREIN_SPARQL_ENDPOINT ?? "https://bedrijventerreinen.vlaanderen.be/sparql/"
     },
   },
   app: {

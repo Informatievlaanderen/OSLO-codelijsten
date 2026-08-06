@@ -63,6 +63,11 @@ export default defineEventHandler(async (event) => {
     const licentieMatch = cleanPath.match(/\/licentie\/(.+)$/)
     const ondernemingMatch = cleanPath.match(/\/onderneming\/(.+)$/)
     const vestigingMatch = cleanPath.match(/\/vestiging\/(.+)$/)
+    const bedrijventerreinMatch = cleanPath.match(/\/bedrijventerrein\/(.+)$/)
+    const bedrijventerreinperceelMatch = cleanPath.match(/\/bedrijventerreinperceel\/(.+)$/)
+    const beheerdebedrijvenzoneMatch = cleanPath.match(/\/beheerdebedrijvenzone\/(.+)$/)
+    const ontwikkelbarebedrijvenzoneMatch = cleanPath.match(/\/ontwikkelbarebedrijvenzone\/(.+)$/)
+    const genidMatch = cleanPath.match(/\/.well-known\/genid\/(.+)$/)
 
     // Redirect to appropriate API endpoint
     switch (true) {
@@ -83,6 +88,21 @@ export default defineEventHandler(async (event) => {
         break
       case !!vestigingMatch:
         apiPath = `/doc/api/branch/${vestigingMatch![1]}${extension}`
+        break
+      case !!bedrijventerreinMatch:
+        apiPath = `/doc/api/bedrijventerrein/${bedrijventerreinMatch![1]}${extension}`
+        break
+      case !!bedrijventerreinperceelMatch:
+        apiPath = `/doc/api/bedrijventerreinperceel/${bedrijventerreinperceelMatch![1]}${extension}`
+        break
+      case !!beheerdebedrijvenzoneMatch:
+        apiPath = `/doc/api/beheerdebedrijvenzone/${beheerdebedrijvenzoneMatch![1]}${extension}`
+        break
+      case !!ontwikkelbarebedrijvenzoneMatch:
+        apiPath = `/doc/api/ontwikkelbarebedrijvenzone/${ontwikkelbarebedrijvenzoneMatch![1]}${extension}`
+        break
+      case !!genidMatch:
+        apiPath = `/doc/api/genid/${genidMatch![1]}${extension}`
         break
     }
     if (!apiPath) {

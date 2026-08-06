@@ -6,7 +6,7 @@ import {
   SUPPORTED_FORMATS,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
-import { serializeAllTriples } from '~/services/serialization-service'
+import { serializeAllTriples } from '~/services/serialization.service'
 import type {
   ConceptScheme,
   ConceptSchemeConfig,

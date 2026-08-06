@@ -167,3 +167,23 @@ ADD ALL KBO DATA
 
     1.18.5
     fix: changed vcard('Kind'), vcard('hasEmail'), vcard('hasTelephone') and vcard('hasAddress') to schema('ContactPoint'), schema('email'), schema('telephone') and locn('address').
+
+    1.19.0
+    feat: support for the bedrijventerreinen PURI service
+
+    - /bedrijventerreinen
+    - /bedrijventerrein/:id
+    - /beheerdebedrijvenzone
+    - /beheerdebedrijvenzone/:id
+    - /bedrijventerreinperceel
+    - /bedrijventerreinperceel/:id
+    - /ontwikkelbarebedrijvenzone
+    - /ontwikkelbarebedrijvenzone/:id
+    - /.well-known/genid/:id
+
+    1.19.1
+      fix: remove `Codelijsten` from SEO header since no longer relevant
+      fix: make the `type` always show up as an anchor tag instead of just a string
+      feat: include the sparql query in the link to the source code
+      fix: change O and 1 values to false and true
+      feat: other definition for broader/narrower

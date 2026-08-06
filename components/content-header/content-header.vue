@@ -5,7 +5,7 @@
     mod-show-mobile
     :mod-context="context"
     :background="{
-      src: '//www.vlaanderen.be/sites/default/files/ip_acm/page_banner_narrow/header.jpg',
+      src: 'https://assets.vlaanderen.be/image/upload/v1590772805/AIV_OVE_computer-2_jhgsfq.jpg',
       alt: 'Content Header',
     }"
   >

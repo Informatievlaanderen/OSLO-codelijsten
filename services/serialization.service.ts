@@ -67,3 +67,44 @@ export const serializeAllTriples = async (
 
   return unwrapJsonLdArray(chunks.join(''), contentType)
 }
+
+/**
+ * Serializes all triples for a specific entity URI from a SPARQL endpoint.
+ */
+export const serializeEntityTriples = async (
+  entityUri: string,
+  sparqlEndpoint: string,
+  contentType: string,
+): Promise<string> => {
+  const query = `
+    CONSTRUCT { ?s ?p ?o }
+    WHERE {
+      { <${entityUri}> ?p ?o . BIND(<${entityUri}> AS ?s) }
+      UNION
+      { ?s ?p <${entityUri}> . BIND(<${entityUri}> AS ?o) }
+    }
+  `
+
+  const quadStream = await queryEngine.queryQuads(query, {
+    sources: [sparqlEndpoint],
+    noCache: true,
+  })
+
+  const quads: RDF.Quad[] = await quadStream.toArray()
+
+  const allPrefixes = await getPrefixes()
+  const usedPrefixes = filterPrefixes(allPrefixes, quads)
+
+  const quadReadable = Readable.from(quads)
+  const textStream = rdfSerializer.serialize(quadReadable, {
+    contentType,
+    prefixes: usedPrefixes,
+  })
+
+  const chunks: string[] = []
+  for await (const chunk of textStream) {
+    chunks.push(typeof chunk === 'string' ? chunk : chunk.toString())
+  }
+
+  return unwrapJsonLdArray(chunks.join(''), contentType)
+}
