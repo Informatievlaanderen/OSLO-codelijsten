@@ -86,7 +86,10 @@ export const serializeEntityTriples = async (
   `
 
   const quadStream = await queryEngine.queryQuads(query, {
-    sources: [sparqlEndpoint],
+    // Explicitly set type to 'sparql' to avoid Comunica's source auto‑detection probe,
+    // which sends a GET without ?query= and fails on nginx‑backed endpoints that only
+    // proxy requests carrying a query parameter (e.g. QLever behind /sparql/qlever).
+    sources: [{ type: 'sparql', value: sparqlEndpoint }],
     noCache: true,
   })
 

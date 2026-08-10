@@ -47,17 +47,17 @@ ADD ALL KBO DATA
     "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141-Gezinsrelatietype.ttl"
     },
 
-              1.16.2
+                1.16.2
 
-              - Fix for root conceptscheme showing the information of a child conceptscheme
+                - Fix for root conceptscheme showing the information of a child conceptscheme
 
-                1.16.3
+                  1.16.3
 
-              - Fix for links to concept or conceptschemes
+                - Fix for links to concept or conceptschemes
 
-                1.16.4
+                  1.16.4
 
-              feat: Use VKBO instead of KBO directly for enterprises
+                feat: Use VKBO instead of KBO directly for enterprises
 
     1.16.5
     feat: add content-negotiation for enterprises
@@ -181,9 +181,12 @@ ADD ALL KBO DATA
     - /ontwikkelbarebedrijvenzone/:id
     - /.well-known/genid/:id
 
-    1.19.1
+      1.19.1
       fix: remove `Codelijsten` from SEO header since no longer relevant
       fix: make the `type` always show up as an anchor tag instead of just a string
       feat: include the sparql query in the link to the source code
       fix: change O and 1 values to false and true
       feat: other definition for broader/narrower
+
+    1.19.2
+    fix: explicitly set type to `sparql` for the sparql query in the link to the source code

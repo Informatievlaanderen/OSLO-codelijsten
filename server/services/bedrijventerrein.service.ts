@@ -31,7 +31,10 @@ const queryEngine = new QueryEngine()
 
 const executeQuery = async (query: string): Promise<any[]> => {
   const bindings: any[] = []
-  const sources = [getSparqlEndpoint()]
+  // Explicitly set type to 'sparql' to avoid Comunica's source auto‑detection probe,
+  // which sends a GET without ?query= and fails on nginx‑backed endpoints that only
+  // proxy requests carrying a query parameter (e.g. QLever behind the /sparql/qlever proxy).
+  const sources = [{ type: 'sparql', value: getSparqlEndpoint() }]
 
   const bindingsStream = await queryEngine.queryBindings(query, {
     sources,
