@@ -13,8 +13,8 @@ import type {
   AdresPositie,
 } from '~/types/adres'
 import { ADRES_FIELD_URIS } from '~/server/utils/adres-predicate-uris'
-import { adresDataToQuads } from '~/server/services/adres-serialization.service'
 import { serializeQuadsToString } from '~/services/serialization.service'
+import { adresDataToQuads } from '~/server/services/adres-serialization.service'
 
 const getLocalizedValue = (
   arr: { '@value'?: string; '@language'?: string }[] | undefined,
