@@ -193,3 +193,4 @@ ADD ALL KBO DATA
 
       1.20.0
       feat: added a subjectpage for adres
+      feat: added a subjectpage for straatnaam

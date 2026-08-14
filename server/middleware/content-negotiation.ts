@@ -64,6 +64,7 @@ export default defineEventHandler(async (event) => {
     const ondernemingMatch = cleanPath.match(/\/onderneming\/(.+)$/)
     const vestigingMatch = cleanPath.match(/\/vestiging\/(.+)$/)
     const adresMatch = cleanPath.match(/\/adres\/(.+)$/)
+    const straatnaamMatch = cleanPath.match(/\/straatnaam\/(.+)$/)
     const bedrijventerreinMatch = cleanPath.match(/\/bedrijventerrein\/(.+)$/)
     const bedrijventerreinperceelMatch = cleanPath.match(/\/bedrijventerreinperceel\/(.+)$/)
     const beheerdebedrijvenzoneMatch = cleanPath.match(/\/beheerdebedrijvenzone\/(.+)$/)
@@ -92,6 +93,9 @@ export default defineEventHandler(async (event) => {
         break
       case !!adresMatch:
         apiPath = `/doc/api/adres/${adresMatch![1]}${extension}`
+        break
+      case !!straatnaamMatch:
+        apiPath = `/doc/api/straatnaam/${straatnaamMatch![1]}${extension}`
         break
       case !!bedrijventerreinMatch:
         apiPath = `/doc/api/bedrijventerrein/${bedrijventerreinMatch![1]}${extension}`
