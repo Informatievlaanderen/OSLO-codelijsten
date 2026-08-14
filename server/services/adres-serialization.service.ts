@@ -9,7 +9,6 @@ const ns = (base: string) => (local: string) => df.namedNode(`${base}${local}`)
 
 const rdf = ns('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 const rdfs = ns('http://www.w3.org/2000/01/rdf-schema#')
-const skos = ns('http://www.w3.org/2004/02/skos/core#')
 const adms = ns('http://www.w3.org/ns/adms#')
 const xsd = ns('http://www.w3.org/2001/XMLSchema#')
 const adres = ns('https://data.vlaanderen.be/ns/adres#')
@@ -161,7 +160,7 @@ export const adresDataToQuads = (data: AdresData): RDF.Quad[] => {
       df.quad(
         subject,
         adres('officieelToegekend'),
-        df.literal(data.officieelToegekend, xsd('boolean')),
+        df.literal(data.officieelToegekend?.toString(), xsd('boolean')),
       ),
     )
   }
