@@ -188,5 +188,8 @@ ADD ALL KBO DATA
       fix: change O and 1 values to false and true
       feat: other definition for broader/narrower
 
-    1.19.2
-    fix: explicitly set type to `sparql` for the sparql query in the link to the source code
+      1.19.2
+      fix: explicitly set type to `sparql` for the sparql query in the link to the source code
+
+      1.20.0
+      feat: added a subjectpage for adres

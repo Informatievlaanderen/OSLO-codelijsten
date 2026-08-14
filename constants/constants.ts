@@ -26,6 +26,8 @@ export const PERSONEELSKLASSE_TTL =
   'https://data.vlaanderen.be/id/conceptscheme/RSZ-Personeelsklasse/v1.ttl'
 export const RAPPORTTYPE_TTL =
   'https://data.vlaanderen.be/id/conceptscheme/RapportType/v1.ttl'
+export const BASISREGISTERS_API_BASE =
+  'https://api.basisregisters.staging-vlaanderen.be/v3'
 
 export const CONCEPT_SCHEME_QUERY = `
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
