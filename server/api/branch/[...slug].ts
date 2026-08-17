@@ -163,7 +163,7 @@ export default defineEventHandler(
               x: geometryX,
               y: geometryY,
               wkt: `POINT (${geometryX} ${geometryY})`,
-              gml: `<gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/31370"><gml:coordinates>${geometryX}, ${geometryY}</gml:coordinates></gml:Point>`,
+              gml: `<gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326"><gml:coordinates>${geometryX}, ${geometryY}</gml:coordinates></gml:Point>`,
             },
           },
         })
