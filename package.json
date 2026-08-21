@@ -1,6 +1,6 @@
 {
   "name": "oslo-codelijsten",
-  "version": "1.19.2",
+  "version": "2.0.0",
   "private": true,
   "engines": {
     "npm": ">=8.0.0",
@@ -28,7 +28,8 @@
     "core-js": "^3.15.1",
     "rdf-serialize": "^5.1.0",
     "sass": "^1.85.0",
-    "sass-loader": "^13.3.2"
+    "sass-loader": "^13.3.2",
+    "soap": "^1.10.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.9",

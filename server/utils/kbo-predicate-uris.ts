@@ -18,4 +18,5 @@ export const KBO_FIELD_URIS: KboFieldUris = {
   doorhalingTijd: 'http://www.w3.org/ns/prov#time',
   status: 'https://www.w3.org/ns/regorg#orgStatus',
   omvang: 'http://purl.org/dc/terms/extent',
+  vestigingen: 'http://www.w3.org/ns/org#hasSite',
 } as const

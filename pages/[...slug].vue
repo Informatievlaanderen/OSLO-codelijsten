@@ -30,7 +30,10 @@
         </vl-column>
 
         <vl-column width="12">
-          <action-buttons :source="data?.source ?? ''" :sparql-query="sparqlQuery" />
+          <action-buttons
+            :source="data?.source ?? ''"
+            :sparql-query="sparqlQuery"
+          />
         </vl-column>
 
         <genid-info v-if="data" :resource="data" />
@@ -105,11 +108,3 @@ useSeoHead({
   description: `Genid resource ${genidSlug}`,
 })
 </script>
-
-<style scoped>
-.vl-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-</style>

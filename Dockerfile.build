@@ -14,5 +14,12 @@ WORKDIR /app
 EXPOSE 3000
 
 COPY --from=BUILD /app/.output /app
+
+# The MAGDA SOAP client reads its WSDL/XSD files from disk at runtime.
+# These are public, so they are baked into the image. The certificates are
+# NOT copied here: they are secrets and must be mounted at runtime via a
+# volume, with CERT_DIR pointing to the mounted directory.
+COPY --from=BUILD /app/XSDs /app/XSDs
+
 CMD ["node", "./server/index.mjs"]
 

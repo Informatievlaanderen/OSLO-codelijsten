@@ -30,8 +30,11 @@ export function buildNaceUri(
   const c = clean(code)
   const v = clean(version)
   if (!c || !v) return undefined
-  const vocabPath = v === '2025' ? 'nace2025' : 'nace2008'
-  return `http://vocab.belgif.be/auth/${vocabPath}/${c}`
+  // Only NACE 2025 and 2008 have a published Belgif vocabulary. Older versions
+  // (e.g. 2003) are not available and must not produce a URI.
+  if (v === '2025') return `http://vocab.belgif.be/auth/nace2025/${c}`
+  if (v === '2008') return `http://vocab.belgif.be/auth/nace2008/${c}`
+  return undefined
 }
 
 let juridicalFormCache: Map<string, string> | null = null
