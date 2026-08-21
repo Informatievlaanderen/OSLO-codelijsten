@@ -18,10 +18,10 @@ build-linux:
 	docker build -f Dockerfile.build --platform=linux/amd64 --build-arg "VERSION=${VERSION}" -t informatievlaanderen/codelijsten:${VERSION} .
 
 exec:
-	docker run -it --rm --name codelijsten -p 3000:3000 informatievlaanderen/codelijsten:${VERSION} sh
+	docker run -it --rm --name codelijsten -p 3000:3000 -v "$(PWD)/certs:/app/certs" -e CERT_DIR=/app/certs informatievlaanderen/codelijsten:${VERSION} sh
 
 run:
-	docker run -d --rm --name codelijsten -p 3000:3000 informatievlaanderen/codelijsten:${VERSION}
+	docker run -d --rm --name codelijsten -p 3000:3000 -v "$(PWD)/certs:/app/certs" -e CERT_DIR=/app/certs informatievlaanderen/codelijsten:${VERSION}
 
 stop:
 	docker stop codelijsten
