@@ -188,5 +188,13 @@ ADD ALL KBO DATA
       fix: change O and 1 values to false and true
       feat: other definition for broader/narrower
 
-    1.19.2
-    fix: explicitly set type to `sparql` for the sparql query in the link to the source code
+      1.19.2
+      fix: explicitly set type to `sparql` for the sparql query in the link to the source code
+
+      2.0.0
+      feat: Switched VKBO API to MAGDA SOAP API for `geefOnderneming`
+      fix: place the `XSD` with the build-dir
+      fix: if the SOAP response is in a different language, showcase that language in the `.ttl`
+      fix: don't use `geefOndernemingVKBO` for contactinfo, but instead rely fully on `geefOnderneming`
+      fix: don't show identificator publically in github
+      fix: Change referte to make it clear we're asking for subjectpages

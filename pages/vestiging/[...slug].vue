@@ -12,18 +12,18 @@
     <vl-region>
       <!-- Content -->
       <vl-grid mod-stacked>
-        <!-- Header Section -->
+        <!-- Header Section - always visible -->
         <vl-column width="12">
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
               {{
                 data?.wettelijkeNaam
-                  ? data.wettelijkeNaam
+                  ? data.wettelijkeNaam.value
                   : `Vestiging: ${slug}`
               }}
             </vl-title>
-            <vl-link @click="copyToClipboard(data?.uri ?? '')">
-              {{ data?.uri ?? '' }}
+            <vl-link @click="copyToClipboard(data?.uri ?? `https://data.vlaanderen.be/id/vestiging/${slug}`)">
+              {{ data?.uri ?? `https://data.vlaanderen.be/id/vestiging/${slug}` }}
               <vl-icon icon="file-copy"></vl-icon>
             </vl-link>
           </div>
@@ -33,6 +33,9 @@
         <vl-column width="12">
           <action-buttons :source="data?.source ?? ''" />
         </vl-column>
+
+        <!-- Content -->
+        <template v-if="data">
 
         <!-- Basic Information -->
         <vl-column width="12">
@@ -44,7 +47,7 @@
                     Wettelijke naam
                   </vl-link>
                 </td>
-                <td>{{ data.wettelijkeNaam }}</td>
+                <td>{{ data.wettelijkeNaam.value }}</td>
               </tr>
               <tr v-if="data?.voorkeursnaam">
                 <td>
@@ -52,7 +55,7 @@
                     Voorkeursnaam
                   </vl-link>
                 </td>
-                <td>{{ data.voorkeursnaam }}</td>
+                <td>{{ data.voorkeursnaam.value }}</td>
               </tr>
               <tr v-if="data?.alternatieveNaam?.length">
                 <td>
@@ -61,8 +64,8 @@
                   </vl-link>
                 </td>
                 <td>
-                  <div v-for="name in data.alternatieveNaam" :key="name">
-                    {{ name }}
+                  <div v-for="name in data.alternatieveNaam" :key="name.value">
+                    {{ name.value }}
                   </div>
                 </td>
               </tr>
@@ -93,7 +96,7 @@
               <tr v-if="data?.parentOrganisatie">
                 <td>
                   <vl-link :href="data.fieldUris.parentOrganisatie" external>
-                    Organisatie
+                    Onderneming
                   </vl-link>
                 </td>
                 <td>
@@ -102,16 +105,18 @@
                   </vl-link>
                 </td>
               </tr>
-              <tr v-if="data?.activiteit">
+              <tr v-if="data?.activiteiten?.length">
                 <td>
                   <vl-link :href="data.fieldUris.activiteit" external>
                     Activiteit
                   </vl-link>
                 </td>
                 <td>
-                  <vl-link :href="data.activiteit.uri" external>
-                    {{ data.activiteit.label ?? data.activiteit.uri }}
-                  </vl-link>
+                  <div v-for="activiteit in data.activiteiten" :key="activiteit.uri">
+                    <vl-link :href="activiteit.uri" external>
+                      {{ activiteit.label ?? activiteit.uri }}
+                    </vl-link>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -212,6 +217,12 @@
                       {{ contact.telephone }}
                     </vl-link>
                   </p>
+                  <p v-if="contact.gsm">
+                    <vl-icon icon="phone" mod-before></vl-icon>
+                    <vl-link :href="`tel:${contact.gsm}`">
+                      {{ contact.gsm }}
+                    </vl-link>
+                  </p>
                   <address v-if="contact.address">
                     <vl-icon icon="location-map" mod-before></vl-icon>
                     {{ contact.address.thoroughfare }}
@@ -223,10 +234,8 @@
               </vl-info-tile>
             </vl-column>
           </template>
-          <vl-column v-if="contactGeoJsonUrl">
-            <contact-map :url="contactGeoJsonUrl" :center="center" />
-          </vl-column>
         </template>
+      </template>
       </vl-grid>
     </vl-region>
   </vl-layout>
@@ -246,25 +255,6 @@ const slug = computed(() => {
   return Array.isArray(params) ? params.join('/') : params
 })
 
-const contactGeoJsonUrl = computed(() => {
-  const geometry = data.value?.contactPoints?.find((cp) => cp.place?.geometry)
-    ?.place.geometry
-  if (geometry?.x && geometry.y) {
-    // Dirty workaround but the map component expects the URL to end with geojson, hence the dummy query param format=geojson at te end
-    // Hoping this gets fixed at some point in the component library
-    // https://vlaamseoverheid.atlassian.net/browse/UXCOMP-4395
-    return `/doc/api/geojson?x=${geometry.x}&y=${geometry.y}&format=geojson`
-  }
-})
-const center = computed((): number[] => {
-  const geometry = data.value?.contactPoints?.find((cp) => cp.place?.geometry)
-    ?.place.geometry
-  if (geometry) {
-    return [Number(geometry.x), Number(geometry.y)]
-  }
-  return [4.3113025, 51.0238049]
-})
-
 const { data } = await useAsyncData<KBOBranchData | null>(
   `branch-${slug.value}`,
   async () => {
@@ -278,10 +268,10 @@ const { data } = await useAsyncData<KBOBranchData | null>(
 )
 
 // Redirect to 404 if no data
-if (!data?.value) {
+if (!data.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: 'Onderneming niet gevonden',
+    statusMessage: 'Vestiging niet gevonden',
   })
 }
 
@@ -298,6 +288,6 @@ const copyToClipboard = async (text: string) => {
 }
 
 useSeoHead({
-  title: data.value?.wettelijkeNaam ?? `Vestiging: ${slug.value}`,
+  title: data.value?.wettelijkeNaam?.value ?? `Vestiging: ${slug.value}`,
 })
 </script>

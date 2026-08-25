@@ -4,8 +4,6 @@ export const FLANDERS_COLOR = '#FFED00'
 export const EXTERNAL_COLOR = '#d62728'
 export const BASEPATH = '/standaarden'
 export const CODELIST_ROOT = 'https://data.vlaanderen.be/id/concept/Domein/'
-export const VKBO_BASE =
-  'https://geo.api.vlaanderen.be/VKBO/ogc/features/v1/collections/Vkbo/items'
 export const ORGANISATIE_TYPE_TTL =
   'https://data.vlaanderen.be/id/conceptscheme/TypeOfEnterprise.ttl'
 export const DOORHALINGS_TYPE_TTL =

@@ -83,11 +83,11 @@ export function kboDataToQuads(
   }
 
   // --- Names ---
-  addLiteral(quads, subject, reorg('legalName'), data.wettelijkeNaam, 'nl')
-  addLiteral(quads, subject, skos('prefLabel'), data.voorkeursnaam, 'nl')
+  addLiteral(quads, subject, reorg('legalName'), data.wettelijkeNaam?.value, data.wettelijkeNaam?.taalcode ?? 'nl')
+  addLiteral(quads, subject, skos('prefLabel'), data.voorkeursnaam?.value, data.voorkeursnaam?.taalcode ?? 'nl')
   if (data.alternatieveNaam) {
     for (const alt of data.alternatieveNaam) {
-      addLiteral(quads, subject, skos('altLabel'), alt, 'nl')
+      addLiteral(quads, subject, skos('altLabel'), alt.value, alt.taalcode ?? 'nl')
     }
   }
 
@@ -248,12 +248,14 @@ export function kboDataToQuads(
   }
 
   // --- Activity (NACE) ---
-  if (data.activiteit) {
-    const activityNode = df.namedNode(data.activiteit.uri)
-    addNamedNode(quads, subject, reorg('orgActivity'), data.activiteit.uri)
-    quads.push(df.quad(activityNode, rdf('type'), skos('Concept')))
-    if (data.activiteit.label) {
-      addLiteral(quads, activityNode, skos('prefLabel'), data.activiteit.label)
+  if (data.activiteiten) {
+    for (const activiteit of data.activiteiten) {
+      const activityNode = df.namedNode(activiteit.uri)
+      addNamedNode(quads, subject, reorg('orgActivity'), activiteit.uri)
+      quads.push(df.quad(activityNode, rdf('type'), skos('Concept')))
+      if (activiteit.label) {
+        addLiteral(quads, activityNode, skos('prefLabel'), activiteit.label)
+      }
     }
   }
 
@@ -271,17 +273,25 @@ export function kboDataToQuads(
         cp.telephone,
         vcard('Voice'),
       )
+      addLiteral(
+        quads,
+        cpNode,
+        schema('telephone'),
+        cp.gsm,
+        vcard('Cell'),
+      )
 
       if (cp.address) {
         const addrNode = df.blankNode(`addr-${cp.id}`)
         quads.push(df.quad(addrNode, rdf('type'), locn('Address')))
         quads.push(df.quad(cpNode, locn('address'), addrNode))
+        const taalcode = cp.address.taalcode ?? 'nl'
         addLiteral(
           quads,
           addrNode,
           locn('thoroughfare'),
           cp.address.thoroughfare,
-          'nl',
+          taalcode,
         )
         addLiteral(quads, addrNode, locn('postCode'), cp.address.postCode)
         addLiteral(
@@ -289,9 +299,9 @@ export function kboDataToQuads(
           addrNode,
           adres('gemeentenaam'),
           cp.address.municipality,
-          'nl',
+          taalcode,
         )
-        addLiteral(quads, addrNode, adres('land'), cp.address.country, 'nl')
+        addLiteral(quads, addrNode, adres('land'), cp.address.country, taalcode)
       }
 
       if (cp.place) {
@@ -315,6 +325,27 @@ export function kboDataToQuads(
           cp.place.geometry.wkt,
           opengis('wktLiteral'),
         )
+      }
+    }
+  }
+
+  // --- Vestigingen ---
+  if (data.vestigingen) {
+    for (const v of data.vestigingen) {
+      const siteNode = df.namedNode(v.uri)
+      quads.push(df.quad(subject, org('hasSite'), siteNode))
+      quads.push(df.quad(siteNode, rdf('type'), org('Site')))
+      addLiteral(quads, siteNode, skos('prefLabel'), v.naam, v.taalcode ?? 'nl')
+      if (v.status) {
+        addNamedNode(quads, siteNode, reorg('orgStatus'), v.status.uri)
+      }
+      if (v.adres || v.postcode || v.gemeente) {
+        const addrNode = df.blankNode()
+        quads.push(df.quad(siteNode, locn('address'), addrNode))
+        quads.push(df.quad(addrNode, rdf('type'), locn('Address')))
+        addLiteral(quads, addrNode, locn('thoroughfare'), v.adres, v.taalcode ?? 'nl')
+        addLiteral(quads, addrNode, locn('postCode'), v.postcode)
+        addLiteral(quads, addrNode, adres('gemeentenaam'), v.gemeente, v.taalcode ?? 'nl')
       }
     }
   }
