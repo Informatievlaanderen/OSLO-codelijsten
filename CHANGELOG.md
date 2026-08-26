@@ -198,3 +198,7 @@ ADD ALL KBO DATA
       fix: don't use `geefOndernemingVKBO` for contactinfo, but instead rely fully on `geefOnderneming`
       fix: don't show identificator publically in github
       fix: Change referte to make it clear we're asking for subjectpages
+
+      2.0.1
+      feat: added some more logic to find the conceptscheme that matches most with slug instead of first one
+      feat: added more recent version of Node and NPM to `package.json`
