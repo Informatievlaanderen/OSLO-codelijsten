@@ -74,11 +74,13 @@ export const getConcept = async (
         continue
       }
 
-      // Find the binding where the concept URI's last path segment matches the concept ID
+      // Find the binding where the concept URI's path (after /concept/) matches the requested slug.
+      // Comparing the full path (instead of just the last segment) disambiguates concepts that
+      // share the same trailing id but live under different concept schemes (e.g. .../Geslacht/1 vs .../Geslacht/v1/1).
       const binding = result.find((b: any) => {
         const conceptUri = b.get('concept')?.value ?? ''
-        const lastSegment = conceptUri.split('/').pop() ?? ''
-        return lastSegment === slug
+        const pathAfterConcept = conceptUri.split('/concept/').pop() ?? conceptUri
+        return pathAfterConcept === slug
       })
 
       if (!binding) {
@@ -125,7 +127,7 @@ export const getConcept = async (
       )
 
       return {
-        id: slug,
+        id: slug.split('/').pop() ?? slug,
         uri: conceptUri,
         label: binding.get('label')?.value ?? slug,
         definition: binding.get('definition')?.value ?? '',

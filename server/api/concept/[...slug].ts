@@ -51,7 +51,7 @@ export default defineEventHandler(
       }
 
       // Return JSON response
-      return await buildConceptResponse(config.conceptId, config.sourceUrl)
+      return await buildConceptResponse(config.conceptPath, config.sourceUrl)
     } catch (error) {
       // Im not displaying the error or throwing an error to avoid cluttering the logs. It printed out the full RDF query error and HTML of the source
       console.error('Error fetching concept')
@@ -65,6 +65,7 @@ export default defineEventHandler(
 
 interface ConceptConfig {
   conceptId: string
+  conceptPath: string
   sourceUrl: string
 }
 
@@ -110,19 +111,19 @@ const getConceptConfig = async (slug: string): Promise<ConceptConfig> => {
     })
   }
 
-  return { conceptId, sourceUrl }
+  return { conceptId, conceptPath: slug, sourceUrl }
 }
 
 const buildConceptResponse = async (
-  conceptId: string,
+  conceptPath: string,
   sourceUrl: string,
 ): Promise<Concept> => {
-  const concept = await getConcept(conceptId, sourceUrl)
+  const concept = await getConcept(conceptPath, sourceUrl)
 
   if (!concept) {
     throw createError({
       statusCode: 404,
-      statusMessage: `Concept not found: ${conceptId}`,
+      statusMessage: `Concept not found: ${conceptPath}`,
     })
   }
 
