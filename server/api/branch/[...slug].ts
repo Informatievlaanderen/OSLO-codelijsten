@@ -8,7 +8,7 @@ import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
 import { serializeQuadsToString } from '~/services/serialization.service'
 import { geefOnderneming } from '~/services/onderneming.service'
 import { mapVestigingToBranch } from '~/server/services/branch.service'
-import { getNaam } from '~/server/utils/soap-utils'
+import { getNaam, getCode, getOmschrijving, toArray } from '~/server/utils/soap-utils'
 
 export default defineEventHandler(
   async (event): Promise<KBOBranchData | string | null> => {
@@ -70,14 +70,61 @@ export default defineEventHandler(
         throw createError({ statusCode: 404, statusMessage: `Branch not found: ${cleanSlug}` })
       }
 
-      // Get the parent enterprise number from MaatschappelijkeZetel
-      const enterpriseNummer = getNaam(vestiging.MaatschappelijkeZetel?.Ondernemingsnummer)
+      // Get the parent enterprise number from MaatschappelijkeZetel.
+      let enterpriseNummer = getNaam(vestiging.MaatschappelijkeZetel?.Ondernemingsnummer)
+
+      // Fallback: for (especially stopped) vestigingen MAGDA does not populate
+      // MaatschappelijkeZetel. The parent is then exposed via
+      // GerelateerdeOndernemingen as the relation "Richt vestigingseenheid op"
+      // (Relatie.Code "001") with IsDochter="1".
+      if (!enterpriseNummer) {
+        const gerelateerde = (vestiging as any).GerelateerdeOndernemingen?.GerelateerdeOnderneming
+        const related = toArray(gerelateerde).find(
+          (r: any) =>
+            getCode(r?.Relatie) === '001' ||
+            String(r?.Relatie?.Omschrijving ?? '').toLowerCase().includes('richt vestiging'),
+        )
+        enterpriseNummer = getNaam(related?.Ondernemingsnummer)
+      }
 
       if (!enterpriseNummer) {
         throw createError({ statusCode: 404, statusMessage: `No parent enterprise found for branch: ${cleanSlug}` })
       }
 
       const branch = mapVestigingToBranch(cleanSlug, vestiging, enterpriseNummer, vestiging)
+
+      // A vestiging of a natural person inherits the natural person's privacy
+      // restriction: strip its contact info (address, phone, email, GSM). The
+      // vestiging's own SOAP response does not carry SoortOnderneming, so we
+      // must fetch the parent enterprise to determine its type. This is
+      // best-effort: if the parent fetch fails, we leave the branch untouched.
+      try {
+        const parentAntwoord = await geefOnderneming(
+          {
+            Criteria: {
+              Ondernemingsnummer: enterpriseNummer,
+              Basisgegevens: '1',
+            },
+          },
+          `OSLO-SP-VestOuder-${Date.now()}`,
+        )
+        const parentInhoud = parentAntwoord?.Repliek?.Antwoorden?.Antwoord?.Inhoud as
+          | { Onderneming?: OndernemingType }
+          | undefined
+        const parentOnderneming = parentInhoud?.Onderneming
+
+        const isNatuurlijkPersoonOuder =
+          getCode(parentOnderneming?.SoortOnderneming) === '1' ||
+          getOmschrijving(parentOnderneming?.SoortOnderneming)
+            ?.toLowerCase()
+            .includes('natuurlijk')
+
+        if (isNatuurlijkPersoonOuder) {
+          branch.contactPoints = undefined
+        }
+      } catch (err) {
+        console.error('Error fetching parent enterprise for privacy check:', err)
+      }
 
       if (requestedFormat) {
         const quads = kboDataToQuads(branch)

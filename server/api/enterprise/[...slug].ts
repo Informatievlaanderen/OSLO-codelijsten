@@ -91,9 +91,18 @@ export default defineEventHandler(
       // (including address) should be exposed for natural persons. The phone,
       // email and GSM data is already mapped from the GeefOnderneming response's
       // Adressen.Descripties.Descriptie.Contact by mapOndernemingToEnterprise.
+      // The registered address also leaks through the vestigingen (org:hasSite
+      // -> locn:address), so strip those addresses as well.
       const isNatuurlijkPersoon = getCode(onderneming.SoortOnderneming) === '1'
       if (isNatuurlijkPersoon) {
         enterprise.contactPoints = undefined
+        if (enterprise.vestigingen) {
+          for (const v of enterprise.vestigingen) {
+            v.adres = undefined
+            v.postcode = undefined
+            v.gemeente = undefined
+          }
+        }
       }
 
       if (requestedFormat) {
