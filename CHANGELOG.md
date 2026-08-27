@@ -202,3 +202,8 @@ ADD ALL KBO DATA
       2.0.1
       feat: added some more logic to find the conceptscheme that matches most with slug instead of first one
       feat: added more recent version of Node and NPM to `package.json`
+
+      2.0.2
+      fix: set vestiging in the URI instead of onderneming for vestiging
+      fix: add logic to deal with fallback language value xx of MAGDA SOAP
+      fix: tweak for vestiging of a natuurlijk persoon still showing contactinfo
