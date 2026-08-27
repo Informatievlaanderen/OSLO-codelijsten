@@ -330,7 +330,7 @@ const buildVestigingen = (onderneming: OndernemingType): KboVestiging[] => {
 
     vestigingen.push({
       id: vestigingsnummer,
-      uri: `https://data.vlaanderen.be/id/onderneming/${vestigingsnummer}`,
+      uri: `https://data.vlaanderen.be/id/vestiging/${vestigingsnummer}`,
       naam,
       status,
       adres: [street, houseNr, bus].filter(Boolean).join(' '),
