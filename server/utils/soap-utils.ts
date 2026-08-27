@@ -76,7 +76,10 @@ const LANGUAGE_PREFERENCE = ['nl', 'fr', 'de', 'en'] as const
  */
 export const getTaalcode = (obj: any): string | undefined => {
   const code = getNaam(obj)?.toLowerCase().trim()
-  return code && /^[a-z]{2}$/.test(code) ? code : undefined
+  // MAGDA uses "xx" as a placeholder for "no language specified". It is not a
+  // valid BCP-47/ISO 639-1 tag, so treat it (and any other non-language value)
+  // as missing instead of leaking it into RDF language tags (e.g. "@xx").
+  return code && /^[a-z]{2}$/.test(code) && code !== 'xx' ? code : undefined
 }
 
 /**
@@ -91,7 +94,7 @@ export const pickPreferredByTaalcode = <T extends { Taalcode?: any }>(
   if (!items.length) return undefined
 
   let best: T = items[0]
-  let bestRank = LANGUAGE_PREFERENCE.length
+  let bestRank: number = LANGUAGE_PREFERENCE.length
 
   for (const item of items) {
     const code = getTaalcode(item.Taalcode)
