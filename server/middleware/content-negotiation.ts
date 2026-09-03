@@ -63,6 +63,12 @@ export default defineEventHandler(async (event) => {
     const licentieMatch = cleanPath.match(/\/licentie\/(.+)$/)
     const ondernemingMatch = cleanPath.match(/\/onderneming\/(.+)$/)
     const vestigingMatch = cleanPath.match(/\/vestiging\/(.+)$/)
+    const adresMatch = cleanPath.match(/\/adres\/(.+)$/)
+    const straatnaamMatch = cleanPath.match(/\/straatnaam\/(.+)$/)
+    const postinfoMatch = cleanPath.match(/\/postinfo\/(.+)$/)
+    const gebouwMatch = cleanPath.match(/\/gebouw\/(.+)$/)
+    const perceelMatch = cleanPath.match(/\/perceel\/(.+)$/)
+    const gemeenteMatch = cleanPath.match(/\/gemeente\/(.+)$/)
     const bedrijventerreinMatch = cleanPath.match(/\/bedrijventerrein\/(.+)$/)
     const bedrijventerreinperceelMatch = cleanPath.match(/\/bedrijventerreinperceel\/(.+)$/)
     const beheerdebedrijvenzoneMatch = cleanPath.match(/\/beheerdebedrijvenzone\/(.+)$/)
@@ -88,6 +94,24 @@ export default defineEventHandler(async (event) => {
         break
       case !!vestigingMatch:
         apiPath = `/doc/api/branch/${vestigingMatch![1]}${extension}`
+        break
+      case !!adresMatch:
+        apiPath = `/doc/api/adres/${adresMatch![1]}${extension}`
+        break
+      case !!straatnaamMatch:
+        apiPath = `/doc/api/straatnaam/${straatnaamMatch![1]}${extension}`
+        break
+      case !!postinfoMatch:
+        apiPath = `/doc/api/postinfo/${postinfoMatch![1]}${extension}`
+        break
+      case !!gebouwMatch:
+        apiPath = `/doc/api/gebouw/${gebouwMatch![1]}${extension}`
+        break
+      case !!perceelMatch:
+        apiPath = `/doc/api/perceel/${perceelMatch![1]}${extension}`
+        break
+      case !!gemeenteMatch:
+        apiPath = `/doc/api/gemeente/${gemeenteMatch![1]}${extension}`
         break
       case !!bedrijventerreinMatch:
         apiPath = `/doc/api/bedrijventerrein/${bedrijventerreinMatch![1]}${extension}`

@@ -207,3 +207,6 @@ ADD ALL KBO DATA
       fix: set vestiging in the URI instead of onderneming for vestiging
       fix: add logic to deal with fallback language value xx of MAGDA SOAP
       fix: tweak for vestiging of a natuurlijk persoon still showing contactinfo
+      
+      2.1.0
+      feat: added subject pages for Perceel, Adres, Straatnaam, Postinfo, Gemeent en Gebouw
