@@ -1,27 +1,14 @@
-import axios from 'axios'
 import {
   SUPPORTED_FORMATS,
   SUPPORTED_EXTENSIONS,
-  VKBO_BASE,
 } from '~/constants/constants'
-import type {
-  KboContactPoint,
-  KboIdentificator,
-  KBOBranchData,
-  KboActiviteit,
-  KboOprichting,
-  KboStopzetting,
-} from '~/types/KBO'
-import {
-  clean,
-  cleanDate,
-  buildNaceUri,
-  buildJuridicalSituationUri,
-  buildJuridicalFormUri,
-} from '../utils/kbo-utils'
-import { KBO_FIELD_URIS } from '~/server/utils/kbo-predicate-uris'
+import type { KBOBranchData } from '~/types/KBO'
+import type { OndernemingType } from '~/types/onderneming'
 import { kboDataToQuads } from '~/server/services/kbo-serialization.service'
 import { serializeQuadsToString } from '~/services/serialization.service'
+import { geefOnderneming } from '~/services/onderneming.service'
+import { mapVestigingToBranch } from '~/server/services/branch.service'
+import { getNaam, getCode, getOmschrijving, toArray } from '~/server/utils/soap-utils'
 
 export default defineEventHandler(
   async (event): Promise<KBOBranchData | string | null> => {
@@ -29,21 +16,14 @@ export default defineEventHandler(
       const slug = getRouterParam(event, 'slug')
 
       if (!slug) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Slug is required',
-        })
+        throw createError({ statusCode: 400, statusMessage: 'Branch is required' })
       }
 
       console.log(`[${new Date().toISOString()}] Fetching branch: ${slug}`)
 
-      // Detect supported file extension (.ttl, .jsonld, .nt)
-      const extension: string | undefined = SUPPORTED_EXTENSIONS.find((ext) =>
-        slug.endsWith(ext),
-      )
+      const extension = SUPPORTED_EXTENSIONS.find((ext) => slug.endsWith(ext))
       const cleanSlug = extension ? slug.replace(extension, '') : slug
 
-      // Vestiging starts with 2 or higher - this endpoint is for branches only
       const firstDigit = parseInt(cleanSlug.charAt(0), 10)
       if (isNaN(firstDigit) || firstDigit < 2) {
         throw createError({
@@ -52,143 +32,98 @@ export default defineEventHandler(
         })
       }
 
-      // Build VKBO API URL
-      const vkboUrl = `${VKBO_BASE}?f=application/json&filter-lang=cql-text&filter=${encodeURIComponent(`Ondernemingsnr eq '${cleanSlug}'`)}`
-
-      // Handle content negotiation for RDF formats
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
-        ? SUPPORTED_FORMATS[
-            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
-          ]
+        ? SUPPORTED_FORMATS[extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS]
         : null
       const requestedFormat =
         extensionFormat ||
-        Object.values(SUPPORTED_FORMATS).find((fmt) =>
-          acceptHeader.includes(fmt),
+        Object.values(SUPPORTED_FORMATS).find((fmt) => acceptHeader.includes(fmt))
+
+      const referte = `OSLO-SP-Vestiging-${Date.now()}`
+      const environment = useRuntimeConfig().public.ENVIRONMENT
+
+      // A vestiging (branch) has no nested vestigingen: querying GeefOnderneming
+      // with a branch number returns the vestiging itself. Its parent enterprise
+      // number is exposed via MaatschappelijkeZetel, which MAGDA only populates
+      // when GerelateerdeOndernemingen is also requested.
+      const antwoord = await geefOnderneming(
+        {
+          Criteria: {
+            Ondernemingsnummer: cleanSlug,
+            Basisgegevens: '1',
+            Activiteiten: '1',
+            GerelateerdeOndernemingen: { Aanduiding: '1', Vestigingen: '1' },
+          },
+        },
+        referte,
+      )
+
+      if (environment !== 'Production') {
+        console.log(`[${new Date().toISOString()}] GeefOnderneming response for branch ${cleanSlug}:`, JSON.stringify(antwoord, null, 2))
+      }
+
+      const inhoud = antwoord?.Repliek?.Antwoorden?.Antwoord?.Inhoud as { Onderneming?: OndernemingType } | undefined
+      const vestiging = inhoud?.Onderneming
+
+      if (!vestiging) {
+        throw createError({ statusCode: 404, statusMessage: `Branch not found: ${cleanSlug}` })
+      }
+
+      // Get the parent enterprise number from MaatschappelijkeZetel.
+      let enterpriseNummer = getNaam(vestiging.MaatschappelijkeZetel?.Ondernemingsnummer)
+
+      // Fallback: for (especially stopped) vestigingen MAGDA does not populate
+      // MaatschappelijkeZetel. The parent is then exposed via
+      // GerelateerdeOndernemingen as the relation "Richt vestigingseenheid op"
+      // (Relatie.Code "001") with IsDochter="1".
+      if (!enterpriseNummer) {
+        const gerelateerde = (vestiging as any).GerelateerdeOndernemingen?.GerelateerdeOnderneming
+        const related = toArray(gerelateerde).find(
+          (r: any) =>
+            getCode(r?.Relatie) === '001' ||
+            String(r?.Relatie?.Omschrijving ?? '').toLowerCase().includes('richt vestiging'),
         )
-
-      // Fetch from VKBO OGC API
-      const { data } = await axios.get(vkboUrl)
-
-      if (!data?.features?.length) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: `Branch not found: ${cleanSlug}`,
-        })
+        enterpriseNummer = getNaam(related?.Ondernemingsnummer)
       }
 
-      const props = data.features[0].properties
-      const geometry = data.features[0].geometry
-
-      // --- Identificator ---
-      const identificator: KboIdentificator = {
-        identificator: cleanSlug,
-        toegekendOp: cleanDate(props.Datum_inschrijving),
-        toegekendDoor: 'https://data.vlaanderen.be/id/organisatie/OVO027341',
+      if (!enterpriseNummer) {
+        throw createError({ statusCode: 404, statusMessage: `No parent enterprise found for branch: ${cleanSlug}` })
       }
 
-      // --- Oprichting (Veranderingsgebeurtenis) ---
-      const oprichting: KboOprichting | undefined = cleanDate(props.Startdatum)
-        ? { datum: cleanDate(props.Startdatum)! }
-        : undefined
+      const branch = mapVestigingToBranch(cleanSlug, vestiging, enterpriseNummer, vestiging)
 
-      // --- Stopzetting (Veranderingsgebeurtenis, remove 1900 placeholder) ---
-      const stopzettingDatum = cleanDate(props.Datum_stopzetting)
-      const stopzetting: KboStopzetting | undefined = stopzettingDatum
-        ? {
-            datum: stopzettingDatum,
-            redenStopzetting: clean(props.Reden_stopzetting),
-          }
-        : undefined
-
-      // --- Names ---
-      const wettelijkeNaam = clean(props.Maatschappelijke_naam)
-      const voorkeursnaam = clean(props.Commerciele_naam)
-      const alternatieveNaam: string[] = []
-      if (clean(props.Afgekorte_naam))
-        alternatieveNaam.push(clean(props.Afgekorte_naam)!)
-      if (clean(props.Zoeknaam)) alternatieveNaam.push(clean(props.Zoeknaam)!)
-
-      // --- GeregistreerdeOrganisatie fields ---
-      const rechtsvorm = await buildJuridicalFormUri(props.Rechtsvorm)
-      const rechtstoestandCode = clean(props.Rechtstoestand)
-      const rechtstoestandUri =
-        await buildJuridicalSituationUri(rechtstoestandCode)
-
-      // --- NACE activity (BTW fallback to RSZ) ---
-      const naceCode =
-        clean(props.NACE_hoofdact_BTW) ?? clean(props.NACE_hoofdact_RSZ)
-      const naceVersion =
-        clean(props.NACE_versie_BTW) ?? clean(props.NACE_Versie_RSZ)
-      const naceLabel =
-        clean(props.Omschrijving_hoofdact_BTW) ??
-        clean(props.Omschrijving_hoofdact_RSZ)
-      const activityUri = buildNaceUri(naceCode, naceVersion)
-      const activiteit: KboActiviteit | undefined = activityUri
-        ? { uri: activityUri, label: naceLabel }
-        : undefined
-
-      // --- Address with AR → KBO fallback ---
-      const street = clean(props.AR_straat) ?? clean(props.KBO_Straat)
-      const houseNr = clean(props.AR_huisnr) ?? clean(props.KBO_Huisnr)
-      const bus = clean(props.AR_busnr) ?? clean(props.KBO_Busnr)
-      const postcode = clean(props.AR_postcode) ?? clean(props.KBO_Postcode)
-      const municipality = clean(props.KBO_Gemeente)
-
-      // --- Contact point ---
-      const contactPoints: KboContactPoint[] = []
-      const email = clean(props.Email)
-      const telephone = clean(props.Telefoonnummer)
-      const geometryX = geometry.coordinates[0]
-      const geometryY = geometry.coordinates[1]
-      if (email || telephone || street) {
-        contactPoints.push({
-          id: 'contact-0',
-          email,
-          telephone,
-          address:
-            street || postcode || municipality
-              ? {
-                  thoroughfare: [street, houseNr, bus]
-                    .filter(Boolean)
-                    .join(' '),
-                  postCode: postcode,
-                  municipality: municipality,
-                  country: 'België',
-                }
-              : undefined,
-          place: {
-            geometry: {
-              x: geometryX,
-              y: geometryY,
-              wkt: `POINT (${geometryX} ${geometryY})`,
-              gml: `<gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/31370"><gml:coordinates>${geometryX}, ${geometryY}</gml:coordinates></gml:Point>`,
+      // A vestiging of a natural person inherits the natural person's privacy
+      // restriction: strip its contact info (address, phone, email, GSM). The
+      // vestiging's own SOAP response does not carry SoortOnderneming, so we
+      // must fetch the parent enterprise to determine its type. This is
+      // best-effort: if the parent fetch fails, we leave the branch untouched.
+      try {
+        const parentAntwoord = await geefOnderneming(
+          {
+            Criteria: {
+              Ondernemingsnummer: enterpriseNummer,
+              Basisgegevens: '1',
             },
           },
-        })
-      }
+          `OSLO-SP-VestOuder-${Date.now()}`,
+        )
+        const parentInhoud = parentAntwoord?.Repliek?.Antwoorden?.Antwoord?.Inhoud as
+          | { Onderneming?: OndernemingType }
+          | undefined
+        const parentOnderneming = parentInhoud?.Onderneming
 
-      // --- Build Branch Data ---
-      const branch: KBOBranchData = {
-        id: cleanSlug,
-        types: ['vestiging'],
-        uri: `https://data.vlaanderen.be/id/vestiging/${cleanSlug}`,
-        fieldUris: KBO_FIELD_URIS,
-        wettelijkeNaam,
-        voorkeursnaam,
-        alternatieveNaam: alternatieveNaam.length
-          ? alternatieveNaam
-          : undefined,
-        identificator,
-        oprichting,
-        stopzetting,
-        rechtsvorm,
-        rechtstoestand: rechtstoestandUri,
-        activiteit,
-        contactPoints: contactPoints.length ? contactPoints : undefined,
-        parentOrganisatie: clean(props.Ondernemingsnr_maatsch_zetel),
-        source: vkboUrl,
+        const isNatuurlijkPersoonOuder =
+          getCode(parentOnderneming?.SoortOnderneming) === '1' ||
+          getOmschrijving(parentOnderneming?.SoortOnderneming)
+            ?.toLowerCase()
+            .includes('natuurlijk')
+
+        if (isNatuurlijkPersoonOuder) {
+          branch.contactPoints = undefined
+        }
+      } catch (err) {
+        console.error('Error fetching parent enterprise for privacy check:', err)
       }
 
       if (requestedFormat) {
@@ -202,10 +137,7 @@ export default defineEventHandler(
     } catch (error: any) {
       if (error.statusCode) throw error
       console.error('Error fetching branch:', error)
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Error fetching branch',
-      })
+      throw createError({ statusCode: 500, statusMessage: 'Error fetching branch' })
     }
   },
 )

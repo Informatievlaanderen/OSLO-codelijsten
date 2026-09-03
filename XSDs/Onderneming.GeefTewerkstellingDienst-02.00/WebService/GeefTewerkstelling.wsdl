@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns="http://webservice.geeftewerkstellingdienst-02_00.onderneming-02_00.vip.vlaanderen.be"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	targetNamespace="http://webservice.geeftewerkstellingdienst-02_00.onderneming-02_00.vip.vlaanderen.be">
+
+	<wsdl:types>
+		<xsd:schema
+			targetNamespace="http://webservice.geeftewerkstellingdienst-02_00.onderneming-02_00.vip.vlaanderen.be"
+			xmlns="http://webservice.geeftewerkstellingdienst-02_00.onderneming-02_00.vip.vlaanderen.be"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="unqualified"
+			attributeFormDefault="unqualified" version="2.00">
+
+			<xsd:include schemaLocation="GeefTewerkstelling.xsd"/>
+			<xsd:include schemaLocation="GeefTewerkstellingResponse.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="GeefTewerkstellingRequest">
+		<wsdl:part name="Verzoek" element="GeefTewerkstelling"/>
+	</wsdl:message>
+	<wsdl:message name="GeefTewerkstellingResponse">
+		<wsdl:part name="Repliek" element="GeefTewerkstellingResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="Onderneming.GeefTewerkstellingPortType">
+		<wsdl:operation name="GeefTewerkstelling">
+			<wsdl:input name="GeefTewerkstellingRequest" message="GeefTewerkstellingRequest"/>
+			<wsdl:output name="GeefTewerkstellingResponse" message="GeefTewerkstellingResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="Onderneming.GeefTewerkstellingHttpBinding" type="Onderneming.GeefTewerkstellingPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GeefTewerkstelling">
+			<soap:operation soapAction="http://magdaondernemingdienst-intern-aip.vonet.be/GeefTewerkstellingDienst-02.00/soap/WebService"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="Onderneming.GeefTewerkstelling">
+		<wsdl:port name="Onderneming.GeefTewerkstellingPortType" binding="Onderneming.GeefTewerkstellingHttpBinding">
+			<soap:address location="https://magdaondernemingdienst-aip.vlaanderen.be/GeefTewerkstellingDienst-02.00/soap/WebService"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

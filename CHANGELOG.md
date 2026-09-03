@@ -191,10 +191,22 @@ ADD ALL KBO DATA
       1.19.2
       fix: explicitly set type to `sparql` for the sparql query in the link to the source code
 
-      1.20.0
-      feat: added a subjectpage for adres
-      feat: added a subjectpage for straatnaam
-      feat: added a subjectpage for postinfo
+      2.0.0
+      feat: Switched VKBO API to MAGDA SOAP API for `geefOnderneming`
+      fix: place the `XSD` with the build-dir
+      fix: if the SOAP response is in a different language, showcase that language in the `.ttl`
+      fix: don't use `geefOndernemingVKBO` for contactinfo, but instead rely fully on `geefOnderneming`
+      fix: don't show identificator publically in github
+      fix: Change referte to make it clear we're asking for subjectpages
+  
+      2.0.1
+      feat: added some more logic to find the conceptscheme that matches most with slug instead of first one
+      feat: added more recent version of Node and NPM to `package.json`
 
-      1.21.0
+      2.0.2
+      fix: set vestiging in the URI instead of onderneming for vestiging
+      fix: add logic to deal with fallback language value xx of MAGDA SOAP
+      fix: tweak for vestiging of a natuurlijk persoon still showing contactinfo
+      
+      2.1.0
       feat: added subject pages for Perceel, Adres, Straatnaam, Postinfo, Gemeent en Gebouw

@@ -29,11 +29,30 @@ export interface KboPeriode {
 export interface KboActiviteit {
   uri: string
   label?: string
+  code?: string
+  versie?: string
 }
 
 export interface KboConcept {
   uri: string
   label: string
+}
+
+/** A text value carrying an optional BCP-47 language tag (e.g. "nl", "fr"). */
+export interface KboLocalizedValue {
+  value: string
+  taalcode?: string
+}
+
+export interface KboVestiging {
+  id: string
+  uri: string
+  naam?: string
+  status?: KboConcept
+  adres?: string
+  postcode?: string
+  gemeente?: string
+  taalcode?: string
 }
 
 export interface KboFieldUris {
@@ -54,6 +73,7 @@ export interface KboFieldUris {
   redenDoorhaling: string
   doorhalingTijd: string
   omvang: string
+  vestigingen: string
 }
 
 export interface KboPlace {
@@ -69,13 +89,15 @@ export interface KboContactPoint {
   id: string
   email?: string
   telephone?: string
+  gsm?: string
   address?: {
     thoroughfare?: string
     postCode?: string
     municipality?: string
     country?: string
+    taalcode?: string
   }
-  place: KboPlace
+  place?: KboPlace
 }
 
 export interface KboOrganizationData {
@@ -85,9 +107,9 @@ export interface KboOrganizationData {
   fieldUris: KboFieldUris
   organisatieType?: KboConcept
   organisatieStatus?: KboConcept
-  wettelijkeNaam?: string
-  voorkeursnaam?: string
-  alternatieveNaam?: string[]
+  wettelijkeNaam?: KboLocalizedValue
+  voorkeursnaam?: KboLocalizedValue
+  alternatieveNaam?: KboLocalizedValue[]
   identificator: KboIdentificator
   oprichting?: KboOprichting
   stopzetting?: KboStopzetting
@@ -97,8 +119,9 @@ export interface KboOrganizationData {
   personeelsklasse?: KboConcept
   rechtsvorm?: KboConcept
   rechtstoestand?: KboConcept
-  activiteit?: KboActiviteit
+  activiteiten?: KboActiviteit[]
   contactPoints?: KboContactPoint[]
+  vestigingen?: KboVestiging[]
   parentOrganisatie?: never
   source: string
 }
@@ -108,16 +131,16 @@ export interface KBOBranchData {
   uri: string
   types: string[]
   fieldUris: KboFieldUris
-  wettelijkeNaam?: string
-  voorkeursnaam?: string
-  alternatieveNaam?: string[]
+  wettelijkeNaam?: KboLocalizedValue
+  voorkeursnaam?: KboLocalizedValue
+  alternatieveNaam?: KboLocalizedValue[]
   identificator: KboIdentificator
   oprichting?: KboOprichting
   stopzetting?: KboStopzetting
   doorhaling?: KboDoorhaling[]
   rechtsvorm?: KboConcept
   rechtstoestand?: KboConcept
-  activiteit?: KboActiviteit
+  activiteiten?: KboActiviteit[]
   contactPoints?: KboContactPoint[]
   parentOrganisatie?: string
   source: string

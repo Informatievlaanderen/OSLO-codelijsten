@@ -14,7 +14,7 @@ export default defineNuxtConfig({
     KBO_TTL_URL: import.meta.env.VITE_KBO_TTL_URL,
     // public runtime env variables
     public: {
-      ENVIRONMENT: process.env.NUXT_ENVIRONMENT || 'Production',
+      ENVIRONMENT: process.env.NUXT_ENVIRONMENT || 'Development',
       DEPARTMENT: process.env.NUXT_DEPARTMENT,
       BEDRIJVENTERREIN_SPARQL_ENDPOINT: process.env.NUXT_BEDRIJVENTERREIN_SPARQL_ENDPOINT ?? "https://bedrijventerreinen.vlaanderen.be/sparql/"
     },
@@ -68,7 +68,9 @@ export default defineNuxtConfig({
   },
 
   // Plugins to run before rendering page: https://nuxt.com/docs/api/configuration/nuxt-config#plugins-1
-  plugins: [{ src: '~/plugins/webcomponents.js', mode: 'client' }],
+  plugins: [
+    { src: '~/plugins/webcomponents.js', mode: 'client' },
+  ],
 
   compatibilityDate: '2025-02-17',
 })
