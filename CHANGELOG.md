@@ -195,3 +195,6 @@ ADD ALL KBO DATA
       feat: added a subjectpage for adres
       feat: added a subjectpage for straatnaam
       feat: added a subjectpage for postinfo
+
+      1.21.0
+      feat: added subject pages for Perceel, Adres, Straatnaam, Postinfo, Gemeent en Gebouw
