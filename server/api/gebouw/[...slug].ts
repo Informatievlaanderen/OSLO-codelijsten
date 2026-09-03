@@ -6,32 +6,21 @@ import {
 } from '~/constants/constants'
 import type {
   GebouwData,
-  GebouwConcept,
   GebouwGeometrie,
   GebouwRef,
 } from '~/types/gebouw'
+import type {
+  JsonLdEnvelope,
+  JsonLdApiResponse,
+} from '~/types/basisregisters'
+import {
+  normalizeArray,
+  getConcept,
+  getGestructureerdeIdentificator,
+} from '~/types/basisregisters'
 import { GEBOUW_FIELD_URIS } from '~/server/utils/gebouw-predicate-uris'
 import { serializeQuadsToString } from '~/services/serialization.service'
 import { gebouwDataToQuads } from '~/server/services/gebouw-serialization.service'
-
-const getLocalizedValue = (
-  arr: { '@value'?: string; '@language'?: string }[] | undefined,
-): string | undefined => {
-  if (!arr || !Array.isArray(arr)) return undefined
-  const first = arr.find((v) => v['@value'])
-  return first?.['@value']
-}
-
-/**
- * Helper: extracts a concept (skos:Concept) with @id and optional skos:prefLabel.
- */
-const getConcept = (obj: any): GebouwConcept | undefined => {
-  if (!obj) return undefined
-  const uri = typeof obj === 'string' ? obj : obj['@id']
-  if (!uri) return undefined
-  const label = obj['skos:prefLabel']
-  return { uri, label: label ?? uri }
-}
 
 export default defineEventHandler(
   async (event: any): Promise<GebouwData | string | null> => {
@@ -70,14 +59,13 @@ export default defineEventHandler(
       const basisregistersUrl = `${BASISREGISTERS_API_BASE}/gebouwen/${cleanSlug}`
 
       // Fetch from basisregisters API
-      let data: any
+      let response
       try {
-        const response = await axios.get(basisregistersUrl, {
+        response = await axios.get<JsonLdEnvelope<JsonLdApiResponse>>(basisregistersUrl, {
           headers: { Accept: 'application/json' },
         })
-        data = response.data
-      } catch (err: any) {
-        if (err?.response?.status === 404) {
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
           throw createError({
             statusCode: 404,
             statusMessage: `Gebouw not found: ${cleanSlug}`,
@@ -86,6 +74,8 @@ export default defineEventHandler(
         throw err
       }
 
+      const data = response.data
+
       if (!data?.data) {
         throw createError({
           statusCode: 404,
@@ -93,18 +83,16 @@ export default defineEventHandler(
         })
       }
 
-      const gebouwData = data.data
+      const gebouwData = data.data as JsonLdApiResponse
 
       // --- Extract fields ---
       const id = cleanSlug
       const uri = gebouwData['@id'] as string
 
       // Identificator
-      const identObj = gebouwData.identificator?.gestructureerdeIdentificator
+      const gestructureerdIdent = getGestructureerdeIdentificator(gebouwData.identificator)
       const identificator = {
-        lokaleIdentificator: identObj?.lokaleIdentificator as
-          | string
-          | undefined,
+        lokaleIdentificator: gestructureerdIdent?.lokaleIdentificator,
       }
 
       // Geometrie (2DGebouwgeometrie)
@@ -113,7 +101,7 @@ export default defineEventHandler(
         ? {
             methode: getConcept(geometrieObj.methode),
             specificatie: getConcept(geometrieObj.specificatie),
-            gml: geometrieObj.gml as string | undefined,
+            gml: geometrieObj.gml,
           }
         : undefined
 
@@ -121,25 +109,21 @@ export default defineEventHandler(
       const status = getConcept(gebouwData.status)
 
       // bestaatUit (Gebouweenheden)
-      const bestaatUitArr = gebouwData.bestaatUit
-      const bestaatUit: GebouwRef[] | undefined = bestaatUitArr
-        ? (Array.isArray(bestaatUitArr) ? bestaatUitArr : [bestaatUitArr]).map(
-            (ref: any) => ({
-              uri: ref['@id'] as string,
-              detail: ref.detail as string | undefined,
-            }),
-          )
+      const bestaatUitRaw = normalizeArray(gebouwData.bestaatUit)
+      const bestaatUit: GebouwRef[] | undefined = bestaatUitRaw.length > 0
+        ? bestaatUitRaw.map((ref) => ({
+            uri: ref['@id'],
+            detail: ref.detail,
+          }))
         : undefined
 
       // ligtOp (Percelen)
-      const ligtOpArr = gebouwData.ligtOp
-      const ligtOp: GebouwRef[] | undefined = ligtOpArr
-        ? (Array.isArray(ligtOpArr) ? ligtOpArr : [ligtOpArr]).map(
-            (ref: any) => ({
-              uri: ref['@id'] as string,
-              detail: ref.detail as string | undefined,
-            }),
-          )
+      const ligtOpRaw = normalizeArray(gebouwData.ligtOp)
+      const ligtOp: GebouwRef[] | undefined = ligtOpRaw.length > 0
+        ? ligtOpRaw.map((ref) => ({
+            uri: ref['@id'],
+            detail: ref.detail,
+          }))
         : undefined
 
       const result: GebouwData = {
@@ -166,8 +150,9 @@ export default defineEventHandler(
       }
 
       return result
-    } catch (error: any) {
-      if (error?.statusCode === 404) throw error
+    } catch (error: unknown) {
+      const err = error as { statusCode?: number }
+      if (err.statusCode === 404) throw error
       console.error('Error fetching gebouw:', error)
       throw createError({
         statusCode: 500,

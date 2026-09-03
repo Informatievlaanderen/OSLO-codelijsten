@@ -8,11 +8,11 @@ const df = new DataFactory()
 const ns = (base: string) => (local: string) => df.namedNode(`${base}${local}`)
 
 const rdf = ns('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-const rdfs = ns('http://www.w3.org/2000/01/rdf-schema#')
 const adms = ns('http://www.w3.org/ns/adms#')
-const xsd = ns('http://www.w3.org/2001/XMLSchema#')
 const gebouw = ns('https://data.vlaanderen.be/ns/gebouw#')
 const generiek = ns('https://data.vlaanderen.be/ns/generiek#')
+const locn = ns('http://www.w3.org/ns/locn#')
+const geosparql = ns('http://www.opengis.net/ont/geosparql#')
 
 const addLiteral = (
   quads: RDF.Quad[],
@@ -70,6 +70,8 @@ export const gebouwDataToQuads = (data: GebouwData): RDF.Quad[] => {
   )
 
   // --- Geometrie (2DGebouwgeometrie) ---
+  // Per JSON-LD context: 2DGebouwgeometrie has gebouw#geometrie → locn:Geometry
+  //   and gebouw#methode → Concept. specificatie is NOT part of this model.
   if (data.geometrie) {
     const geometrieNode = df.blankNode('geometrie')
     quads.push(df.quad(subject, gebouw('2DGebouwgeometrie'), geometrieNode))
@@ -78,20 +80,15 @@ export const gebouwDataToQuads = (data: GebouwData): RDF.Quad[] => {
       addNamedNode(
         quads,
         geometrieNode,
-        generiek('methode'),
+        gebouw('methode'),
         data.geometrie.methode.uri,
       )
     }
-    if (data.geometrie.specificatie) {
-      addNamedNode(
-        quads,
-        geometrieNode,
-        generiek('specificatie'),
-        data.geometrie.specificatie.uri,
-      )
-    }
     if (data.geometrie.gml) {
-      addLiteral(quads, geometrieNode, generiek('gml'), data.geometrie.gml)
+      const geoNode = df.blankNode('geometry')
+      quads.push(df.quad(geometrieNode, gebouw('geometrie'), geoNode))
+      quads.push(df.quad(geoNode, rdf('type'), locn('Geometry')))
+      addLiteral(quads, geoNode, geosparql('asGML'), data.geometrie.gml)
     }
   }
 
