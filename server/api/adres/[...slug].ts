@@ -6,28 +6,30 @@ import {
 } from '~/constants/constants'
 import type {
   AdresData,
-  AdresConcept,
   AdresGemeentenaam,
   AdresPostinfo,
   AdresStraatnaam,
   AdresPositie,
+  AdresConcept,
 } from '~/types/adres'
+import type {
+  JsonLdEnvelope,
+  JsonLdApiResponse,
+  JsonLdConcept,
+  JsonLdLocalizedValue,
+} from '~/types/basisregisters'
+import {
+  getLocalizedValue,
+  getGestructureerdeIdentificator,
+} from '~/types/basisregisters'
 import { ADRES_FIELD_URIS } from '~/server/utils/adres-predicate-uris'
 import { serializeQuadsToString } from '~/services/serialization.service'
 import { adresDataToQuads } from '~/server/services/adres-serialization.service'
 
-const getLocalizedValue = (
-  arr: { '@value'?: string; '@language'?: string }[] | undefined,
-): string | undefined => {
-  if (!arr || !Array.isArray(arr)) return undefined
-  const first = arr.find((v) => v['@value'])
-  return first?.['@value']
-}
-
 /**
  * Helper: extracts a concept (skos:Concept) with @id and optional skos:prefLabel.
  */
-const getConcept = (obj: any): AdresConcept | undefined => {
+const getConcept = (obj: JsonLdConcept | undefined): AdresConcept | undefined => {
   if (!obj) return undefined
   const uri = typeof obj === 'string' ? obj : obj['@id']
   if (!uri) return undefined
@@ -59,8 +61,8 @@ export default defineEventHandler(
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
         ? SUPPORTED_FORMATS[
-            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
-          ]
+        extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+        ]
         : null
       const requestedFormat =
         extensionFormat ||
@@ -74,12 +76,12 @@ export default defineEventHandler(
       // Fetch from basisregisters API
       let data: any
       try {
-        const response = await axios.get(basisregistersUrl, {
+        const response = await axios.get<JsonLdEnvelope<JsonLdApiResponse>>(basisregistersUrl, {
           headers: { Accept: 'application/json' },
         })
         data = response.data
-      } catch (err: any) {
-        if (err?.response?.status === 404) {
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
           throw createError({
             statusCode: 404,
             statusMessage: `Adres not found: ${cleanSlug}`,
@@ -95,7 +97,7 @@ export default defineEventHandler(
         })
       }
 
-      const adresData = data.data
+      const adresData = data.data as JsonLdApiResponse
 
       // --- Extract fields ---
       const id = cleanSlug
@@ -103,59 +105,53 @@ export default defineEventHandler(
 
       // VolledigAdres
       const verrijkt = adresData.isVerrijktMet
-      const volledigAdres = getLocalizedValue(verrijkt?.volledigAdres as any)
+      const volledigAdres = getLocalizedValue(verrijkt?.volledigAdres)
 
       // Identificator
-      const identObj = adresData.identificator?.gestructureerdeIdentificator
+      const identObj = getGestructureerdeIdentificator(adresData.identificator)
       const identificator = {
-        lokaleIdentificator: identObj?.lokaleIdentificator as
-          | string
-          | undefined,
+        lokaleIdentificator: identObj?.lokaleIdentificator,
       }
 
       // Gemeentenaam
       const gemeentenaamObj = adresData.heeftGemeentenaam
       const gemeentenaam: AdresGemeentenaam | undefined = gemeentenaamObj
         ? {
-            uri: gemeentenaamObj.isAfgeleidVan?.['@id'] as string | undefined,
-            label: getLocalizedValue(gemeentenaamObj.gemeentenaam as any),
-            detail: gemeentenaamObj.isAfgeleidVan?.detail as
-              | string
-              | undefined,
-          }
+          uri: gemeentenaamObj.isAfgeleidVan?.['@id'],
+          label: getLocalizedValue(gemeentenaamObj.gemeentenaam as JsonLdLocalizedValue[] | undefined),
+          detail: gemeentenaamObj.isAfgeleidVan?.detail,
+        }
         : undefined
 
       // Postinfo
       const postinfoObj = adresData.heeftPostinfo
       const postinfo: AdresPostinfo | undefined = postinfoObj
         ? {
-            uri: postinfoObj['@id'] as string | undefined,
-            detail: postinfoObj.detail as string | undefined,
-          }
+          uri: postinfoObj['@id'],
+          detail: postinfoObj.detail,
+        }
         : undefined
 
       // Straatnaam
       const straatnaamObj = adresData.heeftStraatnaam
       const straatnaam: AdresStraatnaam | undefined = straatnaamObj
         ? {
-            uri: straatnaamObj['@id'] as string | undefined,
-            label: getLocalizedValue(straatnaamObj.straatnaam as any),
-            detail: straatnaamObj.detail as string | undefined,
-          }
+          uri: straatnaamObj['@id'],
+          label: getLocalizedValue(straatnaamObj.straatnaam as JsonLdLocalizedValue[] | undefined),
+          detail: straatnaamObj.detail,
+        }
         : undefined
 
       // Huisnummer
-      const huisnummer: string | undefined = adresData.huisnummer as
-        | string
-        | undefined
+      const huisnummer: string | undefined = adresData.huisnummer
 
       // Positie
       const positieObj = adresData.positie
       const positie: AdresPositie | undefined = positieObj
         ? {
-            methode: getConcept(positieObj.methode),
-            specificatie: getConcept(positieObj.specificatie),
-          }
+          methode: getConcept(positieObj.methode),
+          specificatie: getConcept(positieObj.specificatie),
+        }
         : undefined
 
       // Status
@@ -193,8 +189,9 @@ export default defineEventHandler(
       }
 
       return result
-    } catch (error: any) {
-      if (error?.statusCode === 404) throw error
+    } catch (error: unknown) {
+      const err = error as { statusCode?: number }
+      if (err.statusCode === 404) throw error
       console.error('Error fetching adres:', error)
       throw createError({
         statusCode: 500,

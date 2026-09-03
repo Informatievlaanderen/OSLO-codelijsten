@@ -6,28 +6,20 @@ import {
 } from '~/constants/constants'
 import type {
   StraatnaamData,
-  StraatnaamConcept,
   StraatnaamGemeente,
 } from '~/types/straatnaam'
+import type {
+  JsonLdEnvelope,
+  JsonLdApiResponse,
+} from '~/types/basisregisters'
+import {
+  getLocalizedValue,
+  getConcept,
+  getGestructureerdeIdentificator,
+} from '~/types/basisregisters'
 import { STRAATNAAM_FIELD_URIS } from '~/server/utils/straatnaam-predicate-uris'
 import { straatnaamDataToQuads } from '~/server/services/straatnaam-serialization.service'
 import { serializeQuadsToString } from '~/services/serialization.service'
-
-const getLocalizedValue = (
-  arr: { '@value'?: string; '@language'?: string }[] | undefined,
-): string | undefined => {
-  if (!arr || !Array.isArray(arr)) return undefined
-  const first = arr.find((v) => v['@value'])
-  return first?.['@value']
-}
-
-const getConcept = (obj: any): StraatnaamConcept | undefined => {
-  if (!obj) return undefined
-  const uri = typeof obj === 'string' ? obj : obj['@id']
-  if (!uri) return undefined
-  const label = obj['skos:prefLabel']
-  return { uri, label: label ?? uri }
-}
 
 export default defineEventHandler(
   async (event: any): Promise<StraatnaamData | string | null> => {
@@ -51,8 +43,8 @@ export default defineEventHandler(
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
         ? SUPPORTED_FORMATS[
-            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
-          ]
+        extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+        ]
         : null
       const requestedFormat =
         extensionFormat ||
@@ -64,12 +56,12 @@ export default defineEventHandler(
 
       let data: any
       try {
-        const response = await axios.get(basisregistersUrl, {
+        const response = await axios.get<JsonLdEnvelope<JsonLdApiResponse>>(basisregistersUrl, {
           headers: { Accept: 'application/json' },
         })
         data = response.data
-      } catch (err: any) {
-        if (err?.response?.status === 404) {
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
           throw createError({
             statusCode: 404,
             statusMessage: `Straatnaam not found: ${cleanSlug}`,
@@ -85,27 +77,24 @@ export default defineEventHandler(
         })
       }
 
-      const straatnaamData = data.data
+      const straatnaamData = data.data as JsonLdApiResponse
 
       const id = cleanSlug
       const uri = straatnaamData['@id'] as string
 
-      const identObj = straatnaamData.identificator?.gestructureerdeIdentificator
+      const identObj = getGestructureerdeIdentificator(straatnaamData.identificator)
       const identificator = {
-        lokaleIdentificator: identObj?.lokaleIdentificator as
-          | string
-          | undefined,
+        lokaleIdentificator: identObj?.lokaleIdentificator,
       }
 
       // Straatnaam label
-      const straatnaam = getLocalizedValue(straatnaamData.straatnaam as any)
+      const straatnaam = getLocalizedValue(straatnaamData.straatnaam)
 
       // Homoniem toevoeging (array of strings)
-      const homoniemToevoeging: string[] | undefined = (
-        straatnaamData.homoniemToevoeging as string[] | undefined
-      )?.length
-        ? (straatnaamData.homoniemToevoeging as string[])
-        : undefined
+      const homoniemToevoeging: string[] | undefined =
+        straatnaamData.homoniemToevoeging?.length
+          ? straatnaamData.homoniemToevoeging
+          : undefined
 
       // Status
       const status = getConcept(straatnaamData.status)
@@ -114,12 +103,10 @@ export default defineEventHandler(
       const gemeenteObj = straatnaamData.isToegekendDoor
       const isToegekendDoor: StraatnaamGemeente | undefined = gemeenteObj
         ? {
-            uri: gemeenteObj['@id'] as string | undefined,
-            label: getLocalizedValue(
-              gemeenteObj.naam?.gemeentenaam as any,
-            ),
-            detail: gemeenteObj.detail as string | undefined,
-          }
+          uri: gemeenteObj['@id'],
+          label: getLocalizedValue(gemeenteObj.naam?.gemeentenaam),
+          detail: gemeenteObj.detail,
+        }
         : undefined
 
       // Link to related adressen
@@ -147,8 +134,9 @@ export default defineEventHandler(
       }
 
       return result
-    } catch (error: any) {
-      if (error?.statusCode === 404) throw error
+    } catch (error: unknown) {
+      const err = error as { statusCode?: number }
+      if (err.statusCode === 404) throw error
       console.error('Error fetching straatnaam:', error)
       throw createError({
         statusCode: 500,

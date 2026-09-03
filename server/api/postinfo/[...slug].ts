@@ -6,28 +6,20 @@ import {
 } from '~/constants/constants'
 import type {
   PostinfoData,
-  PostinfoConcept,
   PostinfoGemeente,
 } from '~/types/postinfo'
+import type {
+  JsonLdEnvelope,
+  JsonLdApiResponse,
+} from '~/types/basisregisters'
+import {
+  getLocalizedValue,
+  getConcept,
+  getGestructureerdeIdentificator,
+} from '~/types/basisregisters'
 import { POSTINFO_FIELD_URIS } from '~/server/utils/postinfo-predicate-uris'
 import { postinfoDataToQuads } from '~/server/services/postinfo-serialization.service'
 import { serializeQuadsToString } from '~/services/serialization.service'
-
-const getLocalizedValue = (
-  arr: { '@value'?: string; '@language'?: string }[] | undefined,
-): string | undefined => {
-  if (!arr || !Array.isArray(arr)) return undefined
-  const first = arr.find((v) => v['@value'])
-  return first?.['@value']
-}
-
-const getConcept = (obj: any): PostinfoConcept | undefined => {
-  if (!obj) return undefined
-  const uri = typeof obj === 'string' ? obj : obj['@id']
-  if (!uri) return undefined
-  const label = obj['skos:prefLabel']
-  return { uri, label: label ?? uri }
-}
 
 export default defineEventHandler(
   async (event: any): Promise<PostinfoData | string | null> => {
@@ -51,8 +43,8 @@ export default defineEventHandler(
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
         ? SUPPORTED_FORMATS[
-            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
-          ]
+        extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+        ]
         : null
       const requestedFormat =
         extensionFormat ||
@@ -62,14 +54,14 @@ export default defineEventHandler(
 
       const basisregistersUrl = `${BASISREGISTERS_API_BASE}/postinfo/${cleanSlug}`
 
-      let data: any
+      let data;
       try {
-        const response = await axios.get(basisregistersUrl, {
+        const response = await axios.get<JsonLdEnvelope<JsonLdApiResponse>>(basisregistersUrl, {
           headers: { Accept: 'application/json' },
         })
         data = response.data
-      } catch (err: any) {
-        if (err?.response?.status === 404) {
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
           throw createError({
             statusCode: 404,
             statusMessage: `Postinfo not found: ${cleanSlug}`,
@@ -85,43 +77,37 @@ export default defineEventHandler(
         })
       }
 
-      const postinfoData = data.data
+      const postinfoData = data.data as JsonLdApiResponse
 
       const id = cleanSlug
       const uri = postinfoData['@id'] as string
 
       const identObj =
-        postinfoData.identificator?.gestructureerdeIdentificator
+        getGestructureerdeIdentificator(postinfoData.identificator)
       const identificator = {
-        lokaleIdentificator: identObj?.lokaleIdentificator as
-          | string
-          | undefined,
+        lokaleIdentificator: identObj?.lokaleIdentificator,
       }
 
       // Postcode
       const postcode: string | undefined = cleanSlug
 
       // Postnaam
-      const postnaam = getLocalizedValue(postinfoData.postnaam as any)
+      const postnaam = getLocalizedValue(postinfoData.postnaam)
 
       // Status
       const status = getConcept(postinfoData.status)
 
       // Nuts3
-      const nuts3: string | undefined = postinfoData.nuts3 as
-        | string
-        | undefined
+      const nuts3: string | undefined = postinfoData.nuts3
 
       // Is toegekend aan (Gemeente)
       const gemeenteObj = postinfoData.isToegekendAan
       const isToegekendAan: PostinfoGemeente | undefined = gemeenteObj
         ? {
-            uri: gemeenteObj['@id'] as string | undefined,
-            label: getLocalizedValue(
-              gemeenteObj.naam?.gemeentenaam as any,
-            ),
-            detail: gemeenteObj.detail as string | undefined,
-          }
+          uri: gemeenteObj['@id'],
+          label: getLocalizedValue(gemeenteObj.naam?.gemeentenaam),
+          detail: gemeenteObj.detail,
+        }
         : undefined
 
       const result: PostinfoData = {
@@ -148,8 +134,9 @@ export default defineEventHandler(
       }
 
       return result
-    } catch (error: any) {
-      if (error?.statusCode === 404) throw error
+    } catch (error: unknown) {
+      const err = error as { statusCode?: number }
+      if (err.statusCode === 404) throw error
       console.error('Error fetching postinfo:', error)
       throw createError({
         statusCode: 500,
