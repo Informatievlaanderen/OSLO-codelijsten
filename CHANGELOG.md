@@ -210,3 +210,6 @@ ADD ALL KBO DATA
       
       2.1.0
       feat: added subject pages for Perceel, Adres, Straatnaam, Postinfo, Gemeent en Gebouw
+
+      2.1.1
+      feat: added copy-to-clipboard button for conceptscheme page
