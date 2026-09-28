@@ -62,45 +62,10 @@
           :slug="slug"
         />
 
-        <template v-if="data?.geometrie">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Geometrie</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr v-if="data.geometrie.methode">
-                  <td>
-                    <vl-link :href="data.fieldUris.methode" external>
-                      Geometriemethode
-                    </vl-link>
-                  </td>
-                  <td>
-                    <vl-link :href="data.geometrie.methode.uri">
-                      {{ data.geometrie.methode.label }}
-                    </vl-link>
-                  </td>
-                </tr>
-                <tr v-if="data.geometrie.specificatie">
-                  <td>
-                    <vl-link :href="data.fieldUris.specificatie" external>
-                      Geometriespecificatie
-                    </vl-link>
-                  </td>
-                  <td>
-                    <vl-link :href="data.geometrie.specificatie.uri">
-                      {{ data.geometrie.specificatie.label }}
-                    </vl-link>
-                  </td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
-
         <template v-if="data?.bestaatUit && data.bestaatUit.length > 0">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Gebouweenheden</vl-title>
+            <vl-title tag-name="h2" mod-h2>Bestaat uit</vl-title>
+            <vl-title tag-name="h3" mod-h3>Gebouweenheden</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
@@ -126,7 +91,8 @@
 
         <template v-if="data?.ligtOp && data.ligtOp.length > 0">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Percelen</vl-title>
+            <vl-title tag-name="h2" mod-h2>Ligt op</vl-title>
+            <vl-title tag-name="h3" mod-h3>Percelen</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>

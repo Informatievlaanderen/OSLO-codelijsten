@@ -7,6 +7,11 @@ export interface PerceelIdentificator {
   lokaleIdentificator?: string
   naamruimte?: string
   versieIdentificator?: string
+  toegekendDoor?: PerceelRef
+}
+
+export interface PerceelRef {
+  uri: string
 }
 
 export interface PerceelAdres {
@@ -18,6 +23,7 @@ export interface PerceelFieldUris {
   identificator: string
   gestructureerdeIdentificator: string
   lokaleIdentificator: string
+  toegekendDoor: string
   status: string
   adressen: string
 }

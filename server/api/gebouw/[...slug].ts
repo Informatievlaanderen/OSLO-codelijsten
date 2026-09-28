@@ -103,7 +103,9 @@ export default defineEventHandler(
         ? {
             methode: getConcept(geometrieObj.methode),
             specificatie: getConcept(geometrieObj.specificatie),
-            gml: geometrieObj.gml,
+            geometrie: geometrieObj.geometrie?.length
+              ? geometrieObj.geometrie.map((g: any) => ({ gml: g.gml }))
+              : undefined,
           }
         : undefined
 
@@ -124,6 +126,7 @@ export default defineEventHandler(
         ? bestaatUitRaw.map((ref) => ({
             uri: ref['@id'],
             detail: ref.detail,
+            status: getConcept(ref.status),
           }))
         : undefined
 

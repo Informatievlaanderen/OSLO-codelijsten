@@ -62,6 +62,31 @@
             :fieldUris="data?.fieldUris"
             :slug="slug"
           />
+          <template v-if="data?.identificator?.toegekendDoor">
+            <vl-column width="12">
+              <vl-title tag-name="h3" mod-h3>toegekendDoor</vl-title>
+            </vl-column>
+            <vl-column width="12">
+              <vl-data-table>
+                <tbody>
+                  <tr>
+                    <td>
+                      <vl-link :href="data.fieldUris.toegekendDoor" external>
+                        toegekendDoor
+                      </vl-link>
+                    </td>
+                    <td>
+                      <vl-link
+                        :href="data.identificator.toegekendDoor.uri"
+                      >
+                        {{ data.identificator.toegekendDoor.uri }}
+                      </vl-link>
+                    </td>
+                  </tr>
+                </tbody>
+              </vl-data-table>
+            </vl-column>
+          </template>
         </template>
 
         <template v-if="data?.adressen && data.adressen.length > 0">

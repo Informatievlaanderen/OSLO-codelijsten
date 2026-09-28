@@ -8,6 +8,7 @@ import type {
   PerceelData,
   PerceelIdentificator,
   PerceelAdres,
+  PerceelRef,
 } from '~/types/perceel'
 import type {
   JsonLdEnvelope,
@@ -92,10 +93,22 @@ export default defineEventHandler(
       // Identificator (first entry with gestructureerdeIdentificator)
       const gestructureerdIdent = getGestructureerdeIdentificator(perceelData.identificator)
 
+      // toegekendDoor from the same identificator entry that has gestructureerdeIdentificator
+      const identificatorArr = perceelData.identificator
+        ? Array.isArray(perceelData.identificator)
+          ? perceelData.identificator
+          : [perceelData.identificator]
+        : []
+      const primaryIdent = identificatorArr.find((i) => i.gestructureerdeIdentificator)
+      const toegekendDoor: PerceelRef | undefined = primaryIdent?.toegekendDoor
+        ? { uri: primaryIdent.toegekendDoor['@id'] }
+        : undefined
+
       const identificator: PerceelIdentificator = {
         lokaleIdentificator: gestructureerdIdent?.lokaleIdentificator,
         naamruimte: gestructureerdIdent?.naamruimte,
         versieIdentificator: gestructureerdIdent?.versieIdentificator,
+        toegekendDoor,
       }
 
       // Status
@@ -133,7 +146,7 @@ export default defineEventHandler(
         // For JSON-LD, return the raw API response directly (it's already valid JSON-LD)
         if (requestedFormat === SUPPORTED_FORMATS.jsonld) {
           setHeader(event, 'Content-Type', SUPPORTED_FORMATS.jsonld)
-          return data;
+          return data as unknown as string;
         }
         // For other RDF formats (TTL, N-Triples), parse the raw JSON-LD response
         // and serialize to the requested format, preserving all original triples

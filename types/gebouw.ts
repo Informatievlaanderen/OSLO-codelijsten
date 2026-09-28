@@ -12,12 +12,17 @@ export interface GebouwIdentificator {
 export interface GebouwGeometrie {
   methode?: GebouwConcept
   specificatie?: GebouwConcept
+  geometrie?: GebouwGeometriePunt[]
+}
+
+export interface GebouwGeometriePunt {
   gml?: string
 }
 
 export interface GebouwRef {
   uri: string
   detail?: string
+  status?: GebouwConcept
 }
 
 export interface GebouwFieldUris {
