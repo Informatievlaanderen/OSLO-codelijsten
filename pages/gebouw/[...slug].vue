@@ -20,7 +20,7 @@
         <vl-column width="12">
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
-              {{ data ? `Gebouw: ${slug}` : `Gebouw: ${slug}` }}
+              {{ data ? `${slug}` : `Gebouw: ${slug}` }}
             </vl-title>
             <vl-link @click="copyToClipboard(data?.uri ?? '')">
               {{ data?.uri ?? '' }}
@@ -31,6 +31,10 @@
 
         <vl-column width="12">
           <action-buttons :source="data?.source ?? ''" />
+        </vl-column>
+
+        <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Gebouw</vl-title>
         </vl-column>
 
         <vl-column width="12">
@@ -52,25 +56,11 @@
           </vl-data-table>
         </vl-column>
 
-        <template v-if="data?.identificator">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Identificator</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr>
-                  <td>
-                    <vl-link :href="data.fieldUris.identificator" external>
-                      Identificator
-                    </vl-link>
-                  </td>
-                  <td>{{ data.identificator.lokaleIdentificator ?? slug }}</td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
+        <identificator
+          :identificator="data?.identificator"
+          :fieldUris="data?.fieldUris"
+          :slug="slug"
+        />
 
         <template v-if="data?.geometrie">
           <vl-column width="12">
@@ -148,9 +138,7 @@
                     </vl-link>
                   </td>
                   <td>
-                    <vl-link
-                      :href="`/doc/perceel/${extractId(item.uri)}`"
-                    >
+                    <vl-link :href="`/doc/perceel/${extractId(item.uri)}`">
                       {{ extractId(item.uri) }}
                     </vl-link>
                   </td>

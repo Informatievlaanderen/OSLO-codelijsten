@@ -93,6 +93,8 @@ export default defineEventHandler(
       const gestructureerdIdent = getGestructureerdeIdentificator(gebouwData.identificator)
       const identificator = {
         lokaleIdentificator: gestructureerdIdent?.lokaleIdentificator,
+        naamruimte: gestructureerdIdent?.naamruimte,
+        versieIdentificator: gestructureerdIdent?.versieIdentificator,
       }
 
       // Geometrie (2DGebouwgeometrie)

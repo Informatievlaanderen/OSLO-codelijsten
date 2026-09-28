@@ -85,6 +85,8 @@ export default defineEventHandler(
       const identObj = getGestructureerdeIdentificator(straatnaamData.identificator)
       const identificator = {
         lokaleIdentificator: identObj?.lokaleIdentificator,
+        naamruimte: identObj?.naamruimte,
+        versieIdentificator: identObj?.versieIdentificator,
       }
 
       // Straatnaam label

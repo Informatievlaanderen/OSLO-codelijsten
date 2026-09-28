@@ -34,6 +34,10 @@
         </vl-column>
 
         <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Postinfo</vl-title>
+        </vl-column>
+
+        <vl-column width="12">
           <vl-data-table>
             <tbody>
               <tr v-if="data?.postcode">
@@ -55,7 +59,7 @@
               <tr v-if="data?.isToegekendAan">
                 <td>
                   <vl-link :href="data.fieldUris.isToegekendAan" external>
-                    Toegekend aan
+                    IsToegekendAan
                   </vl-link>
                 </td>
                 <td>
@@ -91,25 +95,11 @@
           </vl-data-table>
         </vl-column>
 
-        <template v-if="data?.identificator">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Identificator</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr>
-                  <td>
-                    <vl-link :href="data.fieldUris.identificator" external>
-                      Identificator
-                    </vl-link>
-                  </td>
-                  <td>{{ data.identificator.lokaleIdentificator ?? slug }}</td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
+        <identificator
+          :identificator="data?.identificator"
+          :fieldUris="data?.fieldUris"
+          :slug="slug"
+        />
       </vl-grid>
     </vl-region>
   </vl-layout>

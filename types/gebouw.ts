@@ -5,6 +5,8 @@ export interface GebouwConcept {
 
 export interface GebouwIdentificator {
   lokaleIdentificator?: string
+  naamruimte?: string
+  versieIdentificator?: string
 }
 
 export interface GebouwGeometrie {

@@ -86,6 +86,8 @@ export default defineEventHandler(
         getGestructureerdeIdentificator(postinfoData.identificator)
       const identificator = {
         lokaleIdentificator: identObj?.lokaleIdentificator,
+        naamruimte: identObj?.naamruimte,
+        versieIdentificator: identObj?.versieIdentificator,
       }
 
       // Postcode

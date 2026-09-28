@@ -111,6 +111,8 @@ export default defineEventHandler(
       const identObj = getGestructureerdeIdentificator(adresData.identificator)
       const identificator = {
         lokaleIdentificator: identObj?.lokaleIdentificator,
+        naamruimte: identObj?.naamruimte,
+        versieIdentificator: identObj?.versieIdentificator,
       }
 
       // Gemeentenaam

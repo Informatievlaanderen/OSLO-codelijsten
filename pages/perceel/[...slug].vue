@@ -20,7 +20,7 @@
         <vl-column width="12">
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
-              {{ data ? `Perceel: ${slug}` : `Perceel: ${slug}` }}
+              {{ data ? `${slug}` : `Perceel: ${slug}` }}
             </vl-title>
             <vl-link @click="copyToClipboard(data?.uri ?? '')">
               {{ data?.uri ?? '' }}
@@ -31,6 +31,10 @@
 
         <vl-column width="12">
           <action-buttons :source="data?.source ?? ''" />
+        </vl-column>
+
+        <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Perceel</vl-title>
         </vl-column>
 
         <vl-column width="12">
@@ -52,24 +56,12 @@
           </vl-data-table>
         </vl-column>
 
-        <template v-if="data?.identificator">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Identificator</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr>
-                  <td>
-                    <vl-link :href="data.fieldUris.identificator" external>
-                      Identificator
-                    </vl-link>
-                  </td>
-                  <td>{{ data.identificator.lokaleIdentificator ?? slug }}</td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
+        <template v-if="data">
+          <identificator
+            :identificator="data?.identificator"
+            :fieldUris="data?.fieldUris"
+            :slug="slug"
+          />
         </template>
 
         <template v-if="data?.adressen && data.adressen.length > 0">
@@ -86,9 +78,7 @@
                     </vl-link>
                   </td>
                   <td>
-                    <vl-link
-                      :href="`/doc/adres/${extractId(item.uri)}`"
-                    >
+                    <vl-link :href="`/doc/adres/${extractId(item.uri)}`">
                       {{ extractId(item.uri) }}
                     </vl-link>
                   </td>

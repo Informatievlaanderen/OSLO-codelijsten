@@ -5,6 +5,8 @@ export interface StraatnaamConcept {
 
 export interface StraatnaamIdentificator {
   lokaleIdentificator?: string
+  naamruimte?: string
+  versieIdentificator?: string
 }
 
 export interface StraatnaamGemeente {
