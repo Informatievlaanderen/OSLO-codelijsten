@@ -2,9 +2,9 @@ import {
   CONCEPT_SCHEME_QUERY,
   CONCEPT_SCHEME_BY_ID_QUERY,
   ITEMS_PER_PAGE,
-  statusLabelQuery,
 } from '~/constants/constants'
 import { executeQuery } from '~/server/services/rdfquery.service'
+import { resolveStatusLabel } from '~/server/services/status.service'
 import type { ConceptScheme, ConceptSchemeConfig } from '~/types/conceptScheme'
 
 export default defineEventHandler(async (event) => {
@@ -87,27 +87,3 @@ export default defineEventHandler(async (event) => {
     return { total: 0, items: [] }
   }
 })
-
-export const resolveStatusLabel = async (
-  statusUri?: string,
-): Promise<string> => {
-  if (!statusUri) {
-    return ''
-  }
-
-  const statusSource = statusUri.endsWith('.ttl')
-    ? statusUri
-    : `${statusUri}.ttl`
-
-  try {
-    const result = await executeQuery(statusLabelQuery(statusUri), [
-      statusSource,
-    ])
-
-    const label = result[0]?.get('label')?.value ?? ''
-    return label
-  } catch (error) {
-    console.error(`Error resolving status label for: ${statusUri}`, error)
-    return ''
-  }
-}

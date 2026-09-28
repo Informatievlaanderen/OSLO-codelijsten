@@ -19,6 +19,7 @@ import {
 } from '~/types/basisregisters'
 import { STRAATNAAM_FIELD_URIS } from '~/server/utils/straatnaam-predicate-uris'
 import { serializeJsonLdToFormat } from '~/services/serialization.service'
+import { resolveStatusLabel } from '~/server/services/status.service'
 
 export default defineEventHandler(
   async (event: any): Promise<StraatnaamData | string | null> => {
@@ -99,6 +100,14 @@ export default defineEventHandler(
 
       // Status
       const status = getConcept(straatnaamData.status)
+
+      // Resolve proper label from concept scheme
+      if (status?.uri) {
+        const resolvedLabel = await resolveStatusLabel(status.uri)
+        if (resolvedLabel) {
+          status.label = resolvedLabel
+        }
+      }
 
       // Is toegekend door (Gemeente)
       const gemeenteObj = straatnaamData.isToegekendDoor

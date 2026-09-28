@@ -24,6 +24,7 @@ import {
 } from '~/types/basisregisters'
 import { ADRES_FIELD_URIS } from '~/server/utils/adres-predicate-uris'
 import { serializeJsonLdToFormat } from '~/services/serialization.service'
+import { resolveStatusLabel } from '~/server/services/status.service'
 
 /**
  * Helper: extracts a concept (skos:Concept) with @id and optional skos:prefLabel.
@@ -157,6 +158,14 @@ export default defineEventHandler(
 
       // Status
       const status = getConcept(adresData.status)
+
+      // Resolve proper label from concept scheme
+      if (status?.uri) {
+        const resolvedLabel = await resolveStatusLabel(status.uri)
+        if (resolvedLabel) {
+          status.label = resolvedLabel
+        }
+      }
 
       // Officieel toegekend
       const officieelToegekend: boolean | undefined =

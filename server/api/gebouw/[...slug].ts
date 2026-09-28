@@ -20,6 +20,7 @@ import {
 } from '~/types/basisregisters'
 import { GEBOUW_FIELD_URIS } from '~/server/utils/gebouw-predicate-uris'
 import { serializeJsonLdToFormat } from '~/services/serialization.service'
+import { resolveStatusLabel } from '~/server/services/status.service'
 
 export default defineEventHandler(
   async (event: any): Promise<GebouwData | string | null> => {
@@ -108,6 +109,14 @@ export default defineEventHandler(
 
       // Status
       const status = getConcept(gebouwData.status)
+
+      // Resolve proper label from concept scheme
+      if (status?.uri) {
+        const resolvedLabel = await resolveStatusLabel(status.uri)
+        if (resolvedLabel) {
+          status.label = resolvedLabel
+        }
+      }
 
       // bestaatUit (Gebouweenheden)
       const bestaatUitRaw = normalizeArray(gebouwData.bestaatUit)

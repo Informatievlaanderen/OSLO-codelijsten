@@ -21,6 +21,7 @@ import {
 } from '~/types/basisregisters'
 import { GEMEENTE_FIELD_URIS } from '~/server/utils/gemeente-predicate-uris'
 import { serializeJsonLdToFormat } from '~/services/serialization.service'
+import { resolveStatusLabel } from '~/server/services/status.service'
 
 export default defineEventHandler(
   async (event: any): Promise<GemeenteData | string | null> => {
@@ -115,6 +116,14 @@ export default defineEventHandler(
 
       // Status
       const status = getConcept(gemeenteData.status)
+
+      // Resolve proper label from concept scheme
+      if (status?.uri) {
+        const resolvedLabel = await resolveStatusLabel(status.uri)
+        if (resolvedLabel) {
+          status.label = resolvedLabel
+        }
+      }
 
       const result: GemeenteData = {
         id,

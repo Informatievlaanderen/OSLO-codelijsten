@@ -12,7 +12,7 @@ import type {
   ConceptSchemeConfig,
   DatasetConfig,
 } from '~/types/conceptScheme'
-import { resolveStatusLabel } from '../conceptscheme'
+import { resolveStatusLabel } from '~/server/services/status.service'
 
 export default defineEventHandler(
   async (event): Promise<ConceptScheme | string | null> => {
