@@ -19,8 +19,7 @@ import {
   getGestructureerdeIdentificator,
 } from '~/types/basisregisters'
 import { GEBOUW_FIELD_URIS } from '~/server/utils/gebouw-predicate-uris'
-import { serializeQuadsToString } from '~/services/serialization.service'
-import { gebouwDataToQuads } from '~/server/services/gebouw-serialization.service'
+import { serializeJsonLdToFormat } from '~/services/serialization.service'
 
 export default defineEventHandler(
   async (event: any): Promise<GebouwData | string | null> => {
@@ -140,11 +139,17 @@ export default defineEventHandler(
         source: basisregistersUrl,
       }
 
-      // If RDF format requested, serialize
+      // If RDF format requested
       if (requestedFormat) {
-        const quads = gebouwDataToQuads(result)
-        const serialized = await serializeQuadsToString(
-          quads,
+        // For JSON-LD, return the raw API response directly (it's already valid JSON-LD)
+        if (requestedFormat === SUPPORTED_FORMATS.jsonld) {
+          setHeader(event, 'Content-Type', SUPPORTED_FORMATS.jsonld)
+          return data as unknown as string;
+        }
+        // For other RDF formats (TTL, N-Triples), parse the raw JSON-LD response
+        // and serialize to the requested format, preserving all original triples
+        const serialized = await serializeJsonLdToFormat(
+          data,
           requestedFormat,
         )
         setHeader(event, 'Content-Type', requestedFormat)

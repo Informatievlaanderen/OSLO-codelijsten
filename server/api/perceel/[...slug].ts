@@ -19,8 +19,7 @@ import {
   getConcept,
 } from '~/types/basisregisters'
 import { PERCEEL_FIELD_URIS } from '~/server/utils/perceel-predicate-uris'
-import { serializeQuadsToString } from '~/services/serialization.service'
-import { perceelDataToQuads } from '~/server/services/perceel-serialization.service'
+import { serializeJsonLdToFormat } from '~/services/serialization.service'
 
 export default defineEventHandler(
   async (event: any): Promise<PerceelData | string | null> => {
@@ -120,11 +119,17 @@ export default defineEventHandler(
         source: basisregistersUrl,
       }
 
-      // If RDF format requested, serialize
+      // If RDF format requested
       if (requestedFormat) {
-        const quads = perceelDataToQuads(result)
-        const serialized = await serializeQuadsToString(
-          quads,
+        // For JSON-LD, return the raw API response directly (it's already valid JSON-LD)
+        if (requestedFormat === SUPPORTED_FORMATS.jsonld) {
+          setHeader(event, 'Content-Type', SUPPORTED_FORMATS.jsonld)
+          return data;
+        }
+        // For other RDF formats (TTL, N-Triples), parse the raw JSON-LD response
+        // and serialize to the requested format, preserving all original triples
+        const serialized = await serializeJsonLdToFormat(
+          data,
           requestedFormat,
         )
         setHeader(event, 'Content-Type', requestedFormat)

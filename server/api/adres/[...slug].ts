@@ -23,8 +23,7 @@ import {
   getGestructureerdeIdentificator,
 } from '~/types/basisregisters'
 import { ADRES_FIELD_URIS } from '~/server/utils/adres-predicate-uris'
-import { serializeQuadsToString } from '~/services/serialization.service'
-import { adresDataToQuads } from '~/server/services/adres-serialization.service'
+import { serializeJsonLdToFormat } from '~/services/serialization.service'
 
 /**
  * Helper: extracts a concept (skos:Concept) with @id and optional skos:prefLabel.
@@ -179,11 +178,17 @@ export default defineEventHandler(
         source: basisregistersUrl,
       }
 
-      // If RDF format requested, serialize
+      // If RDF format requested
       if (requestedFormat) {
-        const quads = adresDataToQuads(result)
-        const serialized = await serializeQuadsToString(
-          quads,
+        // For JSON-LD, return the raw API response directly (it's already valid JSON-LD)
+        if (requestedFormat === SUPPORTED_FORMATS.jsonld) {
+          setHeader(event, 'Content-Type', SUPPORTED_FORMATS.jsonld)
+          return data;
+        }
+        // For other RDF formats (TTL, N-Triples), parse the raw JSON-LD response
+        // and serialize to the requested format, preserving all original triples
+        const serialized = await serializeJsonLdToFormat(
+          data,
           requestedFormat,
         )
         setHeader(event, 'Content-Type', requestedFormat)
