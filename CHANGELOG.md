@@ -198,7 +198,7 @@ ADD ALL KBO DATA
       fix: don't use `geefOndernemingVKBO` for contactinfo, but instead rely fully on `geefOnderneming`
       fix: don't show identificator publically in github
       fix: Change referte to make it clear we're asking for subjectpages
-  
+
       2.0.1
       feat: added some more logic to find the conceptscheme that matches most with slug instead of first one
       feat: added more recent version of Node and NPM to `package.json`
@@ -207,10 +207,10 @@ ADD ALL KBO DATA
       fix: set vestiging in the URI instead of onderneming for vestiging
       fix: add logic to deal with fallback language value xx of MAGDA SOAP
       fix: tweak for vestiging of a natuurlijk persoon still showing contactinfo
-      
+
       2.1.0
       feat: added subject pages for Perceel, Adres, Straatnaam, Postinfo, Gemeent en Gebouw
-      
+
       2.1.1
       feat: added copy-to-clipboard button for conceptscheme page
 
@@ -220,3 +220,6 @@ ADD ALL KBO DATA
       fix: use label of conceptscheme instead of the id
       fix: better map the subjectpages on the model
       feat: show the response from basisregisters api for JSONLD and make ttl from this response
+
+      2.2.1
+      feat: added subjectpage for gebouweenheid
