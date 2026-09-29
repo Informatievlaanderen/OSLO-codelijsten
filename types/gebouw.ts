@@ -5,17 +5,24 @@ export interface GebouwConcept {
 
 export interface GebouwIdentificator {
   lokaleIdentificator?: string
+  naamruimte?: string
+  versieIdentificator?: string
 }
 
 export interface GebouwGeometrie {
   methode?: GebouwConcept
   specificatie?: GebouwConcept
+  geometrie?: GebouwGeometriePunt[]
+}
+
+export interface GebouwGeometriePunt {
   gml?: string
 }
 
 export interface GebouwRef {
   uri: string
   detail?: string
+  status?: GebouwConcept
 }
 
 export interface GebouwFieldUris {
@@ -38,6 +45,8 @@ export interface GebouwData {
   status?: GebouwConcept
   bestaatUit?: GebouwRef[]
   ligtOp?: GebouwRef[]
+  geopuntUrl?: string
+  centroid?: { x: number; y: number }
   fieldUris: GebouwFieldUris
   source: string
 }

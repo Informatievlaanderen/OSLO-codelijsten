@@ -8,6 +8,7 @@ import type {
   PerceelData,
   PerceelIdentificator,
   PerceelAdres,
+  PerceelRef,
 } from '~/types/perceel'
 import type {
   JsonLdEnvelope,
@@ -19,8 +20,8 @@ import {
   getConcept,
 } from '~/types/basisregisters'
 import { PERCEEL_FIELD_URIS } from '~/server/utils/perceel-predicate-uris'
-import { serializeQuadsToString } from '~/services/serialization.service'
-import { perceelDataToQuads } from '~/server/services/perceel-serialization.service'
+import { serializeJsonLdToFormat } from '~/services/serialization.service'
+import { resolveStatusLabel } from '~/server/services/status.service'
 
 export default defineEventHandler(
   async (event: any): Promise<PerceelData | string | null> => {
@@ -92,14 +93,34 @@ export default defineEventHandler(
       // Identificator (first entry with gestructureerdeIdentificator)
       const gestructureerdIdent = getGestructureerdeIdentificator(perceelData.identificator)
 
+      // toegekendDoor from the same identificator entry that has gestructureerdeIdentificator
+      const identificatorArr = perceelData.identificator
+        ? Array.isArray(perceelData.identificator)
+          ? perceelData.identificator
+          : [perceelData.identificator]
+        : []
+      const primaryIdent = identificatorArr.find((i) => i.gestructureerdeIdentificator)
+      const toegekendDoor: PerceelRef | undefined = primaryIdent?.toegekendDoor
+        ? { uri: primaryIdent.toegekendDoor['@id'] }
+        : undefined
+
       const identificator: PerceelIdentificator = {
         lokaleIdentificator: gestructureerdIdent?.lokaleIdentificator,
         naamruimte: gestructureerdIdent?.naamruimte,
         versieIdentificator: gestructureerdIdent?.versieIdentificator,
+        toegekendDoor,
       }
 
       // Status
       const status = getConcept(perceelData.status)
+
+      // Resolve proper label from concept scheme
+      if (status?.uri) {
+        const resolvedLabel = await resolveStatusLabel(status.uri)
+        if (resolvedLabel) {
+          status.label = resolvedLabel
+        }
+      }
 
       // Adressen
       const adressenRaw = normalizeArray(perceelData.adressen)
@@ -120,11 +141,17 @@ export default defineEventHandler(
         source: basisregistersUrl,
       }
 
-      // If RDF format requested, serialize
+      // If RDF format requested
       if (requestedFormat) {
-        const quads = perceelDataToQuads(result)
-        const serialized = await serializeQuadsToString(
-          quads,
+        // For JSON-LD, return the raw API response directly (it's already valid JSON-LD)
+        if (requestedFormat === SUPPORTED_FORMATS.jsonld) {
+          setHeader(event, 'Content-Type', SUPPORTED_FORMATS.jsonld)
+          return data as unknown as string;
+        }
+        // For other RDF formats (TTL, N-Triples), parse the raw JSON-LD response
+        // and serialize to the requested format, preserving all original triples
+        const serialized = await serializeJsonLdToFormat(
+          data,
           requestedFormat,
         )
         setHeader(event, 'Content-Type', requestedFormat)

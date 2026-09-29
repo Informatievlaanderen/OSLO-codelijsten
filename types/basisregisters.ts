@@ -19,6 +19,7 @@ export interface JsonLdRef {
   '@id': string
   '@type'?: string
   detail?: string
+  status?: JsonLdConcept
 }
 
 export interface JsonLdIdentificator {
@@ -75,7 +76,7 @@ export interface JsonLdApiResponse {
   geometrie?: {
     methode?: JsonLdConcept
     specificatie?: JsonLdConcept
-    gml?: string
+    geometrie?: Array<{ gml?: string }>
   }
   // Gemeente
   naam?: {

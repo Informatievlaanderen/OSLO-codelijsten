@@ -6,6 +6,7 @@ export const PERCEEL_FIELD_URIS = {
     'https://data.vlaanderen.be/ns/generiek#gestructureerdeIdentificator',
   lokaleIdentificator:
     'https://data.vlaanderen.be/ns/generiek#lokaleIdentificator',
+  toegekendDoor: 'http://purl.org/dc/terms/creator',
   status: 'https://implementatie.data.vlaanderen.be/ns/perceel#status',
   adressen: 'https://implementatie.data.vlaanderen.be/ns/gebouw#toegekendAdres',
 } as const

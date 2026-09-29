@@ -18,8 +18,8 @@ import {
   getGestructureerdeIdentificator,
 } from '~/types/basisregisters'
 import { STRAATNAAM_FIELD_URIS } from '~/server/utils/straatnaam-predicate-uris'
-import { straatnaamDataToQuads } from '~/server/services/straatnaam-serialization.service'
-import { serializeQuadsToString } from '~/services/serialization.service'
+import { serializeJsonLdToFormat } from '~/services/serialization.service'
+import { resolveStatusLabel } from '~/server/services/status.service'
 
 export default defineEventHandler(
   async (event: any): Promise<StraatnaamData | string | null> => {
@@ -85,6 +85,8 @@ export default defineEventHandler(
       const identObj = getGestructureerdeIdentificator(straatnaamData.identificator)
       const identificator = {
         lokaleIdentificator: identObj?.lokaleIdentificator,
+        naamruimte: identObj?.naamruimte,
+        versieIdentificator: identObj?.versieIdentificator,
       }
 
       // Straatnaam label
@@ -98,6 +100,14 @@ export default defineEventHandler(
 
       // Status
       const status = getConcept(straatnaamData.status)
+
+      // Resolve proper label from concept scheme
+      if (status?.uri) {
+        const resolvedLabel = await resolveStatusLabel(status.uri)
+        if (resolvedLabel) {
+          status.label = resolvedLabel
+        }
+      }
 
       // Is toegekend door (Gemeente)
       const gemeenteObj = straatnaamData.isToegekendDoor
@@ -124,9 +134,15 @@ export default defineEventHandler(
       }
 
       if (requestedFormat) {
-        const quads = straatnaamDataToQuads(result)
-        const serialized = await serializeQuadsToString(
-          quads,
+        // For JSON-LD, return the raw API response directly (it's already valid JSON-LD)
+        if (requestedFormat === SUPPORTED_FORMATS.jsonld) {
+          setHeader(event, 'Content-Type', SUPPORTED_FORMATS.jsonld)
+          return data;
+        }
+        // For other RDF formats (TTL, N-Triples), parse the raw JSON-LD response
+        // and serialize to the requested format, preserving all original triples
+        const serialized = await serializeJsonLdToFormat(
+          data,
           requestedFormat,
         )
         setHeader(event, 'Content-Type', requestedFormat)

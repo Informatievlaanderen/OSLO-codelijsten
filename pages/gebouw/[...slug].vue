@@ -20,7 +20,7 @@
         <vl-column width="12">
           <div class="h1-sublink">
             <vl-title mod-no-space-bottom tag-name="h1">
-              {{ data ? `Gebouw: ${slug}` : `Gebouw: ${slug}` }}
+              {{ data ? `${slug}` : `Gebouw: ${slug}` }}
             </vl-title>
             <vl-link @click="copyToClipboard(data?.uri ?? '')">
               {{ data?.uri ?? '' }}
@@ -31,6 +31,10 @@
 
         <vl-column width="12">
           <action-buttons :source="data?.source ?? ''" />
+        </vl-column>
+
+        <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Gebouw</vl-title>
         </vl-column>
 
         <vl-column width="12">
@@ -52,65 +56,40 @@
           </vl-data-table>
         </vl-column>
 
-        <template v-if="data?.identificator">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Identificator</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr>
-                  <td>
-                    <vl-link :href="data.fieldUris.identificator" external>
-                      Identificator
-                    </vl-link>
-                  </td>
-                  <td>{{ data.identificator.lokaleIdentificator ?? slug }}</td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
+        <identificator
+          :identificator="data?.identificator"
+          :fieldUris="data?.fieldUris"
+          :slug="slug"
+        />
 
-        <template v-if="data?.geometrie">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Geometrie</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr v-if="data.geometrie.methode">
-                  <td>
-                    <vl-link :href="data.fieldUris.methode" external>
-                      Geometriemethode
-                    </vl-link>
-                  </td>
-                  <td>
-                    <vl-link :href="data.geometrie.methode.uri">
-                      {{ data.geometrie.methode.label }}
-                    </vl-link>
-                  </td>
-                </tr>
-                <tr v-if="data.geometrie.specificatie">
-                  <td>
-                    <vl-link :href="data.fieldUris.specificatie" external>
-                      Geometriespecificatie
-                    </vl-link>
-                  </td>
-                  <td>
-                    <vl-link :href="data.geometrie.specificatie.uri">
-                      {{ data.geometrie.specificatie.label }}
-                    </vl-link>
-                  </td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
+        <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Geometrie</vl-title>
+        </vl-column>
+
+        <vl-column v-if="data?.centroid" width="12">
+          <vl-data-table>
+            <tbody>
+              <tr>
+                <td>
+                  <vl-link :href="data.fieldUris.geometrie" external>
+                    Geometrie
+                  </vl-link>
+                </td>
+                <td>
+                  <vl-link :href="data.geopuntUrl" external>
+                    {{ data.centroid.x.toFixed(2) }},
+                    {{ data.centroid.y.toFixed(2) }}
+                  </vl-link>
+                </td>
+              </tr>
+            </tbody>
+          </vl-data-table>
+        </vl-column>
 
         <template v-if="data?.bestaatUit && data.bestaatUit.length > 0">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Gebouweenheden</vl-title>
+            <vl-title tag-name="h2" mod-h2>Bestaat uit</vl-title>
+            <vl-title tag-name="h3" mod-h3>Gebouweenheden</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
@@ -136,7 +115,8 @@
 
         <template v-if="data?.ligtOp && data.ligtOp.length > 0">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Percelen</vl-title>
+            <vl-title tag-name="h2" mod-h2>Ligt op</vl-title>
+            <vl-title tag-name="h3" mod-h3>Percelen</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
@@ -148,9 +128,7 @@
                     </vl-link>
                   </td>
                   <td>
-                    <vl-link
-                      :href="`/doc/perceel/${extractId(item.uri)}`"
-                    >
+                    <vl-link :href="`/doc/perceel/${extractId(item.uri)}`">
                       {{ extractId(item.uri) }}
                     </vl-link>
                   </td>

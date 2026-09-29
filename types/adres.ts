@@ -5,6 +5,8 @@ export interface AdresConcept {
 
 export interface AdresIdentificator {
   lokaleIdentificator?: string
+  naamruimte?: string
+  versieIdentificator?: string
 }
 
 export interface AdresGemeentenaam {

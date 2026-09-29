@@ -19,8 +19,9 @@ import {
   getGestructureerdeIdentificator,
 } from '~/types/basisregisters'
 import { GEBOUW_FIELD_URIS } from '~/server/utils/gebouw-predicate-uris'
-import { serializeQuadsToString } from '~/services/serialization.service'
-import { gebouwDataToQuads } from '~/server/services/gebouw-serialization.service'
+import { serializeJsonLdToFormat } from '~/services/serialization.service'
+import { resolveStatusLabel } from '~/server/services/status.service'
+import { parseGmlCentroid, buildGeopuntUrl } from '~/utils/utils'
 
 export default defineEventHandler(
   async (event: any): Promise<GebouwData | string | null> => {
@@ -93,6 +94,8 @@ export default defineEventHandler(
       const gestructureerdIdent = getGestructureerdeIdentificator(gebouwData.identificator)
       const identificator = {
         lokaleIdentificator: gestructureerdIdent?.lokaleIdentificator,
+        naamruimte: gestructureerdIdent?.naamruimte,
+        versieIdentificator: gestructureerdIdent?.versieIdentificator,
       }
 
       // Geometrie (2DGebouwgeometrie)
@@ -101,12 +104,36 @@ export default defineEventHandler(
         ? {
             methode: getConcept(geometrieObj.methode),
             specificatie: getConcept(geometrieObj.specificatie),
-            gml: geometrieObj.gml,
+            geometrie: geometrieObj.geometrie?.length
+              ? geometrieObj.geometrie.map((g: any) => ({ gml: g.gml }))
+              : undefined,
           }
         : undefined
 
+      // Build Geopunt URL from the first Lambert 1972 GML geometry
+      let geopuntUrl: string | undefined
+      let centroid: { x: number; y: number } | undefined
+      if (geometrie?.geometrie?.length) {
+        const firstGml = geometrie.geometrie.find((g) => g.gml)
+        if (firstGml?.gml) {
+          const c = parseGmlCentroid(firstGml.gml)
+          if (c) {
+            centroid = c
+            geopuntUrl = buildGeopuntUrl(c.x, c.y)
+          }
+        }
+      }
+
       // Status
       const status = getConcept(gebouwData.status)
+
+      // Resolve proper label from concept scheme
+      if (status?.uri) {
+        const resolvedLabel = await resolveStatusLabel(status.uri)
+        if (resolvedLabel) {
+          status.label = resolvedLabel
+        }
+      }
 
       // bestaatUit (Gebouweenheden)
       const bestaatUitRaw = normalizeArray(gebouwData.bestaatUit)
@@ -114,6 +141,7 @@ export default defineEventHandler(
         ? bestaatUitRaw.map((ref) => ({
             uri: ref['@id'],
             detail: ref.detail,
+            status: getConcept(ref.status),
           }))
         : undefined
 
@@ -134,15 +162,23 @@ export default defineEventHandler(
         status,
         bestaatUit,
         ligtOp,
+        geopuntUrl,
+        centroid,
         fieldUris: GEBOUW_FIELD_URIS,
         source: basisregistersUrl,
       }
 
-      // If RDF format requested, serialize
+      // If RDF format requested
       if (requestedFormat) {
-        const quads = gebouwDataToQuads(result)
-        const serialized = await serializeQuadsToString(
-          quads,
+        // For JSON-LD, return the raw API response directly (it's already valid JSON-LD)
+        if (requestedFormat === SUPPORTED_FORMATS.jsonld) {
+          setHeader(event, 'Content-Type', SUPPORTED_FORMATS.jsonld)
+          return data as unknown as string;
+        }
+        // For other RDF formats (TTL, N-Triples), parse the raw JSON-LD response
+        // and serialize to the requested format, preserving all original triples
+        const serialized = await serializeJsonLdToFormat(
+          data,
           requestedFormat,
         )
         setHeader(event, 'Content-Type', requestedFormat)

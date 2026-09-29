@@ -34,20 +34,34 @@
         </vl-column>
 
         <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Adresuitbreiding</vl-title>
+        </vl-column>
+
+        <vl-column width="12">
           <vl-data-table>
             <tbody>
               <tr v-if="data?.volledigAdres">
                 <td>
                   <vl-link :href="data.fieldUris.volledigAdres" external>
-                    Volledig adres
+                    VolledigAdres
                   </vl-link>
                 </td>
                 <td>{{ data.volledigAdres }}</td>
               </tr>
+            </tbody>
+          </vl-data-table>
+        </vl-column>
+
+        <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Adres</vl-title>
+        </vl-column>
+        <vl-column width="12">
+          <vl-data-table>
+            <tbody>
               <tr v-if="data?.straatnaam">
                 <td>
                   <vl-link :href="data.fieldUris.straatnaam" external>
-                    Straatnaam
+                    HeeftStraatnaam
                   </vl-link>
                 </td>
                 <td>
@@ -71,7 +85,7 @@
               <tr v-if="data?.postinfo">
                 <td>
                   <vl-link :href="data.fieldUris.postinfo" external>
-                    Postinfo
+                    HeeftPostinfo
                   </vl-link>
                 </td>
                 <td>
@@ -86,7 +100,7 @@
               <tr v-if="data?.gemeentenaam">
                 <td>
                   <vl-link :href="data.fieldUris.gemeentenaam" external>
-                    Gemeentenaam
+                    HeeftGemeentenaam
                   </vl-link>
                 </td>
                 <td>
@@ -114,7 +128,7 @@
               <tr v-if="data?.officieelToegekend !== undefined">
                 <td>
                   <vl-link :href="data.fieldUris.officieelToegekend" external>
-                    Officieel toegekend
+                    OfficieelToegekend
                   </vl-link>
                 </td>
                 <td>{{ data.officieelToegekend ? 'Ja' : 'Nee' }}</td>
@@ -123,29 +137,15 @@
           </vl-data-table>
         </vl-column>
 
-        <template v-if="data?.identificator">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Identificator</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr>
-                  <td>
-                    <vl-link :href="data.fieldUris.identificator" external>
-                      Identificator
-                    </vl-link>
-                  </td>
-                  <td>{{ data.identificator.lokaleIdentificator ?? slug }}</td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
+        <identificator
+          :identificator="data?.identificator"
+          :fieldUris="data?.fieldUris"
+          :slug="slug"
+        />
 
         <template v-if="data?.positie">
           <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Positie</vl-title>
+            <vl-title tag-name="h2" mod-h2>GeografischePositie</vl-title>
           </vl-column>
           <vl-column width="12">
             <vl-data-table>
@@ -153,7 +153,7 @@
                 <tr v-if="data.positie.methode">
                   <td>
                     <vl-link :href="data.fieldUris.methode" external>
-                      Geometriemethode
+                      Methode
                     </vl-link>
                   </td>
                   <td>
@@ -165,7 +165,7 @@
                 <tr v-if="data.positie.specificatie">
                   <td>
                     <vl-link :href="data.fieldUris.specificatie" external>
-                      Geometriespecificatie
+                      Specificatie
                     </vl-link>
                   </td>
                   <td>

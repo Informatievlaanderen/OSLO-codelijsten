@@ -5,6 +5,8 @@ export interface PostinfoConcept {
 
 export interface PostinfoIdentificator {
   lokaleIdentificator?: string
+  naamruimte?: string
+  versieIdentificator?: string
 }
 
 export interface PostinfoGemeente {

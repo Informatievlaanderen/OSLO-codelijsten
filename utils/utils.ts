@@ -41,3 +41,40 @@ export const compareText = (a?: string, b?: string) => {
     numeric: true,
   })
 }
+
+/**
+ * Parse a GML posList string and compute the centroid of the polygon
+ * Returns [x, y] in the original coordinate system (Lambert 1972 EPSG:31370).
+ */
+export const parseGmlCentroid = (
+  gml: string,
+): { x: number; y: number } | null => {
+  const match = gml.match(/<gml:posList>([^<]+)<\/gml:posList>/)
+  if (!match) return null
+
+  const numbers = match[1].trim().split(/\s+/).map(Number)
+  if (numbers.length < 2 || numbers.some(isNaN)) return null
+
+  // Pair up: x y x y x y ...
+  const xs: number[] = []
+  const ys: number[] = []
+  for (let i = 0; i < numbers.length - 1; i += 2) {
+    xs.push(numbers[i])
+    ys.push(numbers[i + 1])
+  }
+
+  const cx = xs.reduce((a, b) => a + b, 0) / xs.length
+  const cy = ys.reduce((a, b) => a + b, 0) / ys.length
+
+  return { x: cx, y: cy }
+}
+
+/**
+ * Build a Geopunt URL from the centroid of a GML geometry
+ * Uses the coordinaten parameter + zoom level for a reliable result.
+ */
+export const buildGeopuntUrl = (x: number, y: number, lod = 12): string => {
+  // Lambert 1972 (EPSG:31370) — format: x,y
+  const round = (n: number) => n.toFixed(2)
+  return `https://www.geopunt.be?app=algemene-kaart&coordinaten=${round(x)},${round(y)}&lod=${lod}`
+}

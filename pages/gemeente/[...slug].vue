@@ -34,12 +34,16 @@
         </vl-column>
 
         <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Gemeente</vl-title>
+        </vl-column>
+
+        <vl-column width="12">
           <vl-data-table>
             <tbody>
               <tr v-if="data?.naam?.gemeentenaam">
                 <td>
                   <vl-link :href="data.fieldUris.naam" external>
-                    Gemeentenaam
+                    Naam
                   </vl-link>
                 </td>
                 <td>{{ data.naam.gemeentenaam }}</td>
@@ -59,7 +63,7 @@
               <tr v-if="data?.officieleTaal?.length">
                 <td>
                   <vl-link :href="data.fieldUris.officieleTaal" external>
-                    Officiële taal
+                    OfficiëleTaal
                   </vl-link>
                 </td>
                 <td>
@@ -71,7 +75,7 @@
               <tr v-if="data?.faciliteitenTaal?.length">
                 <td>
                   <vl-link :href="data.fieldUris.faciliteitenTaal" external>
-                    Faciliteitentaal
+                    FaciliteitenTaal
                   </vl-link>
                 </td>
                 <td>
@@ -84,25 +88,11 @@
           </vl-data-table>
         </vl-column>
 
-        <template v-if="data?.identificator">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Identificator</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr>
-                  <td>
-                    <vl-link :href="data.fieldUris.identificator" external>
-                      Identificator
-                    </vl-link>
-                  </td>
-                  <td>{{ data.identificator.lokaleIdentificator ?? slug }}</td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
+        <identificator
+          :identificator="data?.identificator"
+          :fieldUris="data?.fieldUris"
+          :slug="slug"
+        />
       </vl-grid>
     </vl-region>
   </vl-layout>

@@ -34,6 +34,10 @@
         </vl-column>
 
         <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Straatnaam</vl-title>
+        </vl-column>
+
+        <vl-column width="12">
           <vl-data-table>
             <tbody>
               <tr v-if="data?.straatnaam">
@@ -62,7 +66,7 @@
               <tr v-if="data?.isToegekendDoor">
                 <td>
                   <vl-link :href="data.fieldUris.isToegekendDoor" external>
-                    Toegekend door
+                    isToegekendDoor
                   </vl-link>
                 </td>
                 <td>
@@ -90,25 +94,11 @@
           </vl-data-table>
         </vl-column>
 
-        <template v-if="data?.identificator">
-          <vl-column width="12">
-            <vl-title tag-name="h2" mod-h2>Identificator</vl-title>
-          </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr>
-                  <td>
-                    <vl-link :href="data.fieldUris.identificator" external>
-                      Identificator
-                    </vl-link>
-                  </td>
-                  <td>{{ data.identificator.lokaleIdentificator ?? slug }}</td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
-        </template>
+        <identificator
+          :identificator="data?.identificator"
+          :fieldUris="data?.fieldUris"
+          :slug="slug"
+        />
       </vl-grid>
     </vl-region>
   </vl-layout>
