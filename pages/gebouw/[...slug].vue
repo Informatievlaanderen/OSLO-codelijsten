@@ -62,6 +62,30 @@
           :slug="slug"
         />
 
+        <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Geometrie</vl-title>
+        </vl-column>
+
+        <vl-column v-if="data?.centroid" width="12">
+          <vl-data-table>
+            <tbody>
+              <tr>
+                <td>
+                  <vl-link :href="data.fieldUris.geometrie" external>
+                    Geometrie
+                  </vl-link>
+                </td>
+                <td>
+                  <vl-link :href="data.geopuntUrl" external>
+                    {{ data.centroid.x.toFixed(2) }},
+                    {{ data.centroid.y.toFixed(2) }}
+                  </vl-link>
+                </td>
+              </tr>
+            </tbody>
+          </vl-data-table>
+        </vl-column>
+
         <template v-if="data?.bestaatUit && data.bestaatUit.length > 0">
           <vl-column width="12">
             <vl-title tag-name="h2" mod-h2>Bestaat uit</vl-title>

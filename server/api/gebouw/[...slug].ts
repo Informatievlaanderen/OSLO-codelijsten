@@ -21,6 +21,7 @@ import {
 import { GEBOUW_FIELD_URIS } from '~/server/utils/gebouw-predicate-uris'
 import { serializeJsonLdToFormat } from '~/services/serialization.service'
 import { resolveStatusLabel } from '~/server/services/status.service'
+import { parseGmlCentroid, buildGeopuntUrl } from '~/utils/utils'
 
 export default defineEventHandler(
   async (event: any): Promise<GebouwData | string | null> => {
@@ -109,6 +110,20 @@ export default defineEventHandler(
           }
         : undefined
 
+      // Build Geopunt URL from the first Lambert 1972 GML geometry
+      let geopuntUrl: string | undefined
+      let centroid: { x: number; y: number } | undefined
+      if (geometrie?.geometrie?.length) {
+        const firstGml = geometrie.geometrie.find((g) => g.gml)
+        if (firstGml?.gml) {
+          const c = parseGmlCentroid(firstGml.gml)
+          if (c) {
+            centroid = c
+            geopuntUrl = buildGeopuntUrl(c.x, c.y)
+          }
+        }
+      }
+
       // Status
       const status = getConcept(gebouwData.status)
 
@@ -147,6 +162,8 @@ export default defineEventHandler(
         status,
         bestaatUit,
         ligtOp,
+        geopuntUrl,
+        centroid,
         fieldUris: GEBOUW_FIELD_URIS,
         source: basisregistersUrl,
       }
