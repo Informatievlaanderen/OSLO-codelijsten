@@ -69,6 +69,7 @@ export default defineEventHandler(async (event) => {
     const gebouwMatch = cleanPath.match(/\/gebouw\/(.+)$/)
     const perceelMatch = cleanPath.match(/\/perceel\/(.+)$/)
     const gemeenteMatch = cleanPath.match(/\/gemeente\/(.+)$/)
+    const gebouweenheidMatch = cleanPath.match(/\/gebouweenheid\/(.+)$/)
     const bedrijventerreinMatch = cleanPath.match(/\/bedrijventerrein\/(.+)$/)
     const bedrijventerreinperceelMatch = cleanPath.match(/\/bedrijventerreinperceel\/(.+)$/)
     const beheerdebedrijvenzoneMatch = cleanPath.match(/\/beheerdebedrijvenzone\/(.+)$/)
@@ -112,6 +113,9 @@ export default defineEventHandler(async (event) => {
         break
       case !!gemeenteMatch:
         apiPath = `/doc/api/gemeente/${gemeenteMatch![1]}${extension}`
+        break
+      case !!gebouweenheidMatch:
+        apiPath = `/doc/api/gebouweenheid/${gebouweenheidMatch![1]}${extension}`
         break
       case !!bedrijventerreinMatch:
         apiPath = `/doc/api/bedrijventerrein/${bedrijventerreinMatch![1]}${extension}`

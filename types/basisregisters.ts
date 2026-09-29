@@ -44,7 +44,7 @@ export interface JsonLdGemeenteRef extends JsonLdRef {
 export interface JsonLdPositie {
   methode?: JsonLdConcept
   specificatie?: JsonLdConcept
-  geometrie?: { gml?: string; wkt?: string }
+  geometrie?: Array<{ gml?: string; wkt?: string }>
 }
 
 export interface JsonLdAdresuitbreiding {
@@ -102,6 +102,11 @@ export interface JsonLdApiResponse {
   nuts3?: string
   postcode?: string
   isToegekendAan?: JsonLdGemeenteRef
+  // Gebouweenheid
+  functie?: JsonLdConcept
+  isDeelVan?: JsonLdRef
+  toegekendAdres?: JsonLdRef[]
+  afwijkingVastgesteld?: boolean
   [key: string]: unknown
 }
 

@@ -43,13 +43,16 @@ export const compareText = (a?: string, b?: string) => {
 }
 
 /**
- * Parse a GML posList string and compute the centroid of the polygon
- * Returns [x, y] in the original coordinate system (Lambert 1972 EPSG:31370).
+ * Parse a GML geometry string and compute the centroid.
+ * Supports both Polygon (gml:posList) and Point (gml:pos).
+ * Returns {x, y} in the original coordinate system (Lambert 1972 EPSG:31370).
  */
 export const parseGmlCentroid = (
   gml: string,
 ): { x: number; y: number } | null => {
+  // Try posList first (Polygon), then pos (Point)
   const match = gml.match(/<gml:posList>([^<]+)<\/gml:posList>/)
+    ?? gml.match(/<gml:pos>([^<]+)<\/gml:pos>/)
   if (!match) return null
 
   const numbers = match[1].trim().split(/\s+/).map(Number)
