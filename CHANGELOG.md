@@ -210,3 +210,10 @@ ADD ALL KBO DATA
       
       2.1.0
       feat: added subject pages for Perceel, Adres, Straatnaam, Postinfo, Gemeent en Gebouw
+
+      2.2.0
+      feat: added link to geopunt for gebouw
+      feat: improved the status pages with missing information
+      fix: use label of conceptscheme instead of the id
+      fix: better map the subjectpages on the model
+      feat: show the response from basisregisters api for JSONLD and make ttl from this response
