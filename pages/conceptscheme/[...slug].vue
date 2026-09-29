@@ -4,6 +4,10 @@
     href="https://www.vlaanderen.be/digitaal-vlaanderen"
   />
 
+  <vl-toaster v-if="showToaster" mod-top-right fade-out>
+    <vl-alert mod-small mod-success mod-fade-out icon="check-circle" title="URI gekopiëerd" />
+  </vl-toaster>
+
   <vl-layout>
     <vl-region>
       <vl-grid mod-v-center mod-stacked>
@@ -12,6 +16,15 @@
             <vl-title mod-no-space-bottom tag-name="h1">
               {{ data?.label ?? `Conceptschema: ${slug}` }}
             </vl-title>
+            <vl-link
+              @click="copyToClipboard(data?.uri ?? fullUri)"
+            >
+            {{ data?.uri ?? fullUri }}
+            <vl-icon
+              icon="file-copy"
+              @click="copyToClipboard(data?.uri ?? fullUri)"
+            ></vl-icon>
+            </vl-link>
           </div>
         </vl-column>
         <vl-column width="12">
@@ -51,6 +64,8 @@
 import { useSeoHead } from '~/composables/useSEO'
 import type { ConceptScheme } from '~/types/conceptScheme'
 
+const showToaster = ref(false)
+
 const runtimeConfig = useRuntimeConfig()
 
 const route = useRoute()
@@ -60,6 +75,22 @@ const slug = computed(() => {
   // If it's a string, use it directly
   return Array.isArray(params) ? params.join('/') : params
 })
+
+const fullUri = computed(
+  () => `https://data.vlaanderen.be/id/conceptscheme/${slug.value}`,
+)
+
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    showToaster.value = true
+    setTimeout(() => {
+      showToaster.value = false
+    }, 3000)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
+}
 
 const { data } = await useAsyncData<ConceptScheme | null>(
   `conceptscheme-${slug.value}`,
