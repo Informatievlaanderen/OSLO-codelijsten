@@ -34,25 +34,6 @@
         </vl-column>
 
         <vl-column width="12">
-          <vl-title tag-name="h2" mod-h2>Adresuitbreiding</vl-title>
-        </vl-column>
-
-        <vl-column width="12">
-          <vl-data-table>
-            <tbody>
-              <tr v-if="data?.volledigAdres">
-                <td>
-                  <vl-link :href="data.fieldUris.volledigAdres" external>
-                    VolledigAdres
-                  </vl-link>
-                </td>
-                <td>{{ data.volledigAdres }}</td>
-              </tr>
-            </tbody>
-          </vl-data-table>
-        </vl-column>
-
-        <vl-column width="12">
           <vl-title tag-name="h2" mod-h2>Adres</vl-title>
         </vl-column>
         <vl-column width="12">
@@ -132,6 +113,25 @@
                   </vl-link>
                 </td>
                 <td>{{ data.officieelToegekend ? 'Ja' : 'Nee' }}</td>
+              </tr>
+            </tbody>
+          </vl-data-table>
+        </vl-column>
+
+        <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Adresuitbreiding</vl-title>
+        </vl-column>
+
+        <vl-column width="12">
+          <vl-data-table>
+            <tbody>
+              <tr v-if="data?.volledigAdres">
+                <td>
+                  <vl-link :href="data.fieldUris.volledigAdres" external>
+                    VolledigAdres
+                  </vl-link>
+                </td>
+                <td>{{ data.volledigAdres }}</td>
               </tr>
             </tbody>
           </vl-data-table>
