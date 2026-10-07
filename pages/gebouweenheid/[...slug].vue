@@ -119,6 +119,8 @@
               </td>
             </tr>
           </GeopuntLink>
+
+          <GeopuntEmbed :src="data?.geopuntEmbedUrl" />
         </template>
 
         <template v-if="data?.toegekendAdres && data.toegekendAdres.length > 0">

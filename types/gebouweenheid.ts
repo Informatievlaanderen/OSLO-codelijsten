@@ -43,6 +43,7 @@ export interface GebouweenheidData {
   toegekendAdres?: GebouweenheidRef[]
   afwijkingVastgesteld?: boolean
   geopuntUrl?: string
+  geopuntEmbedUrl?: string
   centroid?: { x: number; y: number }
   fieldUris: GebouweenheidFieldUris
   source: string

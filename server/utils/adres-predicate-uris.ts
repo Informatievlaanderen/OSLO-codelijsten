@@ -17,6 +17,7 @@ export const ADRES_FIELD_URIS = {
   positie: 'https://data.vlaanderen.be/ns/adres#positie',
   methode: 'https://data.vlaanderen.be/ns/generiek#methode',
   specificatie: 'https://data.vlaanderen.be/ns/generiek#specificatie',
+  geometrie: 'https://data.vlaanderen.be/ns/generiek#geometrie',
 } as const
 
 export type { AdresData }

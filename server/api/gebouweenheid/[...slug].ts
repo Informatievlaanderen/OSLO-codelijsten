@@ -22,7 +22,7 @@ import {
 import { GEBOUWEENHEID_FIELD_URIS } from '~/server/utils/gebouweenheid-predicate-uris'
 import { serializeJsonLdToFormat } from '~/services/serialization.service'
 import { resolveStatusLabel } from '~/server/services/status.service'
-import { parseGmlCentroid, buildGeopuntUrl } from '~/utils/utils'
+import { parseGmlCentroid, buildGeopuntUrl, buildGeopuntEmbedUrl } from '~/utils/utils'
 
 export default defineEventHandler(
   async (event: any): Promise<GebouweenheidData | string | null> => {
@@ -175,6 +175,9 @@ export default defineEventHandler(
         toegekendAdres,
         afwijkingVastgesteld,
         geopuntUrl,
+        geopuntEmbedUrl: centroid
+          ? buildGeopuntEmbedUrl(centroid.x, centroid.y)
+          : undefined,
         centroid,
         fieldUris: GEBOUWEENHEID_FIELD_URIS,
         source: basisregistersUrl,

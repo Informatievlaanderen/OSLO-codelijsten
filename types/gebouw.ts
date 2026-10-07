@@ -46,6 +46,7 @@ export interface GebouwData {
   bestaatUit?: GebouwRef[]
   ligtOp?: GebouwRef[]
   geopuntUrl?: string
+  geopuntEmbedUrl?: string
   centroid?: { x: number; y: number }
   fieldUris: GebouwFieldUris
   source: string
