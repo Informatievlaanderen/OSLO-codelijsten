@@ -29,6 +29,7 @@ export interface AdresStraatnaam {
 export interface AdresPositie {
   methode?: AdresConcept
   specificatie?: AdresConcept
+  geometrie?: Array<{ gml?: string; wkt?: string }>
 }
 
 export interface AdresFieldUris {
@@ -45,6 +46,7 @@ export interface AdresFieldUris {
   positie: string
   methode: string
   specificatie: string
+  geometrie: string
 }
 
 export interface AdresData {
@@ -59,6 +61,9 @@ export interface AdresData {
   positie?: AdresPositie
   status?: AdresConcept
   officieelToegekend?: boolean
+  geopuntUrl?: string
+  geopuntEmbedUrl?: string
+  centroid?: { x: number; y: number }
   fieldUris: AdresFieldUris
   source: string
 }

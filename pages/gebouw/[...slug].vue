@@ -72,6 +72,8 @@
           :field-uri="data?.fieldUris.geometrie ?? ''"
         />
 
+        <GeopuntEmbed :src="data?.geopuntEmbedUrl" />
+
         <template v-if="data?.bestaatUit && data.bestaatUit.length > 0">
           <vl-column width="12">
             <vl-title tag-name="h2" mod-h2>Bestaat uit</vl-title>

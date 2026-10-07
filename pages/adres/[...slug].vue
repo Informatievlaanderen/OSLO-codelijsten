@@ -34,25 +34,6 @@
         </vl-column>
 
         <vl-column width="12">
-          <vl-title tag-name="h2" mod-h2>Adresuitbreiding</vl-title>
-        </vl-column>
-
-        <vl-column width="12">
-          <vl-data-table>
-            <tbody>
-              <tr v-if="data?.volledigAdres">
-                <td>
-                  <vl-link :href="data.fieldUris.volledigAdres" external>
-                    VolledigAdres
-                  </vl-link>
-                </td>
-                <td>{{ data.volledigAdres }}</td>
-              </tr>
-            </tbody>
-          </vl-data-table>
-        </vl-column>
-
-        <vl-column width="12">
           <vl-title tag-name="h2" mod-h2>Adres</vl-title>
         </vl-column>
         <vl-column width="12">
@@ -137,6 +118,25 @@
           </vl-data-table>
         </vl-column>
 
+        <vl-column width="12">
+          <vl-title tag-name="h2" mod-h2>Adresuitbreiding</vl-title>
+        </vl-column>
+
+        <vl-column width="12">
+          <vl-data-table>
+            <tbody>
+              <tr v-if="data?.volledigAdres">
+                <td>
+                  <vl-link :href="data.fieldUris.volledigAdres" external>
+                    VolledigAdres
+                  </vl-link>
+                </td>
+                <td>{{ data.volledigAdres }}</td>
+              </tr>
+            </tbody>
+          </vl-data-table>
+        </vl-column>
+
         <identificator
           :identificator="data?.identificator"
           :fieldUris="data?.fieldUris"
@@ -147,36 +147,38 @@
           <vl-column width="12">
             <vl-title tag-name="h2" mod-h2>GeografischePositie</vl-title>
           </vl-column>
-          <vl-column width="12">
-            <vl-data-table>
-              <tbody>
-                <tr v-if="data.positie.methode">
-                  <td>
-                    <vl-link :href="data.fieldUris.methode" external>
-                      Methode
-                    </vl-link>
-                  </td>
-                  <td>
-                    <vl-link :href="data.positie.methode.uri">
-                      {{ data.positie.methode.label }}
-                    </vl-link>
-                  </td>
-                </tr>
-                <tr v-if="data.positie.specificatie">
-                  <td>
-                    <vl-link :href="data.fieldUris.specificatie" external>
-                      Specificatie
-                    </vl-link>
-                  </td>
-                  <td>
-                    <vl-link :href="data.positie.specificatie.uri">
-                      {{ data.positie.specificatie.label }}
-                    </vl-link>
-                  </td>
-                </tr>
-              </tbody>
-            </vl-data-table>
-          </vl-column>
+
+          <GeopuntLink
+            :centroid="data?.centroid"
+            :geopunt-url="data?.geopuntUrl"
+            :field-uri="data?.fieldUris.geometrie ?? ''"
+          >
+            <tr v-if="data.positie.methode">
+              <td>
+                <vl-link :href="data.fieldUris.methode" external>
+                  Methode
+                </vl-link>
+              </td>
+              <td>
+                <vl-link :href="data.positie.methode.uri">
+                  {{ data.positie.methode.label }}
+                </vl-link>
+              </td>
+            </tr>
+            <tr v-if="data.positie.specificatie">
+              <td>
+                <vl-link :href="data.fieldUris.specificatie" external>
+                  Specificatie
+                </vl-link>
+              </td>
+              <td>
+                <vl-link :href="data.positie.specificatie.uri">
+                  {{ data.positie.specificatie.label }}
+                </vl-link>
+              </td>
+            </tr>
+          </GeopuntLink>
+          <GeopuntEmbed :src="data?.geopuntEmbedUrl" />
         </template>
       </vl-grid>
     </vl-region>

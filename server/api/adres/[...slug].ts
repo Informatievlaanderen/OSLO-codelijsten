@@ -25,6 +25,7 @@ import {
 import { ADRES_FIELD_URIS } from '~/server/utils/adres-predicate-uris'
 import { serializeJsonLdToFormat } from '~/services/serialization.service'
 import { resolveStatusLabel } from '~/server/services/status.service'
+import { parseGmlCentroid, buildGeopuntUrl, buildGeopuntEmbedUrl } from '~/utils/utils'
 
 /**
  * Helper: extracts a concept (skos:Concept) with @id and optional skos:prefLabel.
@@ -153,8 +154,25 @@ export default defineEventHandler(
         ? {
           methode: getConcept(positieObj.methode),
           specificatie: getConcept(positieObj.specificatie),
+          geometrie: positieObj.geometrie?.length
+            ? positieObj.geometrie.map((g: any) => ({ gml: g.gml, wkt: g.wkt }))
+            : undefined,
         }
         : undefined
+
+      // Build Geopunt URL from the first GML geometry
+      let geopuntUrl: string | undefined
+      let centroid: { x: number; y: number } | undefined
+      if (positie?.geometrie?.length) {
+        const firstGml = positie.geometrie.find((g) => g.gml)
+        if (firstGml?.gml) {
+          const c = parseGmlCentroid(firstGml.gml)
+          if (c) {
+            centroid = c
+            geopuntUrl = buildGeopuntUrl(c.x, c.y)
+          }
+        }
+      }
 
       // Status
       const status = getConcept(adresData.status)
@@ -183,6 +201,11 @@ export default defineEventHandler(
         positie,
         status,
         officieelToegekend,
+        geopuntUrl,
+        geopuntEmbedUrl: centroid
+          ? buildGeopuntEmbedUrl(centroid.x, centroid.y)
+          : undefined,
+        centroid,
         fieldUris: ADRES_FIELD_URIS,
         source: basisregistersUrl,
       }

@@ -223,3 +223,7 @@ ADD ALL KBO DATA
 
       2.2.1
       feat: added subjectpage for gebouweenheid
+
+      2.2.2
+      feat: added geopunt-map to adres, gebouw and gebouweenheid subjectpages
+      fix: changed location of Adres and Adresuitbreiding on slug page
