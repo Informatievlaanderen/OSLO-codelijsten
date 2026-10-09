@@ -203,7 +203,7 @@ export default defineEventHandler(
         officieelToegekend,
         geopuntUrl,
         geopuntEmbedUrl: centroid
-          ? buildGeopuntEmbedUrl(centroid.x, centroid.y)
+          ? buildGeopuntEmbedUrl(centroid.x, centroid.y, '98f57659-42d5-427a-82ee-375c9de8cdec')
           : undefined,
         centroid,
         fieldUris: ADRES_FIELD_URIS,

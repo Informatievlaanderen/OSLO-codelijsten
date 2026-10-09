@@ -87,9 +87,11 @@ export const buildGeopuntUrl = (x: number, y: number, lod = 12): string => {
  * Geopunt supports Lambert 1972 (EPSG:31370), Lambert 2008 (EPSG:3812),
  * WGS84 (EPSG:4326) and Web Mercator (EPSG:3857).
  * Coordinates are space-separated: "x y" (URL-encoded as %20).
- * The GRB basemap is added by default.
+ * Each embed UUID corresponds to a pre-configured map with specific layers.
+ * Defaults to the GRB basemap embed.
  */
-export const buildGeopuntEmbedUrl = (x: number, y: number): string => {
+export const buildGeopuntEmbedUrl = (x: number, y: number, embedUuid?: string): string => {
   const round = (n: number) => n.toFixed(2)
-  return `https://www.geopunt.be/embed/fcf65745-c2a3-4105-be53-b120318bf708/?searchbar=0?coordinaten=${encodeURIComponent(`${round(x)} ${round(y)}`)}&kaart=landb 2018`
+  const uuid = embedUuid ?? 'fcf65745-c2a3-4105-be53-b120318bf708'
+  return `https://www.geopunt.be/embed/${uuid}/?searchbar=0&coordinaten=${encodeURIComponent(`${round(x)} ${round(y)}`)}`
 }

@@ -47,8 +47,8 @@ export default defineEventHandler(
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
         ? SUPPORTED_FORMATS[
-            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
-          ]
+        extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+        ]
         : null
       const requestedFormat =
         extensionFormat ||
@@ -102,12 +102,12 @@ export default defineEventHandler(
       const geometrieObj = gebouwData.geometrie
       const geometrie: GebouwGeometrie | undefined = geometrieObj
         ? {
-            methode: getConcept(geometrieObj.methode),
-            specificatie: getConcept(geometrieObj.specificatie),
-            geometrie: geometrieObj.geometrie?.length
-              ? geometrieObj.geometrie.map((g: any) => ({ gml: g.gml }))
-              : undefined,
-          }
+          methode: getConcept(geometrieObj.methode),
+          specificatie: getConcept(geometrieObj.specificatie),
+          geometrie: geometrieObj.geometrie?.length
+            ? geometrieObj.geometrie.map((g: any) => ({ gml: g.gml }))
+            : undefined,
+        }
         : undefined
 
       // Build Geopunt URL from the first Lambert 1972 GML geometry
@@ -139,19 +139,19 @@ export default defineEventHandler(
       const bestaatUitRaw = normalizeArray(gebouwData.bestaatUit)
       const bestaatUit: GebouwRef[] | undefined = bestaatUitRaw.length > 0
         ? bestaatUitRaw.map((ref) => ({
-            uri: ref['@id'],
-            detail: ref.detail,
-            status: getConcept(ref.status),
-          }))
+          uri: ref['@id'],
+          detail: ref.detail,
+          status: getConcept(ref.status),
+        }))
         : undefined
 
       // ligtOp (Percelen)
       const ligtOpRaw = normalizeArray(gebouwData.ligtOp)
       const ligtOp: GebouwRef[] | undefined = ligtOpRaw.length > 0
         ? ligtOpRaw.map((ref) => ({
-            uri: ref['@id'],
-            detail: ref.detail,
-          }))
+          uri: ref['@id'],
+          detail: ref.detail,
+        }))
         : undefined
 
       const result: GebouwData = {
@@ -164,7 +164,7 @@ export default defineEventHandler(
         ligtOp,
         geopuntUrl,
         geopuntEmbedUrl: centroid
-          ? buildGeopuntEmbedUrl(centroid.x, centroid.y)
+          ? buildGeopuntEmbedUrl(centroid.x, centroid.y, '64a2ba4e-3e69-40b4-a8b9-7023a4eb78c6')
           : undefined,
         centroid,
         fieldUris: GEBOUW_FIELD_URIS,

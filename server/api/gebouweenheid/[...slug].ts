@@ -48,8 +48,8 @@ export default defineEventHandler(
       const acceptHeader = getHeader(event, 'accept') ?? ''
       const extensionFormat = extension
         ? SUPPORTED_FORMATS[
-            extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
-          ]
+        extension.replace('.', '') as keyof typeof SUPPORTED_FORMATS
+        ]
         : null
       const requestedFormat =
         extensionFormat ||
@@ -121,20 +121,20 @@ export default defineEventHandler(
       const isDeelVanObj = gebouweenheidData.isDeelVan
       const isDeelVan: GebouweenheidRef | undefined = isDeelVanObj
         ? {
-            uri: isDeelVanObj['@id'],
-            detail: isDeelVanObj.detail,
-          }
+          uri: isDeelVanObj['@id'],
+          detail: isDeelVanObj.detail,
+        }
         : undefined
 
       // Positie
       const positieObj = gebouweenheidData.positie
       const positie: GebouweenheidPositie | undefined = positieObj
         ? {
-            methode: getConcept(positieObj.methode),
-            geometrie: positieObj.geometrie?.length
-              ? positieObj.geometrie.map((g: any) => ({ gml: g.gml }))
-              : undefined,
-          }
+          methode: getConcept(positieObj.methode),
+          geometrie: positieObj.geometrie?.length
+            ? positieObj.geometrie.map((g: any) => ({ gml: g.gml }))
+            : undefined,
+        }
         : undefined
 
       // Build Geopunt URL from the first Lambert 1972 GML geometry
@@ -155,9 +155,9 @@ export default defineEventHandler(
       const adressenRaw = normalizeArray(gebouweenheidData.toegekendAdres)
       const toegekendAdres: GebouweenheidRef[] | undefined = adressenRaw.length > 0
         ? adressenRaw.map((ref) => ({
-            uri: ref['@id'],
-            detail: ref.detail,
-          }))
+          uri: ref['@id'],
+          detail: ref.detail,
+        }))
         : undefined
 
       // afwijkingVastgesteld
@@ -176,7 +176,7 @@ export default defineEventHandler(
         afwijkingVastgesteld,
         geopuntUrl,
         geopuntEmbedUrl: centroid
-          ? buildGeopuntEmbedUrl(centroid.x, centroid.y)
+          ? buildGeopuntEmbedUrl(centroid.x, centroid.y, "936eb6e8-5d33-41dc-b2fc-0b6b45d7f177")
           : undefined,
         centroid,
         fieldUris: GEBOUWEENHEID_FIELD_URIS,
