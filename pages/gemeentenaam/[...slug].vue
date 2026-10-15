@@ -9,5 +9,5 @@
   </vl-layout>
 </template>
 
-<script setup lang="ts" name="conceptSchemes">
+<script setup lang="ts" name="deprecatedPage">
 </script>

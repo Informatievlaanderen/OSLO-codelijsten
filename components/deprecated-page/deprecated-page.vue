@@ -9,7 +9,7 @@
       <vl-alert type="warning">
         U bent op deze pagina gekomen omdat u een basisregister URI gebruikt in
         uw systeem dat NIET de juiste identificator is. Waarschijnlijk is deze
-        URI van de vorm https://data.vlaanderen.be/doc/. En correcte URI moet de
+        URI van de vorm https://data.vlaanderen.be/doc/. Een correcte URI moet de
         prefix met id hebben: https://data.vlaanderen.be/id/.
       </vl-alert>
     </vl-column>
