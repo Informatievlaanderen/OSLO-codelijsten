@@ -231,3 +231,7 @@ ADD ALL KBO DATA
 
       2.2.3
       feat: added separate embed ID for all the GRAR pages so that the different layers are visible on the map per theme (adres, gebouw and gebouwheenheid)
+
+      2.2.4
+      feat: added fallbackpage for wegsegment, wegknoop, gelijkgrondse kruising and ongelijkgrondse kruising
+
