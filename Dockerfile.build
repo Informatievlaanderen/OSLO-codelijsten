@@ -6,7 +6,7 @@ WORKDIR /app
 
 ADD . /app
 
-RUN npm run build
+RUN yarn run build
 
 FROM node:24-alpine
 

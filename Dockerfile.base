@@ -13,7 +13,6 @@ RUN apk update
 RUN apk add python3 vim make gcc g++ curl
 
 # force a build
-RUN npm install --force
-
+RUN yarn install
 
 

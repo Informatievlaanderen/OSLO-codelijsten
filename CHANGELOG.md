@@ -228,10 +228,11 @@ ADD ALL KBO DATA
       feat: added geopunt-map to adres, gebouw and gebouweenheid subjectpages
       fix: changed location of Adres and Adresuitbreiding on slug page
 
-
       2.2.3
       feat: added separate embed ID for all the GRAR pages so that the different layers are visible on the map per theme (adres, gebouw and gebouwheenheid)
 
       2.2.4
       feat: added fallbackpage for wegsegment, wegknoop, gelijkgrondse kruising and ongelijkgrondse kruising
 
+      2.2.6
+      fix: added missing fallbackpage for wegsegment

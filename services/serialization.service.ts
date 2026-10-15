@@ -1,6 +1,6 @@
 import { QueryEngine } from '@comunica/query-sparql'
 import { rdfSerializer } from 'rdf-serialize'
-import { rdfParser } from 'rdf-parse'
+import rdfParser from 'rdf-parse'
 import { getPrefixes } from '@oslo-flanders/core'
 import * as RDF from '@rdfjs/types'
 import { Readable } from 'stream'
