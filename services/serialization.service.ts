@@ -1,12 +1,17 @@
 import { QueryEngine } from '@comunica/query-sparql'
 import { rdfSerializer } from 'rdf-serialize'
-import rdfParser from 'rdf-parse'
+import rdfParserModule from 'rdf-parse'
+import type { RdfParser } from 'rdf-parse'
 import { getPrefixes } from '@oslo-flanders/core'
 import * as RDF from '@rdfjs/types'
 import { Readable } from 'stream'
 import { filterPrefixes, unwrapJsonLdArray } from '../utils/serialization.utils'
 
 const queryEngine = new QueryEngine()
+
+// rdf-parse@2.x is a CommonJS package whose module.exports is { RdfParser, default }.
+const rdfParser: RdfParser =
+  (rdfParserModule as { default?: RdfParser }).default ?? rdfParserModule
 
 /**
  * Serializes an array of in-memory RDF quads in the requested format.

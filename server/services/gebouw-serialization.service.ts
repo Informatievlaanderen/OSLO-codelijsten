@@ -84,11 +84,15 @@ export const gebouwDataToQuads = (data: GebouwData): RDF.Quad[] => {
         data.geometrie.methode.uri,
       )
     }
-    if (data.geometrie.gml) {
-      const geoNode = df.blankNode('geometry')
-      quads.push(df.quad(geometrieNode, gebouw('geometrie'), geoNode))
-      quads.push(df.quad(geoNode, rdf('type'), locn('Geometry')))
-      addLiteral(quads, geoNode, geosparql('asGML'), data.geometrie.gml)
+    if (data.geometrie.geometrie?.length) {
+      for (const punt of data.geometrie.geometrie) {
+        if (punt.gml) {
+          const geoNode = df.blankNode('geometry')
+          quads.push(df.quad(geometrieNode, gebouw('geometrie'), geoNode))
+          quads.push(df.quad(geoNode, rdf('type'), locn('Geometry')))
+          addLiteral(quads, geoNode, geosparql('asGML'), punt.gml)
+        }
+      }
     }
   }
 
