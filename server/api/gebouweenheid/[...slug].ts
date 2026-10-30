@@ -128,9 +128,14 @@ export default defineEventHandler(
 
       // Positie
       const positieObj = gebouweenheidData.positie
+      const methode = getConcept(positieObj?.methode)
+      const methodeLabel = methode?.uri
+        ? await resolveStatusLabel(methode.uri)
+        : ''
+      if (methodeLabel && methode) methode.label = methodeLabel
       const positie: GebouweenheidPositie | undefined = positieObj
         ? {
-          methode: getConcept(positieObj.methode),
+          methode,
           geometrie: positieObj.geometrie?.length
             ? positieObj.geometrie.map((g: any) => ({ gml: g.gml }))
             : undefined,

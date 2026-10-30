@@ -150,10 +150,18 @@ export default defineEventHandler(
 
       // Positie
       const positieObj = adresData.positie
+      const methode = getConcept(positieObj?.methode)
+      const specificatie = getConcept(positieObj?.specificatie)
+      const [methodeLabel, specificatieLabel] = await Promise.all([
+        methode?.uri ? resolveStatusLabel(methode.uri) : Promise.resolve(''),
+        specificatie?.uri ? resolveStatusLabel(specificatie.uri) : Promise.resolve(''),
+      ])
+      if (methodeLabel && methode) methode.label = methodeLabel
+      if (specificatieLabel && specificatie) specificatie.label = specificatieLabel
       const positie: AdresPositie | undefined = positieObj
         ? {
-          methode: getConcept(positieObj.methode),
-          specificatie: getConcept(positieObj.specificatie),
+          methode,
+          specificatie,
           geometrie: positieObj.geometrie?.length
             ? positieObj.geometrie.map((g: any) => ({ gml: g.gml, wkt: g.wkt }))
             : undefined,

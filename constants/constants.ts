@@ -311,7 +311,7 @@ export const TTL = '.ttl'
 export const SUPPORTED_FORMATS: { [key: string]: string } = {
   ttl: 'text/turtle',
   jsonld: 'application/ld+json',
-  nt: 'application/n-triples',
+  nt: ' ',
 }
 
 export const SUPPORTED_EXTENSIONS = ['.ttl', '.jsonld', '.nt']
