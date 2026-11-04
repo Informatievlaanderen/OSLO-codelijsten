@@ -2,7 +2,7 @@ import { executeQuery } from '~/server/services/rdfquery.service'
 import { statusLabelQuery } from '~/constants/constants'
 
 /**
- * Resolves the human-readable label for a status URI by querying its concept scheme TTL source.
+ * Resolves the human-readable label for a concept URI by querying its concept scheme TTL source.
  * Falls back to an empty string if the label cannot be resolved.
  */
 export const resolveStatusLabel = async (

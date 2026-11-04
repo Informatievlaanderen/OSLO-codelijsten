@@ -236,3 +236,9 @@ ADD ALL KBO DATA
 
       2.2.6
       fix: added missing fallbackpage for wegsegment
+
+      2.2.7
+      fix: improvements on CN for adres and gebouw
+
+      2.2.8
+      fix: use `prefLabel` instead of URI for all concepts of data.vlaanderen.be

@@ -100,10 +100,18 @@ export default defineEventHandler(
 
       // Geometrie (2DGebouwgeometrie)
       const geometrieObj = gebouwData.geometrie
+      const methode = getConcept(geometrieObj?.methode)
+      const specificatie = getConcept(geometrieObj?.specificatie)
+      const [methodeLabel, specificatieLabel] = await Promise.all([
+        methode?.uri ? resolveStatusLabel(methode.uri) : Promise.resolve(''),
+        specificatie?.uri ? resolveStatusLabel(specificatie.uri) : Promise.resolve(''),
+      ])
+      if (methodeLabel && methode) methode.label = methodeLabel
+      if (specificatieLabel && specificatie) specificatie.label = specificatieLabel
       const geometrie: GebouwGeometrie | undefined = geometrieObj
         ? {
-          methode: getConcept(geometrieObj.methode),
-          specificatie: getConcept(geometrieObj.specificatie),
+          methode,
+          specificatie,
           geometrie: geometrieObj.geometrie?.length
             ? geometrieObj.geometrie.map((g: any) => ({ gml: g.gml }))
             : undefined,
