@@ -5,7 +5,7 @@
 
 - 1.12.0
 
-Finalised the migration to Nuxt 3 for codelists and added a catch-all path for basisregister urls
+* Finalised the migration to Nuxt 3 for codelists and added a catch-all path for basisregister urls
 
 - 1.13.0
 
@@ -19,226 +19,274 @@ Finalised the migration to Nuxt 3 for codelists and added a catch-all path for b
 
 * Allow content-negotiation for codelists
 
-  1.14.0
+- 1.14.0
 
 * Add support for jsonld codelists
 
-  1.15.0
+- 1.15.0
 
-ADD ALL KBO DATA
+* ADD ALL KBO DATA
 
-1.16.0
+- 1.16.0
 
-- Add support for nested codelists
+* Add support for nested codelists
   {
   "urlRef": "IT001/Dossierstatus",
   "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT001-Dossierstatus.ttl"
-  },
+  }
 
-  1.16.1
+- 1.16.1
 
-  - Add support for conceptschemes of conceptschemes
-    {
-    "urlRef": "IT141",
-    "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141.ttl"
-    },
-    {
-    "urlRef": "IT141/Gezinsrelatie",
-    "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141-Gezinsrelatietype.ttl"
-    },
+* Add support for conceptschemes of conceptschemes
+  {
+  "urlRef": "IT141",
+  "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141.ttl"
+  }
+  {
+  "urlRef": "IT141/Gezinsrelatie",
+  "sourceUrl": "https://github.com/Informatievlaanderen/codelijsten/raw/master/MAGDA/PersoonREST/IT141-Gezinsrelatietype.ttl"
+  }
 
-                1.16.2
+- 1.16.2
 
-                - Fix for root conceptscheme showing the information of a child conceptscheme
+* Fix for root conceptscheme showing the information of a child conceptscheme
 
-                  1.16.3
+- 1.16.3
 
-                - Fix for links to concept or conceptschemes
+* Fix for links to concept or conceptschemes
 
-                  1.16.4
+- 1.16.4
 
-                feat: Use VKBO instead of KBO directly for enterprises
+* feat: Use VKBO instead of KBO directly for enterprises
 
-    1.16.5
-    feat: add content-negotiation for enterprises
+- 1.16.5
 
-    1.16.6
-    feat: add link to conceptscheme for JuridicalSituation, JuridicalForm and EnterpriseType
-    fix: split up concepts for vestiging and enterprise
-    fix: readded parentOrganisatie at vestiging
-    fix: remove attempt at lazyloading on vestiging page
-    fix: add types for geometry to TypeScript interfaces
-    fix: readded types for .ttl representation of enterprises and vestigingen
+* feat: add content-negotiation for enterprises
 
-    1.16.7
-    fix: add missing /id in uri to onderneming on vestiging page
+- 1.16.6
 
-    1.16.8
-    feat: Add a OSM map to the vestiging page and onderneming page
+* feat: add link to conceptscheme for JuridicalSituation, JuridicalForm and EnterpriseType
+* fix: split up concepts for vestiging and enterprise
+* fix: readded parentOrganisatie at vestiging
+* fix: remove attempt at lazyloading on vestiging page
+* fix: add types for geometry to TypeScript interfaces
+* fix: readded types for .ttl representation of enterprises and vestigingen
 
-    1.16.9
+- 1.16.7
 
-    fix: fixes to the .ttl of onderneming
+* fix: add missing /id in uri to onderneming on vestiging page
 
-    1.16.10
-    fix: fixes to the .ttl of onderneming
+- 1.16.8
 
-    1.16.11
-    fix: use `toISODateString()` instead of `toLocaleDateString()` for the .ttl representation of enterprises and vestigingen to avoid locale issues
+* feat: Add a OSM map to the vestiging page and onderneming page
 
-    1.16.12
-    fix: add missing `@type` to .ttl representation of vestiging
-    fix: add missing `@type` to .ttl representation of enterprise
-    fix: Don't use miliseconds in the ISO date format for the .ttl/jsonld representation of enterprises and vestigingen
+- 1.16.9
 
-    1.16.13
-    fix: Added language to the .jsonld representation of enterprises and vestigingen
+* fix: fixes to the .ttl of onderneming
 
-    1.16.14
-    feat: added a link to the .ttl and .jsonld sections of each enterprise / branch
-    fix: added https://www.w3.org/ns/regorg#orgType to the .ttl representation of enterprise / branch
-    feat: add dereferencable uris to the labels of the enterprise / branch view
-    fix: follow https://data.test-vlaanderen.be/doc/implementatiemodel/organisatie/ontwerpdocument/VKBO/ completely for the visual representation of the data
+- 1.16.10
 
-    1.16.15
-    fix: add /doc to the .jsonld and .ttl buttons for enterprise and branch
+* fix: fixes to the .ttl of onderneming
 
-    1.16.16
-    fix: small copy improvement for adres
-    fix: ignore empty contact points
-    fix: remove <strong> tag from OVO page
-    feat: add URIs to the labels of the OVO code page
+- 1.16.11
 
-    1.16.17
-    fix: Correct uri for `Identificator.identificator` in the html representation
-    fix: Correct labels for `type`, `contactinfo`, `stopzetting` and `oprichting`
+* fix: use `toISODateString()` instead of `toLocaleDateString()` for the .ttl representation of enterprises and vestigingen to avoid locale issues
 
-    1.16.18
-    fix: add logging to `error fetching concept schemes` error
+- 1.16.12
 
-    1.16.19
-    feat: added GRB as layer to the map and map controls
+* fix: add missing `@type` to .ttl representation of vestiging
+* fix: add missing `@type` to .ttl representation of enterprise
+* fix: Don't use miliseconds in the ISO date format for the .ttl/jsonld representation of enterprises and vestigingen
 
-    1.16.20
-    fix: run conceptscheme API in batches for better performance
+- 1.16.13
 
-    1.17.0
-    feat: add support for codelists with a large amount of concepts by implementing pagination on the conceptscheme API
+* fix: Added language to the .jsonld representation of enterprises and vestigingen
 
-    1.17.1
-    feat: add support for external codelists when navigating to a conceptscheme that's not part of data.vlaanderen.be
+- 1.16.14
 
-    1.17.2
-    feat: added doorhaling to the ondernemingen subjectpage
+* feat: added a link to the .ttl and .jsonld sections of each enterprise / branch
+* fix: added https://www.w3.org/ns/regorg#orgType to the .ttl representation of enterprise / branch
+* feat: add dereferencable uris to the labels of the enterprise / branch view
+* fix: follow https://data.test-vlaanderen.be/doc/implementatiemodel/organisatie/ontwerpdocument/VKBO/ completely for the visual representation of the data
 
-    1.17.3
-    feat: added specific conceptscheme page for wegenenverkeer with specific columns and information relevant for wegenenverkeer
+- 1.16.15
 
-    1.17.4
-    feat: Make the `status` of a conceptscheme more visible on the conceptscheme page by adding a badge with the status and fetching the label at realtime
+* fix: add /doc to the .jsonld and .ttl buttons for enterprise and branch
 
-    1.17.5
-    feat: added status to the onderneming and type fixing for KboFieldUris
+- 1.16.16
 
-    1.17.6
-    feat: Sort WG data based on status and notation
+* fix: small copy improvement for adres
+* fix: ignore empty contact points
+* fix: remove <strong> tag from OVO page
+* feat: add URIs to the labels of the OVO code page
 
-    1.17.7
-    fix: changed CONCEPT_SCHEME_TABLE to DEPARTMENT to be broader
-    fix: Added logic for different footers/headers based on the DEPARTMENT env variable
+- 1.16.17
 
-    1.18.0
-    feat: added landingpage explaining the PURI of /vestiging and /ondeneming
+* fix: Correct uri for `Identificator.identificator` in the html representation
+* fix: Correct labels for `type`, `contactinfo`, `stopzetting` and `oprichting`
 
-    1.18.1
-    fix: Fix for content-footer in content-header
+- 1.16.18
 
-    1.18.2
-    feat: added jaarrekening to the onderneming page
-    fix: UI improvements to the doorhaling section of an onderneming
+* fix: add logging to `error fetching concept schemes` error
 
-    1.18.3
-    fix: UI improvements to onderneming page
-    feat: added copy-to-clipboard button near financieel rapport
-    fix: better typing for onderneming
+- 1.16.19
 
-    1.18.4
-    feat: made the uri still link to the external page of financieel rapport, only the copy-to-clipboard button copies the uri to the clipboard
+* feat: added GRB as layer to the map and map controls
 
-    1.18.5
-    fix: changed vcard('Kind'), vcard('hasEmail'), vcard('hasTelephone') and vcard('hasAddress') to schema('ContactPoint'), schema('email'), schema('telephone') and locn('address').
+- 1.16.20
 
-    1.19.0
-    feat: support for the bedrijventerreinen PURI service
+* fix: run conceptscheme API in batches for better performance
 
-    - /bedrijventerreinen
-    - /bedrijventerrein/:id
-    - /beheerdebedrijvenzone
-    - /beheerdebedrijvenzone/:id
-    - /bedrijventerreinperceel
-    - /bedrijventerreinperceel/:id
-    - /ontwikkelbarebedrijvenzone
-    - /ontwikkelbarebedrijvenzone/:id
-    - /.well-known/genid/:id
+- 1.17.0
 
-      1.19.1
-      fix: remove `Codelijsten` from SEO header since no longer relevant
-      fix: make the `type` always show up as an anchor tag instead of just a string
-      feat: include the sparql query in the link to the source code
-      fix: change O and 1 values to false and true
-      feat: other definition for broader/narrower
+* feat: add support for codelists with a large amount of concepts by implementing pagination on the conceptscheme API
 
-      1.19.2
-      fix: explicitly set type to `sparql` for the sparql query in the link to the source code
+- 1.17.1
 
-      2.0.0
-      feat: Switched VKBO API to MAGDA SOAP API for `geefOnderneming`
-      fix: place the `XSD` with the build-dir
-      fix: if the SOAP response is in a different language, showcase that language in the `.ttl`
-      fix: don't use `geefOndernemingVKBO` for contactinfo, but instead rely fully on `geefOnderneming`
-      fix: don't show identificator publically in github
-      fix: Change referte to make it clear we're asking for subjectpages
+* feat: add support for external codelists when navigating to a conceptscheme that's not part of data.vlaanderen.be
 
-      2.0.1
-      feat: added some more logic to find the conceptscheme that matches most with slug instead of first one
-      feat: added more recent version of Node and NPM to `package.json`
+- 1.17.2
 
-      2.0.2
-      fix: set vestiging in the URI instead of onderneming for vestiging
-      fix: add logic to deal with fallback language value xx of MAGDA SOAP
-      fix: tweak for vestiging of a natuurlijk persoon still showing contactinfo
+* feat: added doorhaling to the ondernemingen subjectpage
 
-      2.1.0
-      feat: added subject pages for Perceel, Adres, Straatnaam, Postinfo, Gemeent en Gebouw
+- 1.17.3
 
-      2.1.1
-      feat: added copy-to-clipboard button for conceptscheme page
+* feat: added specific conceptscheme page for wegenenverkeer with specific columns and information relevant for wegenenverkeer
 
-      2.2.0
-      feat: added link to geopunt for gebouw
-      feat: improved the status pages with missing information
-      fix: use label of conceptscheme instead of the id
-      fix: better map the subjectpages on the model
-      feat: show the response from basisregisters api for JSONLD and make ttl from this response
+- 1.17.4
 
-      2.2.1
-      feat: added subjectpage for gebouweenheid
+* feat: Make the `status` of a conceptscheme more visible on the conceptscheme page by adding a badge with the status and fetching the label at realtime
 
-      2.2.2
-      feat: added geopunt-map to adres, gebouw and gebouweenheid subjectpages
-      fix: changed location of Adres and Adresuitbreiding on slug page
+- 1.17.5
 
-      2.2.3
-      feat: added separate embed ID for all the GRAR pages so that the different layers are visible on the map per theme (adres, gebouw and gebouwheenheid)
+* feat: added status to the onderneming and type fixing for KboFieldUris
 
-      2.2.4
-      feat: added fallbackpage for wegsegment, wegknoop, gelijkgrondse kruising and ongelijkgrondse kruising
+- 1.17.6
 
-      2.2.6
-      fix: added missing fallbackpage for wegsegment
+* feat: Sort WG data based on status and notation
 
-      2.2.7
-      fix: improvements on CN for adres and gebouw
+- 1.17.7
 
-      2.2.8
-      fix: use `prefLabel` instead of URI for all concepts of data.vlaanderen.be
+* fix: changed CONCEPT_SCHEME_TABLE to DEPARTMENT to be broader
+* fix: Added logic for different footers/headers based on the DEPARTMENT env variable
+
+- 1.18.0
+
+* feat: added landingpage explaining the PURI of /vestiging and /ondeneming
+
+- 1.18.1
+
+* fix: Fix for content-footer in content-header
+
+- 1.18.2
+
+* feat: added jaarrekening to the onderneming page
+* fix: UI improvements to the doorhaling section of an onderneming
+
+- 1.18.3
+
+* fix: UI improvements to onderneming page
+* feat: added copy-to-clipboard button near financieel rapport
+* fix: better typing for onderneming
+
+- 1.18.4
+
+* feat: made the uri still link to the external page of financieel rapport, only the copy-to-clipboard button copies the uri to the clipboard
+
+- 1.18.5
+
+* fix: changed vcard('Kind'), vcard('hasEmail'), vcard('hasTelephone') and vcard('hasAddress') to schema('ContactPoint'), schema('email'), schema('telephone') and locn('address')
+
+- 1.19.0
+
+* feat: support for the bedrijventerreinen PURI service
+* /bedrijventerreinen
+* /bedrijventerrein/:id
+* /beheerdebedrijvenzone
+* /beheerdebedrijvenzone/:id
+* /bedrijventerreinperceel
+* /bedrijventerreinperceel/:id
+* /ontwikkelbarebedrijvenzone
+* /ontwikkelbarebedrijvenzone/:id
+* /.well-known/genid/:id
+
+- 1.19.1
+
+* fix: remove `Codelijsten` from SEO header since no longer relevant
+* fix: make the `type` always show up as an anchor tag instead of just a string
+* feat: include the sparql query in the link to the source code
+* fix: change O and 1 values to false and true
+* feat: other definition for broader/narrower
+
+- 1.19.2
+
+* fix: explicitly set type to `sparql` for the sparql query in the link to the source code
+
+- 2.0.0
+
+* feat: Switched VKBO API to MAGDA SOAP API for `geefOnderneming`
+* fix: place the `XSD` with the build-dir
+* fix: if the SOAP response is in a different language, showcase that language in the `.ttl`
+* fix: don't use `geefOndernemingVKBO` for contactinfo, but instead rely fully on `geefOnderneming`
+* fix: don't show identificator publically in github
+* fix: Change referte to make it clear we're asking for subjectpages
+
+- 2.0.1
+
+* feat: added some more logic to find the conceptscheme that matches most with slug instead of first one
+* feat: added more recent version of Node and NPM to `package.json`
+
+- 2.0.2
+
+* fix: set vestiging in the URI instead of onderneming for vestiging
+* fix: add logic to deal with fallback language value xx of MAGDA SOAP
+* fix: tweak for vestiging of a natuurlijk persoon still showing contactinfo
+
+- 2.1.0
+
+* feat: added subject pages for Perceel, Adres, Straatnaam, Postinfo, Gemeent en Gebouw
+
+- 2.1.1
+
+* feat: added copy-to-clipboard button for conceptscheme page
+
+- 2.2.0
+
+* feat: added link to geopunt for gebouw
+* feat: improved the status pages with missing information
+* fix: use label of conceptscheme instead of the id
+* fix: better map the subjectpages on the model
+* feat: show the response from basisregisters api for JSONLD and make ttl from this response
+
+- 2.2.1
+
+* feat: added subjectpage for gebouweenheid
+
+- 2.2.2
+
+* feat: added geopunt-map to adres, gebouw and gebouweenheid subjectpages
+* fix: changed location of Adres and Adresuitbreiding on slug page
+
+- 2.2.3
+
+* feat: added separate embed ID for all the GRAR pages so that the different layers are visible on the map per theme (adres, gebouw and gebouwheenheid)
+
+- 2.2.4
+
+* feat: added fallbackpage for wegsegment, wegknoop, gelijkgrondse kruising and ongelijkgrondse kruising
+
+- 2.2.6
+
+* fix: added missing fallbackpage for wegsegment
+
+- 2.2.7
+
+* fix: improvements on CN for adres and gebouw
+
+- 2.2.8
+
+* fix: use `prefLabel` instead of URI for all concepts of data.vlaanderen.be
+
+- 2.2.9
+
+* fix: consistent PascalCase labels across all GRAR subject pages

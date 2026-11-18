@@ -66,7 +66,7 @@
               <tr v-if="data?.isToegekendDoor">
                 <td>
                   <vl-link :href="data.fieldUris.isToegekendDoor" external>
-                    isToegekendDoor
+                    IsToegekendDoor
                   </vl-link>
                 </td>
                 <td>

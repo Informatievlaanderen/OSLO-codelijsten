@@ -64,7 +64,7 @@
           />
           <template v-if="data?.identificator?.toegekendDoor">
             <vl-column width="12">
-              <vl-title tag-name="h3" mod-h3>toegekendDoor</vl-title>
+              <vl-title tag-name="h3" mod-h3>ToegekendDoor</vl-title>
             </vl-column>
             <vl-column width="12">
               <vl-data-table>
@@ -72,7 +72,7 @@
                   <tr>
                     <td>
                       <vl-link :href="data.fieldUris.toegekendDoor" external>
-                        toegekendDoor
+                        ToegekendDoor
                       </vl-link>
                     </td>
                     <td>

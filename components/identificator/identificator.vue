@@ -10,7 +10,7 @@
           <tr>
             <td>
               <vl-link :href="fieldUris?.lokaleIdentificator ?? ''" external>
-                lokaleIdentificator
+                LokaleIdentificator
               </vl-link>
             </td>
             <td>{{ identificator.lokaleIdentificator ?? slug }}</td>
@@ -18,7 +18,7 @@
           <tr v-if="identificator.naamruimte">
             <td>
               <vl-link :href="fieldUris?.lokaleIdentificator ?? ''" external>
-                naamruimte
+                Naamruimte
               </vl-link>
             </td>
             <td>{{ identificator.naamruimte }}</td>
@@ -26,7 +26,7 @@
           <tr v-if="identificator.versieIdentificator">
             <td>
               <vl-link :href="fieldUris?.lokaleIdentificator ?? ''" external>
-                versieIdentificator
+                VersieIdentificator
               </vl-link>
             </td>
             <td>{{ formatVersieIdentificator(identificator.versieIdentificator) }}</td>
